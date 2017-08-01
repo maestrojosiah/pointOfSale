@@ -1,0 +1,145 @@
+        <div id="page-wrapper">
+			{{ include('templates/category.html.twig') }}			 
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="panel panel-default" style="margin-top:15px;">
+						<div class="container col-lg-12" style="padding:30px; background-color:white;">
+							<div class="form-group input-group">
+								<span class="input-group-addon"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></span>
+								<input class="form-control input-lg" type="text" placeholder="Enter item name or barcode">
+								<span class="btn btn-default input-group-addon toggleSale">Sale</span>
+								<a href="#category" class="btn btn-primary input-group-addon toggleButton" data-toggle="collapse" style="background-color: #337ab7; color:white;">Show Items</a>
+							</div>
+						</div>
+					</div>
+					<div class="panel panel-default" style="margin-top:15px;">					
+                        <div class="panel-heading">
+                            <i class="fa fa-list fa-fw"></i> Sale list
+                            <div class="pull-right">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                        Actions
+                                        <span class="caret"></span>
+                                    </button>
+									  <ul class="dropdown-menu">
+										<li><a href="#">Suspended Sales</a></li>
+										<li><a href="#">Search Sales</a></li>
+										<li><a href="#">Show Last Sale Receipt</a></li>
+										<li role="separator" class="divider"></li>
+										<li><a href="#">Open Cash Drawer</a></li>
+									  </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.panel-heading -->
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>Item Name</th>
+                                            <th>Price</th>
+                                            <th>Qty</th>
+                                            <th>Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>1</td>
+                                            <td>Mark</td>
+                                            <td>Otto</td>
+                                            <td>@mdo</td>
+                                            <td>@mdo</td>
+                                        </tr>
+                                        <tr>
+                                            <td>2</td>
+                                            <td>Jacob</td>
+                                            <td>Thornton</td>
+                                            <td>@fat</td>
+                                            <td>@fat</td>
+                                        </tr>
+                                        <tr>
+                                            <td>3</td>
+                                            <td>Larry</td>
+                                            <td>the Bird</td>
+                                            <td>@twitter</td>
+                                            <td>@twitter</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- /.table-responsive -->
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+                    <!-- /.panel -->
+                </div>
+                <!-- /.col-lg-8 -->
+                <div class="col-lg-4">
+                    <div class="panel panel-default" style="margin-top:15px;">
+                        <div class="panel-heading">
+                            <i class="fa fa-shopping-cart fa-fw"></i> Sale
+                        </div>
+                        <!-- /.panel-heading -->
+                        <div class="panel-body">
+							<!-- Dropdown button -->
+							<div class="btn-group">
+							  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								<strong>&nbsp;&nbsp;...&nbsp;&nbsp</strong>
+							  </button>
+							  <ul class="dropdown-menu">
+								<li><a href="#">Suspended Sales</a></li>
+								<li><a href="#">Search Sales</a></li>
+								<li><a href="#">Show Last Sale Receipt</a></li>
+								<li role="separator" class="divider"></li>
+								<li><a href="#">Open Cash Drawer</a></li>
+							  </ul>
+							</div>
+							<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								<strong>Suspend Sale</strong>
+							</button>							
+							<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								<strong>Cancel Sale</strong>
+							</button>	
+							<hr />
+                            <div class="list-group">
+                                <a href="#" class="list-group-item">
+                                    <i class="fa fa-comment fa-fw"></i> New Comment
+                                    <span class="pull-right text-muted small"><em>4 minutes ago</em>
+                                    </span>
+                                </a>
+                                <a href="#" class="list-group-item">
+                                    <i class="fa fa-twitter fa-fw"></i> 3 New Followers
+                                    <span class="pull-right text-muted small"><em>12 minutes ago</em>
+                                    </span>
+                                </a>
+                            </div>
+                            <!-- /.list-group -->
+                            <a href="#" class="btn btn-default btn-block">Amount Due:</a>
+							<br />
+							<a href="#Foo" class="btn btn-primary" data-toggle="collapse">Cash</a>
+							<a href="#Foo" class="btn btn-default" data-toggle="collapse">Credit Card</a>
+							<a href="#Bar" class="btn btn-default" data-toggle="collapse">Check</a>
+							<hr />
+							<div id="Bar" class="main-container collapse">
+								<input class="form-control" type="text" placeholder="Check Number">
+							</div>
+							<div id="Foo" class="main-container collapse">
+								<input class="form-control" type="text" placeholder="Credit Card Number">
+							</div>
+							<hr />
+							<div class="form-group input-group">
+								<input class="form-control" type="text" placeholder="Paid Amt">
+								<a href="#category" class="btn btn-primary input-group-addon toggleButton" data-toggle="collapse" style="background-color: #337ab7; color:white;">Complete Sale</a>
+							</div>
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+                    <!-- /.panel -->
+                </div>
+                <!-- /.col-lg-4 -->
+            </div>
+            <!-- /.row -->
+        </div>
+        <!-- /#page-wrapper -->
