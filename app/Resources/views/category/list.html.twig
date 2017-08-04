@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+{{ include('templates/nav.html.twig') }}			 
+<div id="page-wrapper">
+<div class="panel-body">
+{% for category in data.categories %}
+
+<ul>
+<li>{{ category.categoryName }} | 
+    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal{{ category.id }}" data-categoryId="{{ category.id }}">
+	Delete
+    </button>
+</ul>
+    <!-- Modal -->
+    <div class="modal fade" id="deleteModal{{ category.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="color:black; text-shadow:none;">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Delete {{ category.categoryName }}?</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>Do you really want to delete {{ category.categoryName }}?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            <a href="{{ path('category_delete', { 'categoryId': category.id } ) }}" class="btn btn-primary">Delete</a>
+      		</div>
+        </div>
+      </div>
+    </div>
+{% endfor %}
+<a href="{{ path('restore_list') }}">Restore deleted Categories</a>
+</div>
+</div>
+<!-- /.panel-body -->
+{# {{ dump(form) }} #}
+{% endblock %}

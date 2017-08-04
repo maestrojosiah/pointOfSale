@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+{{ include('templates/nav.html.twig') }}			 
+<div id="page-wrapper">
+<div class="panel-body">
+    <div class="row">
+        <div class="col-lg-6">
+			{{ form_start(form) }}
+                <div class="form-group">
+                    <label>{{ form_label(form.category_name) }}</label>
+        			{{ form_widget(form.category_name, {'attr': {'class': 'form-control', 'placeholder': 'Category Name', 'id': 'category_name' }} ) }}
+                    <p class="help-block">Write the name of the new category.</p>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit Button</button>
+			{{ form_end(form) }}
+        </div>
+    </div>
+    <!-- /.row (nested) -->
+</div>
+</div>
+<!-- /.panel-body -->
+{# {{ dump(form) }} #}
+{% endblock %}

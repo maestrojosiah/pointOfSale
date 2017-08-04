@@ -35,14 +35,6 @@ class UserType extends AbstractType
         ;
     }
 
-    public function buildLoginForm(FormBuilderInterface $builder, array $options)
-    {
-        $builder
-            ->add('email', EmailType::class)
-            ->add('password', PasswordType::class)
-        ;
-    }
-
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(

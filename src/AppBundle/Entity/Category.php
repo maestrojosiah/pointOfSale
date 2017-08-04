@@ -9,7 +9,7 @@ use Doctrine\Common\Collections\ArrayCollection;
  * Category
  *
  * @ORM\Table(name="category")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\CategoryRepository")
  */
 class Category
 {
@@ -58,6 +58,7 @@ class Category
 	public function __construct()
 	{
 		$this->products = new ArrayCollection();
+        $this->deleted = false;
 	}
 
 
