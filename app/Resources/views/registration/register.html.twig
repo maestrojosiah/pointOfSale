@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+{{ include('templates/nav.html.twig') }}			 
+<div id="page-wrapper">
+	{{ form_start(form, {'method': 'post', 'action': path('user_registration'), 'attr': {'class': 'form-signin' }} ) }}
+        <h2 class="form-signin-heading">Please Sign Up</h2>
+        <label for="f_name" class="sr-only">First Name</label>
+        {{ form_errors(form.f_name) }}
+        {{ form_widget(form.f_name, {'attr': {'class': 'form-control', 'placeholder': 'First Name', 'id': 'f_name' }} ) }}
+        <label for="l_name" class="sr-only">Last Name</label>
+        {{ form_errors(form.l_name) }}
+        {{ form_widget(form.l_name, {'attr': {'class': 'form-control', 'placeholder': 'Last Name', 'id': 'l_name' }} ) }}
+        <label for="abc" class="sr-only">ABC Branch</label>
+        {{ form_errors(form.abc) }}
+        {{ form_widget(form.abc, {'attr': {'class': 'form-control', 'placeholder': 'ABC Branch', 'id': 'abc' }} ) }}
+        <label for="email" class="sr-only">Email Address</label>
+        {{ form_errors(form.email) }}
+        {{ form_widget(form.email, {'attr': {'class': 'form-control', 'placeholder': 'Email', 'id': 'email' }} ) }}
+        <label for="password" class="sr-only">Password</label>
+		{{ form_errors(form.plainPassword.first) }}
+        {{ form_widget(form.plainPassword.first, {'attr': {'class': 'form-control', 'placeholder': 'Password', 'id': 'password' }} ) }}
+        <label for="password_repeat" class="sr-only">Repeat Password</label>
+		{{ form_errors(form.plainPassword.second) }}
+        {{ form_widget(form.plainPassword.second, {'attr': {'class': 'form-control', 'placeholder': 'Repeat Password', 'id': 'password_repeat' }} ) }}
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign up</button>
+	{{ form_end(form) }}
+</div>
+{% endblock %}
