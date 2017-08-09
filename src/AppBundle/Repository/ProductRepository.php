@@ -5,29 +5,47 @@ namespace AppBundle\Repository;
 class ProductRepository extends \Doctrine\ORM\EntityRepository
 {
 
-	public function getProductsForUser($user)
-	{
-		$qb = $this->createQueryBuilder('j');
-		$qb->leftJoin('j.user', 'u', 'with', 'u.user = :user');
-		$qb->setParameter('user', $user);
+    public function loadLastProductEntry()
+    {
+        return $this->createQueryBuilder('p')
+		    ->select('p')
+		    ->orderBy('p.id', 'DESC')
+		    ->setMaxResults(1)
+		    ->getQuery()
+		    ->getOneOrNullResult();
+    }
 
-		return $qb;
-	}
+    public function loadAllProductsFromThisUser($user)
+    {
+        return $this->createQueryBuilder('p')
+		    ->select('p')
+		    ->where('p.user = :user AND p.deleted = 0')
+		    ->setParameter('user', $user)
+		    ->orderBy('p.id', 'ASC')
+		    ->getQuery()
+		    ->getResult();
+    }
 
-	public function findAllFromThisUser($user)
-	{
-		$query = $this->getEntityManager()
-			->createQuery(
-				'SELECT p FROM AppBundle:Product p
-				WHERE p.user = :user
-				ORDER BY p.productName ASC'
-			)->setParameter('user', $user);
-		try{
-			return $query->getResult();
-		} catch (\Doctrine\ORM\NoResultException $e){
-			return null;
-		}
+    public function loadAllDeletedProductsFromThisUser($user)
+    {
+        return $this->createQueryBuilder('p')
+		    ->select('p')
+		    ->where('p.user = :user AND p.deleted = 1')
+		    ->setParameter('user', $user)
+		    ->orderBy('p.id', 'ASC')
+		    ->getQuery()
+		    ->getResult();
+    }
 
-	}
+    public function loadAllProductsFromThisCategory($category)
+    {
+        return $this->createQueryBuilder('p')
+		    ->select('p')
+		    ->where('p.category = :category AND p.deleted = 0')
+		    ->setParameter('category', $category)
+		    ->orderBy('p.id', 'ASC')
+		    ->getQuery()
+		    ->getResult();
+    }
 
 }

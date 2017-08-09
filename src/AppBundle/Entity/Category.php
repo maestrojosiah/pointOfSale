@@ -61,7 +61,9 @@ class Category
         $this->deleted = false;
 	}
 
-
+    public function __toString() {
+        return $this->categoryName;
+    }
 
     /**
      * Set categoryName

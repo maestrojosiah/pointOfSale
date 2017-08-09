@@ -54,7 +54,11 @@ class CategoryController extends Controller
             // ... do any other work - like sending them an email, etc
             // maybe set a "flash" success message for the user
 
-            return $this->redirectToRoute('homepage');
+            if($form->get('saveAndAdd')->isClicked()){
+                return $this->redirectToRoute('category_add');
+            } else {
+                return $this->redirectToRoute('homepage');
+            }
         }
 
         return $this->render(

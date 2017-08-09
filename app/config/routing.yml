@@ -4,3 +4,19 @@ app:
 
 logout:
     path: /logout
+    
+fake_route_stream:
+    path:      /fake/stream
+    defaults:  { _controller: LiuggioExcelBundle:Fake:stream }
+
+fake_route_store:
+    path:      /fake/store
+    defaults:  { _controller: LiuggioExcelBundle:Fake:store }
+
+fake_route_read:
+    path:      /fake/read
+    defaults:  { _controller: LiuggioExcelBundle:Fake:readAndSave }
+
+fake_route_insert:
+    path:      /fake/insert/{file}
+    defaults:  { _controller: LiuggioExcelBundle:Fake:insert }

@@ -17,10 +17,10 @@
         {{ form_errors(form.email) }}
         {{ form_widget(form.email, {'attr': {'class': 'form-control', 'placeholder': 'Email', 'id': 'email' }} ) }}
         <label for="password" class="sr-only">Password</label>
-		{{ form_errors(form.plainPassword.first) }}
+	{{ form_errors(form.plainPassword.first) }}
         {{ form_widget(form.plainPassword.first, {'attr': {'class': 'form-control', 'placeholder': 'Password', 'id': 'password' }} ) }}
         <label for="password_repeat" class="sr-only">Repeat Password</label>
-		{{ form_errors(form.plainPassword.second) }}
+	{{ form_errors(form.plainPassword.second) }}
         {{ form_widget(form.plainPassword.second, {'attr': {'class': 'form-control', 'placeholder': 'Repeat Password', 'id': 'password_repeat' }} ) }}
         <button class="btn btn-lg btn-primary btn-block" type="submit">Sign up</button>
 	{{ form_end(form) }}

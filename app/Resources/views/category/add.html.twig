@@ -11,7 +11,8 @@
         			{{ form_widget(form.category_name, {'attr': {'class': 'form-control', 'placeholder': 'Category Name', 'id': 'category_name' }} ) }}
                     <p class="help-block">Write the name of the new category.</p>
                 </div>
-                <button type="submit" class="btn btn-primary">Submit Button</button>
+                {{ form_widget(form.save, {'attr': {'class': 'btn btn-primary' }} ) }}
+                {{ form_widget(form.saveAndAdd, {'attr': {'class': 'btn btn-primary' }} ) }}
 			{{ form_end(form) }}
         </div>
     </div>

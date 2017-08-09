@@ -1,47 +1,48 @@
-            <div class="row collapse" id="category" style="margin-top:15px;">
-                <div class="col-lg-2 col-md-6">
-                    <div class="panel panel-primary">
-                        <a href="#">
-                            <div class="panel-footer">
-                                <span class="pull-left">View Details</span>
-                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                                <div class="clearfix"></div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-6">
-                    <div class="panel panel-green">
-                        <a href="#">
-                            <div class="panel-footer">
-                                <span class="pull-left">View Details</span>
-                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                                <div class="clearfix"></div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-6">
-                    <div class="panel panel-yellow">
-                        <a href="#">
-                            <div class="panel-footer">
-                                <span class="pull-left">View Details</span>
-                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                                <div class="clearfix"></div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-6">
-                    <div class="panel panel-red">
-                        <a href="#">
-                            <div class="panel-footer">
-                                <span class="pull-left">View Details</span>
-                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                                <div class="clearfix"></div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <!-- /.row -->
+<style type="text/css">
+.modal-dialog {
+  width: 100%;
+  height: auto;
+  padding: 0;
+}
+
+.modal-content {
+  height: 100%;
+  border-radius: 0;
+}
+</style>
+<div class="row collapse" id="category" style="color:black; text-shadow:none;">
+  {% for category in data.categories %}
+    {% if category is not null %}
+        <button type="button" class="btn btn-info`" data-toggle="modal" data-target="#deleteModal{{ category.id }}" data-clientId="{{ category.id }}" style="margin-top:5px;">
+          {{category.categoryName}}
+        </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="deleteModal{{ category.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="color:black; text-shadow:none;">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 class="modal-title" id="exampleModalLabel">{{ category.categoryName|capitalize }}</h3>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body-fullscreen">
+            {% for product in data.products %}
+            {% if product.category is not null %}
+                {% if category.id == product.category.id %}
+                    <a class="btn btn-info" style="margin-top:5px; margin-bottom:5px;" href="#" data-dismiss="modal">{{ product.productName }}</a>
+                {% endif %}
+            {% endif %}
+            {% endfor %}
+          </div>
+          <div class="modal-footer">
+            {# <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button> #}
+            <a href="{# {{ path('product_delete', { 'productId': product.id } ) }} #}" class="btn btn-primary">Delete</a>
+          </div>
+        </div>
+      </div>
+    </div>
+{% endif %}
+  {% endfor %}
+</div>

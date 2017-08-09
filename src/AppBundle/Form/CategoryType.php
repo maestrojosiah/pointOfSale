@@ -5,6 +5,7 @@ namespace AppBundle\Form;
 use AppBundle\Entity\Category;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
@@ -14,6 +15,8 @@ class CategoryType extends AbstractType
     {
         $builder
             ->add('category_name', TextType::class)
+            ->add('save', SubmitType::class, array('label' => 'Save Category'))
+            ->add('saveAndAdd', SubmitType::class, array('label' => 'Save and Add Category'))
         ;
     }
 

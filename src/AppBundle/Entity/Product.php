@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Product
  *
  * @ORM\Table(name="product", indexes={@ORM\Index(name="product_code", columns={"product_code"}), @ORM\Index(name="product_name", columns={"product_name"})})
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\ProductRepository")
  */
 class Product
 {
@@ -18,13 +18,6 @@ class Product
      * @ORM\Column(name="orig_id", type="integer", nullable=false)
      */
     private $origId;
-
-    /**
-     * @var integer
-	 *
-     * @ORM\Column(name="category_id", type="integer", nullable=false)
-     */
-    private $categoryId;
 
     /**
      * @var string
@@ -89,8 +82,15 @@ class Product
 	 */
 	private $user;
 
+    public function __construct()
+    {
+        $this->deleted = false;
+    }
 
-
+    public function __toString() {
+        return $this->productName;
+    }
+    
     /**
      * Set origId
      *
