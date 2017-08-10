@@ -1,26 +1,16 @@
-<style type="text/css">
-.modal-dialog {
-  width: 100%;
-  height: auto;
-  padding: 0;
-}
+{% extends 'base.html.twig' %}
+{% block body %}
 
-.modal-content {
-  height: 100%;
-  border-radius: 0;
-}
-</style>
 <div class="row collapse" id="category" style="color:black; text-shadow:none;">
   {% for category in data.categories %}
     {% if category is not null %}
         <button type="button" class="btn btn-info`" data-toggle="modal" data-target="#deleteModal{{ category.id }}" data-clientId="{{ category.id }}" style="margin-top:5px;">
           {{category.categoryName}}
         </button>
-
     <!-- Modal -->
     <div class="modal fade" id="deleteModal{{ category.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="color:black; text-shadow:none;">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
+      <div class="modal-dialog" style="width:100%; height:auto; padding: 0;" role="document">
+        <div class="modal-content" style="height:100%; border-radius: 0;">
           <div class="modal-header">
             <h3 class="modal-title" id="exampleModalLabel">{{ category.categoryName|capitalize }}</h3>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -31,7 +21,7 @@
             {% for product in data.products %}
             {% if product.category is not null %}
                 {% if category.id == product.category.id %}
-                    <a class="btn btn-info" style="margin-top:5px; margin-bottom:5px;" href="#" data-dismiss="modal">{{ product.productName }}</a>
+                    <a class="btn btn-info" id="ajax_{{product.id}}" style="margin-top:5px; margin-bottom:5px;" href="#" data-dismiss="modal">{{ product.productName }}</a>
                 {% endif %}
             {% endif %}
             {% endfor %}
@@ -44,5 +34,128 @@
       </div>
     </div>
 {% endif %}
-  {% endfor %}
+{% endfor %}
 </div>
+{# <button class="btn btn-info" data-toggle='modal' data-target='.bd-example-modal-sm'>Click Me</button>
+ #}
+<p id="tableToArray"></p>
+<div class="modal fade bd-example-modal-sm" id="changeValueModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" style="margin-top:200px;">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <input class="form-control text-center" type="text" value="" id="valueHolder">
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).on('click', '[id^="ajax_"]', function(){
+            that = $(this);
+            var id = jQuery(this).attr("id");
+            $.ajax({
+                url:'{{ (path('ajax_request')) }}',
+                type: "POST",
+                dataType: "json",
+                data: {
+                    "some_var_name": id,
+                },
+                async: true,
+                success: function (data)
+                {
+                    console.log(data)
+                    $('#sales > tbody:last-child').append(data.output);
+                    $('#tableToArray').click();
+                }
+            });
+            return false;
+
+        });
+    </script>
+    <script>
+
+    </script>
+    <script>
+    $(document).on("click", '[id^="Qt_"]', function(){
+      var value = $(this).text();
+      var id = jQuery(this).attr("id");
+        $.ajax({
+            url:'{{ (path('get_value')) }}',
+            type: "POST",
+            dataType: "json",
+            data: {
+                "thisValue": value,
+            },
+            async: true,
+            success: function (data)
+            {
+                console.log(data)
+                $("#changeValueModal").modal('show');
+                $('#valueHolder').val(data.output);
+                $("#valueHolder").removeClass (function (index, className) {
+                    return (className.match (/(^|\s)changeRow_Qt_\S+/g) || []).join(' ');
+                });
+                $('#valueHolder').addClass('changeRow_'+id);
+                $('#valueHolder').focus().select();
+                $('#tableToArray').click();
+            }
+        });
+        
+      $('#searchItem').focus();      
+    });
+  </script>
+  <script>
+    $(document).on("change", '#valueHolder', function(){
+      var classNames = $("#valueHolder").attr("class").toString().split(' ');
+      var thirdClass = classNames[2];
+      var newValue = $("#valueHolder").val();
+
+      var thirdClassArray = thirdClass.split('_'); //changeRow_Qt_1504
+      var id = thirdClassArray[2] //1504
+
+      var price = $("#Pr_"+id).text();
+      var total = $("#Tl_"+id);
+      var qty = $("#Qt_"+id);
+      qty.text(newValue);
+      total.text(price*newValue)
+
+      $("#changeValueModal").modal('hide');
+      $('#searchItem').focus(); 
+      $('#tableToArray').click();     
+    });
+  </script>
+  <script>
+    $( "#tableToArray" ).click(function() {
+      var $table = $("#sales"),
+          $rowCells = $table.find("tbody tr td");
+      
+      var rows = [];
+
+      $rowCells.each(function(k,v) {
+         rows[rows.length] = $(this).text();
+      });
+      
+      console.log(rows);
+
+      $.ajax({
+            url:'{{ (path('get_additions')) }}',
+            type: "POST",
+            dataType: "json",
+            data: {
+                "rows": rows,
+            },
+            async: true,
+            success: function (data)
+            {
+              console.log(data.output.priceSum);
+              console.log(data.output.qtySum);
+              console.log(data.output.totalSum);
+              $("#amountDue").text("Amount Due: " + data.output.totalSum);
+              // $('#valueHolder').val(data.output);
+            }
+        });
+
+      });
+  </script>
+
+{% endblock %}   

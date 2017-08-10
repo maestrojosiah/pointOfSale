@@ -21,16 +21,17 @@ class SellController extends Controller
             ->getRepository('AppBundle:Product')
             ->loadAllProductsFromThisUser($user);
         $data['products'] = $products;
-        $categories = [];
-        foreach($products as $product){
-            $categories[] = $product->getCategory();
-        }
-        $data['categories'] = array_unique($categories);
+
+        $categories = $this->getDoctrine()
+            ->getRepository('AppBundle:Category')
+            ->loadAllCategoriesFromThisUser($user);
+
+        $data['categories'] = $categories;
 
         $chunks = array_chunk($products, 4);
         $data['chunks'] = $chunks;
 
-        return $this->render('default/index.html.twig', [
+        return $this->render('sell/index.html.twig', [
             'base_dir' => realpath($this->getParameter('kernel.project_dir')).DIRECTORY_SEPARATOR,
             'data' => $data,
             'chunks' => $chunks,            

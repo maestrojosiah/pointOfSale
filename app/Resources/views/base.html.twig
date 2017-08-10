@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="UTF-8" />
-        <title>{% block title %}Welcome!{% endblock %}</title>
+        <title>{% block title %}ABC - POS{% endblock %}</title>
         {% block stylesheets %}
 			<meta charset="utf-8">
 			<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -53,8 +53,8 @@
 			<!-- Morris Charts JavaScript -->
 			<script src="{{ asset('vendor/raphael/raphael.min.js') }}"></script>
 			<script src="{{ asset('vendor/morrisjs/morris.min.js') }}"></script>
-			<script src="{{ asset('data/morris-data.js') }}"></script>
-
+			{# <script src="{{ asset('data/morris-data.js') }}"></script>
+			#}
 			<!-- Custom Theme JavaScript -->
 			<script src="{{ asset('dist/js/sb-admin-2.js') }}"></script>
 			
@@ -62,8 +62,51 @@
 			<script src="{{ asset('js/shortcut.js') }}"></script>
 			<script>
 			window.onload=loadShortcuts;
+            $('#valueHolder').focus();
+			$("input[type='text']").focus(function () {
+			   $(this).select();
+			});
 			</script>
-			
+		  <script type="text/javascript">
+
+		  </script>
+
+			<script>
+			var xTriggered = 0;
+			$( "#searchItem" ).keyup(function( event ) {
+			  xTriggered++;
+			  var msg = "Handler for .keyup() called " + xTriggered + " time(s).";
+			  console.log(msg);
+			  var value = $(this).val();
+			  console.log(value);
+			  var id = jQuery(this).attr("id");
+			    $.ajax({
+			        url:'{{ (path('get_matches')) }}',
+			        type: "POST",
+			        dataType: "json",
+			        data: {
+			            "thisValue": value,
+			        },
+			        async: true,
+			        success: function (data)
+			        {
+			            console.log(data)
+			            $('.result').text(data.output.product);
+			            $('.result').attr('id', 'ajax_'+data.output.id);
+			            if ( event.which == 13 ) {
+						    event.preventDefault();
+						    $('#ajax_'+data.output.id).click();
+						    $('#searchItem').val('');
+						}
+			        }
+			    });
+
+			}).keydown(function( event ) {
+			  if ( event.which == 13 ) {
+			    event.preventDefault();
+			  }
+			});
+			</script>
 		{% endblock %}
 		
     </body>

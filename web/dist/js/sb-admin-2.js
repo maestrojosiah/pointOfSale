@@ -11,9 +11,13 @@ $('.toggleButton').click(function(){
     var $this = $(this);
     $this.toggleClass('toggleButton');
     if($this.hasClass('toggleButton')){
-        $this.text('Show Items');         
+        $this.text('Show Items');
+        console.log('hidden');
+        $("#category").hide(700);
     } else {
         $this.text('Hide Items');
+        console.log('hidden');
+        $("#category").show(700);        
     }
 });
 
@@ -27,6 +31,7 @@ $('.toggleSale').click(function(){
     }
 });
 
+
 function loadShortcuts() {
 	shortcut.add("F1", function() {
 		alert("F1 should redirect to new sale");
@@ -38,17 +43,32 @@ function loadShortcuts() {
 		alert("F4 should complete sale");
 	});
 	shortcut.add("F2", function() {
-		alert("F2 should focus on item search");
+		$('#searchItem').focus();      
 	});
 	shortcut.add("F7", function() {
-		alert("F7 should focus on amount paid field");
+        $('#paidAmt').focus();      
 	});
-	shortcut.add("ESC", function() {
-		alert("ESC should cancel the current sale");
+    shortcut.add("ESC", function() {
+        alert("ESC should cancel the current sale");
+    });
+	shortcut.add("F6", function() {
+        var lastQtySpan = $('#sales tr:last td:nth-last-child(2) span');
+        var lastQtyColumn = $('#sales tr:last td:nth-last-child(2)');
+        var lastQtyValue = lastQtyColumn.text();
+        var trimmedValue = $.trim(lastQtyValue);
+        var id = lastQtySpan.attr("id");
+        console.log(lastQtyValue);
+        $("#changeValueModal").modal('show');
+        $("#valueHolder").val(trimmedValue);
+        $("#valueHolder").removeClass (function (index, className) {
+            return (className.match (/(^|\s)changeRow_Qt_\S+/g) || []).join(' ');
+        });
+        $('#valueHolder').addClass('changeRow_'+id);
+        $('#valueHolder').focus().select();
 	});
 }
 
-window.onload=init;//Loads the correct sidebar on window load,
+//window.onload=init;//Loads the correct sidebar on window load,
 //collapses the sidebar on window resize.
 // Sets the min-height of #page-wrapper to window size
 $(function() {

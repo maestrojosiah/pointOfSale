@@ -1,0 +1,4 @@
+{{ dump(data) }}
+{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+    <p>Username: {{ app.user.email }}</p>
+{% endif %}
