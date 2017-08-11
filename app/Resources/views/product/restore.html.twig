@@ -8,37 +8,43 @@
     <thead>
         <tr>
             <th>Name</th>
+            <th>Cost</th>
+            <th>Retail</th>
+            <th>Tax </th>
             <th>Manage</th>
         </tr>
     </thead>
     <tbody>
 
-{% for category in data.categories %}
+{% for product in data.products %}
             <tr class="odd gradeX">
-                <td>{{ category.categoryName }}</td>
+                <td>{{ product.productName }}</td>
+                <td>{{ product.productCost }}</td>
+                <td>{{ product.productRetailPrice }}</td>
+                <td class="center">NA</td>
                 <td class="center">
-                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#restoreModal{{ category.id }}" data-categoryId="{{ category.id }}">
+                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#restoreModal{{ product.id }}" data-productId="{{ product.id }}">
                   Restore
                 </button>
                 </td>
             </tr>
 
     <!-- Modal -->
-    <div class="modal fade" id="restoreModal{{ category.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="color:black; text-shadow:none;">
+    <div class="modal fade" id="restoreModal{{ product.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="color:black; text-shadow:none;">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Delete {{ category.categoryName }}?</h5>
+            <h5 class="modal-title" id="exampleModalLabel">Delete {{ product.productName }}?</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
-            <p>Do you really want to delete {{ category.categoryName }}?</p>
+            <p>Do you really want to delete {{ product.productName }}?</p>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-            <a href="{{ path('category_restore', { 'categoryId': category.id } ) }}" class="btn btn-primary">Restore</a>
+            <a href="{{ path('product_restore', { 'productId': product.id } ) }}" class="btn btn-primary">Restore</a>
           </div>
         </div>
       </div>
@@ -46,7 +52,7 @@
 {% endfor %}
   </tbody>
 </table>
-<a href="{{ path('category_list') }}">Back to categories</a>
+<a href="{{ path('product_list') }}">Back to products</a>
 </div>
 </div>
 

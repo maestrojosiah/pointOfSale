@@ -58,7 +58,7 @@ class SellController extends Controller
         $user = $this->get('security.token_storage')->getToken()->getUser();
         $data['user'] = $user;
 
-        return $this->render('default/test.html.twig', [
+        return $this->render('sell/test.html.twig', [
             'data' => $data,
         ]);
 

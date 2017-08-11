@@ -48,6 +48,11 @@ class ProductController extends Controller
             $em->persist($product);
             $em->flush();
 
+        	$this->addFlash(
+	            'success',
+	            'Product added successfully!'
+        	);
+
             // ... do any other work - like sending them an email, etc
             // maybe set a "flash" success message for the user
 
@@ -88,6 +93,11 @@ class ProductController extends Controller
 			$em->persist($form_data);
 			$em->flush();
 
+        	$this->addFlash(
+	            'success',
+	            'Product edited successfully!'
+        	);
+
 			return $this->redirectToRoute('product_list');
 		} else {
 			$form_data['product_code'] = $product->getProductCode();
@@ -120,7 +130,7 @@ class ProductController extends Controller
 	}
 
 	/**
-	 * @Route("/product/restore", name="restore_list")
+	 * @Route("/product/restore", name="product_restore_list")
 	 */	
 	public function restoreListAction()
 	{
@@ -157,6 +167,11 @@ class ProductController extends Controller
 		$em->persist($product);
 		$em->flush(); 
 
+    	$this->addFlash(
+            'success',
+            'Product deleted successfully!'
+    	);
+
 		return $this->redirectToRoute('product_list');
 	}
 
@@ -181,7 +196,12 @@ class ProductController extends Controller
 		$em->persist($product);
 		$em->flush(); 
 
-		return $this->redirectToRoute('restore_list');
+    	$this->addFlash(
+            'success',
+            'Product restored successfully!'
+    	);
+
+		return $this->redirectToRoute('product_restore_list');
 	}
 
 

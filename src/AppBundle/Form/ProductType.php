@@ -12,6 +12,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Doctrine\ORM\EntityRepository;
 
 class ProductType extends AbstractType
 {
@@ -31,10 +32,17 @@ class ProductType extends AbstractType
 					),
 				'label' => 'Tax'
 				)
-			)			->add('category', EntityType::class, array(
+			)			
+			->add('category', EntityType::class, array(
 				'label' => 'Choose Category',
 				'class' => 'AppBundle:Category',
-				// 'choice_label' => 'title'
+				// 'query_builder' => function (EntityRepository $er, $user) {
+			 //        return $er->createQueryBuilder('c')
+			 //        	->where('c.user = :user AND c.deleted = 0')
+			 //        	->setParameter('user', $user)
+			 //            ->orderBy('c.id', 'ASC');
+			 //    },
+    			// 'choice_label' => 'title'
 				'choices' => $user->getCategories()
 			))
 			->add('save', SubmitType::class, array('label' => 'Save Product'))

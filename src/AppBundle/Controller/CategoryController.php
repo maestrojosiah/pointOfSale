@@ -32,7 +32,6 @@ class CategoryController extends Controller
         // 2) handle the submit (will only happen on POST)
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-
             $em = $this->getDoctrine()->getManager();
 
 			$last_entity = $em->getRepository('AppBundle:Category')
@@ -50,6 +49,11 @@ class CategoryController extends Controller
 
             $em->persist($category);
             $em->flush();
+
+        	$this->addFlash(
+	            'success',
+	            'Category added successfully!'
+        	);
 
             // ... do any other work - like sending them an email, etc
             // maybe set a "flash" success message for the user
@@ -90,7 +94,12 @@ class CategoryController extends Controller
 			$em->persist($form_data);
 			$em->flush();
 
-			return $this->redirectToRoute('homepage');
+        	$this->addFlash(
+	            'success',
+	            'Category edited successfully!'
+        	);
+
+			return $this->redirectToRoute('category_list');
 		} else {
 			$form_data['category_name'] = $category->getCategoryName();
 			$data['form'] = $form_data;
@@ -151,6 +160,12 @@ class CategoryController extends Controller
 		}
 
 		$category->setDeleted(1);
+ 
+        	$this->addFlash(
+	            'success',
+	            'Category deleted successfully!'
+        	);
+
 
 		$em->persist($category);
 		$em->flush(); 
@@ -175,6 +190,11 @@ class CategoryController extends Controller
 		}
 
 		$category->setDeleted(0);
+
+        	$this->addFlash(
+	            'success',
+	            'Category restored successfully!'
+        	);
 
 		$em->persist($category);
 		$em->flush(); 

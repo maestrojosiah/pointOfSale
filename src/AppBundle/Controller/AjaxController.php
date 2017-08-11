@@ -50,6 +50,42 @@ class AjaxController extends Controller
     }
 
     /**
+     * @Route("/ajax_request_search", name="ajax_request_search")
+     */
+    public function tableSearchRowAction(Request $request)
+    {
+            $code = $request->request->get('code');
+
+
+            $product = $this->getDoctrine()
+                ->getRepository('AppBundle:Product')
+                ->findOneByProductCode($code);
+            if(!$product){
+              $arrData = [];
+            } else {
+              $itemName   =     $product->getProductName();
+              $price      =     $product->getProductRetailPrice();
+              $quantity   =     "1";
+              $total      =     $price*$quantity;
+
+              $row = " 
+              <tr> 
+                <td><span id='IN_$code' class='btn btn-secondary'>".$itemName."</span></td>
+                <td><span id='Pr_$code' class='btn btn-secondary'>".$price."</span></td>
+                <td><span id='Qt_$code' class='btn btn-secondary'>".$quantity."</span></td>
+                <td><span id='Tl_$code' class='btn btn-secondary'>".$total."</span></td>
+              </tr>";
+
+              $arrData = ['output' => $row ];
+
+            }
+
+            return new JsonResponse($arrData);
+        
+
+    }
+
+    /**
      * @Route("/get_id", name="get_id")
      */
     public function getIdAction(Request $request)

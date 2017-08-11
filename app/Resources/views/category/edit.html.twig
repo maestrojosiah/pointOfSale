@@ -10,7 +10,9 @@
                     <label>{{ form_label(form.category_name) }}</label>
         			{{ form_widget(form.category_name, {'attr': {'class': 'form-control', 'id': 'category_name' }} ) }}
                 </div>
-                <button type="submit" class="btn btn-primary">Submit Button</button>
+                
+                {{ form_widget(form.save, {'attr': {'class': 'btn btn-success'}} ) }}
+                {{ form_widget(form.saveAndAdd, {'attr': {'class': 'btn btn-success'}} ) }}
 			{{ form_end(form) }}
         </div>
     </div>
