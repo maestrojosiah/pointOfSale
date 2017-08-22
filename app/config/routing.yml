@@ -5,9 +5,13 @@ app:
 logout:
     path: /logout
     
-fake_route_stream:
-    path:      /fake/stream
+excel_product_stream:
+    path:      /product/excel
     defaults:  { _controller: LiuggioExcelBundle:Fake:stream }
+
+pdf_product_stream:
+    path:      /product/pdf
+    defaults:  { _controller: LiuggioExcelBundle:Fake:streamPDF }
 
 fake_route_store:
     path:      /fake/store

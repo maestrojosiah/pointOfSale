@@ -3,12 +3,14 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * SystSetting
  *
+ * @UniqueEntity("user")
  * @ORM\Table(name="syst_setting")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\SystSettingRepository")
  */
 class SystSetting
 {
@@ -34,32 +36,11 @@ class SystSetting
     private $currencyCode;
 
     /**
-     * @var integer
-     *
-     * @ORM\Column(name="def_discount", type="integer", nullable=false)
-     */
-    private $defDiscount;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="def_tax_rate", type="integer", nullable=false)
-     */
-    private $defTaxRate;
-
-    /**
      * @var string
      *
      * @ORM\Column(name="rows_per_page", type="string", length=100, nullable=false)
      */
     private $rowsPerPage;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="default_category", type="string", length=100, nullable=false)
-     */
-    private $defaultCategory;
 
     /**
      * @var string

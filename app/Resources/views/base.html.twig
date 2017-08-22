@@ -49,6 +49,12 @@
 				{{ include('templates/nav.html.twig') }}			 
 			 </div>
 		{% endblock %}
+        {% if data.systSetting is defined %}
+            {% set limitRows = data.systSetting.rowsPerPage %}
+        {% else %}
+            {% set limitRows = '20' %}
+        {% endif %}
+
         {% block javascripts %}	{% endblock %}   
 		    <!-- jQuery -->
 			<script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
@@ -77,6 +83,7 @@
 
 		<!-- Keyboard Shortcut Javascript -->
 			<script src="{{ asset('js/shortcut.js') }}"></script>
+
 			<script>
 			window.onload=loadShortcuts;
             $('#valueHolder').focus();
@@ -87,7 +94,8 @@
 		    <script>
 		    $(document).ready(function() {
 		        $('#niceTable').DataTable({
-		            responsive: true
+		            responsive: true,
+                "pageLength": "{{limitRows}}",
 		        });
 		    });
 		    </script>
@@ -115,8 +123,8 @@
 			            $('.result').text(data.output.product);
 			            $('.result').attr('id', 'ajax_'+data.output.id);
 			            if ( event.which == 13 ) {
-						    $('#ajax_'+data.output.id).click();
-						    console.log('#ajax_'+data.output.id);
+						    //$('#ajax_'+data.output.id).click();
+						    console.log('from#ajax_'+data.output.id);
 						    return false;
 						    $('#searchItem').val('');
 						}
@@ -131,7 +139,7 @@
 				</script>
 			{% endfor %}
 
-	  <script>
+    <script>
         $(document).on('click', '[id^="ajax_"]', function(){
             that = $(this);
             var id = jQuery(this).attr("id");
@@ -145,8 +153,33 @@
                 async: true,
                 success: function (data)
                 {
-                    console.log(data)
+                    console.log(data.output)
                     $('#sales > tbody:last-child').append(data.output);
+                    $('#tableToArray').click();
+                }
+            });
+            return false;
+
+        });
+    </script>
+
+	  <script>
+        $(document).on('click', '[id^="Cl_"]', function(){
+            that = $(this);
+            var id = jQuery(this).attr("id");
+            $.ajax({
+                url:'{{ (path('remove_request')) }}',
+                type: "POST",
+                dataType: "json",
+                data: {
+                    "some_var_name": id,
+                },
+                async: true,
+                success: function (data)
+                {
+                    console.log(data)
+                    $('#Rw_'+data).remove();
+                    // $("#sales > tbody:nth-child("+data+")").remove();
                     $('#tableToArray').click();
                 }
             });
@@ -169,7 +202,7 @@
                 async: true,
                 success: function (data)
                 {
-                    console.log(data)
+                    console.log("ajaxSearch"+data.output)
                     $('#sales > tbody:last-child').append(data.output);
                     $('#searchItem').val('');                    
                     $('#tableToArray').click();
@@ -231,36 +264,391 @@
   </script>
   <script>
     $( "#tableToArray" ).click(function() {
-      var $table = $("#sales"),
-          $rowCells = $table.find("tbody tr td");
+      var $table = $("#sales");
+      $rowCells = $table.find("tbody tr td");
+      $rowFull = $table.find("tbody tr");
       
       var rows = [];
+      var raws = [];
 
       $rowCells.each(function(k,v) {
          rows[rows.length] = $(this).text();
       });
       
-      console.log(rows);
-
+      $rowFull.each(function(k,v) {
+         raws[raws.length] = $(this).attr('id');
+      });
+      
       $.ajax({
             url:'{{ (path('get_additions')) }}',
             type: "POST",
             dataType: "json",
             data: {
                 "rows": rows,
+                "raws": raws,
             },
             async: true,
             success: function (data)
             {
-              console.log(data.output.priceSum);
-              console.log(data.output.qtySum);
-              console.log(data.output.totalSum);
-              $("#amountDue").text("Amount Due: " + data.output.totalSum);
-              // $('#valueHolder').val(data.output);
+              // console.log("row:");
+              // console.log(data.output.chunks);
+              $("#amountDue").text(data.output.totalSum);
+              $("#show_tax").text(data.output.tax);
+              $("#show_qty").text(data.output.qtySum);
+              var arrayLength = data.output.chunks.length;
+
+              var stock = new Array();
+              $("#salesRow").closest("tbody").html("");
+              for (var i = 0; i < arrayLength; i++) {
+                  stock.push(data.output.chunks[i]);
+                  var oneRow = data.output.chunks[i];
+                  var row = '<tr id="salesRow"><td class="col-md-9"><em>'+oneRow[1]+'</em></td><td class="col-md-1" style="text-align: center">'+oneRow[3]+'</td><td class="col-md-1 text-center">'+oneRow[2]+'</td><td class="col-md-1 text-center">'+oneRow[4]+'</td></tr>';
+                  $('#receiptTable > tbody:first').append(row);
+
+              }
             }
         });
 
       });
+  </script>
+  <script type="text/javascript">
+      $( "#paidAmt" ).keyup(function(event) {
+        var value = $(this).val();
+        var amountDue = $("#amountDue").text();
+        var difference = parseInt(value)-parseInt(amountDue);
+        if(difference >= 0){
+          $("#show_bal").text(difference);
+        }
+        console.log("diff:"+difference);
+      });
+
+  </script>
+  <script type="text/javascript">
+  shortcut.add("F4", function() {
+      var paidAmt =    $("#paidAmt").val();
+      if($("#paidAmt").val()==""){
+        $("#infoParagraph").html("<span class='text-danger'>Please indicate how much has been paid?</span><br />Hit F7 to focus");
+        $("#infoModal").modal('show');
+
+      } else {
+            var qtyTotal = $("#show_qty").text();
+            var total = $("#amountDue").text();
+            var tax = $("#show_tax").text();
+            if($("#creditCardInput").val() != ""){
+              var creditCard = $("#creditCardInput").val();
+              var paymentMode = "creditCard";
+            } else {
+              var creditCard = 0;
+            } 
+            if($("#mpesaInput").val() != "") {
+              var mpesa = $("#mpesaInput").val();
+              var paymentMode = "mpesa";
+            } else {
+              var mpesa = 0;
+            }
+            if($("#checkInput").val() != "") {
+              var check = $("#checkInput").val();
+              var paymentMode = "check";
+            } else {
+              var check = 0;
+            }
+
+              $.ajax({
+              type: "POST",
+              url: '{{ (path('save_sale')) }}',
+              data: {
+                'qtyTotal': qtyTotal,
+                'total': total,
+                'tax': tax,
+                'mpesa': mpesa,
+                'check': check,
+                'creditCard': creditCard,
+                'paymentMode': paymentMode,
+              },
+              async: true,
+              success: function (data) 
+              {
+                //console.log("fromAjax"+data.output);
+                $("#receiptTotal").html('<strong>' + $("#amountDue").text() +'</strong>');              
+                $("#receiptPaid").html('<strong>' + $("#paidAmt").val() +'</strong>');              
+                $("#receiptChange").html('<strong>' + $("#show_bal").text() +'</strong>');              
+                $("#receiptModal").modal('show'); 
+
+                var $table = $("#sales");
+                $rowCells = $table.find("tbody tr td");
+                $rowFull = $table.find("tbody tr");
+                
+                var rows = [];
+                var raws = [];
+
+                $rowCells.each(function(k,v) {
+                   rows[rows.length] = $(this).text();
+                });
+                
+                $rowFull.each(function(k,v) {
+                   raws[raws.length] = $(this).attr('id');
+                });
+                
+                $.ajax({
+                      url:'{{ (path('get_additions')) }}',
+                      type: "POST",
+                      dataType: "json",
+                      data: {
+                          "rows": rows,
+                          "raws": raws,
+                      },
+                      async: true,
+                      success: function (data)
+                      {
+                        var arrayLength = data.output.chunks.length;
+                        var stock = new Array();
+                        for (var i = 0; i < arrayLength; i++) {                          
+                            data.output.chunks[i].splice(0, 1, data.output.products[i]);
+                            stock.push(data.output.chunks[i]);
+                        }
+                        var stockString = JSON.stringify(stock);
+                          $.ajax({
+                          url:'{{ (path('save_stock')) }}',
+                          type: "POST",
+                          dataType: "json",
+                          data: {
+                              "stock": stock,
+                          },
+                          async: true,
+                          success: function (data)
+                          {
+                            console.log("fromAjax: "+data.output);
+                          }
+                        });
+
+                      }
+                  });
+
+            }
+        });
+      }
+  });
+
+  </script>
+  <script type="text/javascript">
+  $(document).on('keypress', '#paidAmt', function(e){  
+      var key = e.which;
+      if(key == 13) {
+      var paidAmt =    $("#paidAmt").val();
+      if($("#paidAmt").val()==""){
+        $("#infoParagraph").html("<span class='text-danger'>Please indicate how much has been paid?</span><br />Hit F7 to focus");
+        $("#infoModal").modal('show');
+
+      } else {
+            var qtyTotal = $("#show_qty").text();
+            var total = $("#amountDue").text();
+            var tax = $("#show_tax").text();
+            if($("#creditCardInput").val() != ""){
+              var creditCard = $("#creditCardInput").val();
+              var paymentMode = "creditCard";
+            } else {
+              var creditCard = 0;
+            } 
+            if($("#mpesaInput").val() != "") {
+              var mpesa = $("#mpesaInput").val();
+              var paymentMode = "mpesa";
+            } else {
+              var mpesa = 0;
+            }
+            if($("#checkInput").val() != "") {
+              var check = $("#checkInput").val();
+              var paymentMode = "check";
+            } else {
+              var check = 0;
+            }
+
+              $.ajax({
+              type: "POST",
+              url: '{{ (path('save_sale')) }}',
+              data: {
+                'qtyTotal': qtyTotal,
+                'total': total,
+                'tax': tax,
+                'mpesa': mpesa,
+                'check': check,
+                'creditCard': creditCard,
+                'paymentMode': paymentMode,
+              },
+              async: true,
+              success: function (data) 
+              {
+                //console.log("fromAjax"+data.output);
+                $("#receiptTotal").html('<strong>' + $("#amountDue").text() +'</strong>');              
+                $("#receiptPaid").html('<strong>' + $("#paidAmt").val() +'</strong>');              
+                $("#receiptChange").html('<strong>' + $("#show_bal").text() +'</strong>');              
+                $("#receiptModal").modal('show'); 
+
+                var $table = $("#sales");
+                $rowCells = $table.find("tbody tr td");
+                $rowFull = $table.find("tbody tr");
+                
+                var rows = [];
+                var raws = [];
+
+                $rowCells.each(function(k,v) {
+                   rows[rows.length] = $(this).text();
+                });
+                
+                $rowFull.each(function(k,v) {
+                   raws[raws.length] = $(this).attr('id');
+                });
+                
+                $.ajax({
+                      url:'{{ (path('get_additions')) }}',
+                      type: "POST",
+                      dataType: "json",
+                      data: {
+                          "rows": rows,
+                          "raws": raws,
+                      },
+                      async: true,
+                      success: function (data)
+                      {
+                        var arrayLength = data.output.chunks.length;
+                        var stock = new Array();
+                        for (var i = 0; i < arrayLength; i++) {                          
+                            data.output.chunks[i].splice(0, 1, data.output.products[i]);
+                            stock.push(data.output.chunks[i]);
+                        }
+                        var stockString = JSON.stringify(stock);
+                          $.ajax({
+                          url:'{{ (path('save_stock')) }}',
+                          type: "POST",
+                          dataType: "json",
+                          data: {
+                              "stock": stock,
+                          },
+                          async: true,
+                          success: function (data)
+                          {
+                            console.log("fromAjax: "+data.output);
+                          }
+                        });
+
+                      }
+                  });
+
+            }
+        });
+      }
+    }
+  });
+
+  </script>
+  <script type="text/javascript">
+  $(document).on('click', '#suspendSale', function(e){ 
+
+      var paidAmt =    $("#paidAmt").val();
+      if($("#amountDue").text()==""){
+        $("#infoParagraph").html("<span class='text-danger'>No sale exists to cancel?</span><br />Hit F7 to focus");
+        $("#infoModal").modal('show');
+
+      } else {
+            var qtyTotal = $("#show_qty").text();
+            var total = $("#amountDue").text();
+            var tax = $("#show_tax").text();
+            if($("#creditCardInput").val() != ""){
+              var creditCard = $("#creditCardInput").val();
+              var paymentMode = "creditCard";
+            } else {
+              var creditCard = 0;
+            } 
+            if($("#mpesaInput").val() != "") {
+              var mpesa = $("#mpesaInput").val();
+              var paymentMode = "mpesa";
+            } else {
+              var mpesa = 0;
+            }
+            if($("#checkInput").val() != "") {
+              var check = $("#checkInput").val();
+              var paymentMode = "check";
+            } else {
+              var check = 0;
+            }
+
+              $.ajax({
+              type: "POST",
+              url: '{{ (path('save_sale')) }}',
+              data: {
+                'qtyTotal': qtyTotal,
+                'total': total,
+                'tax': tax,
+                'mpesa': mpesa,
+                'check': check,
+                'creditCard': creditCard,
+                'suspended': "suspended",
+                'paymentMode': paymentMode,
+              },
+              async: true,
+              success: function (data) 
+              {
+                //console.log("fromAjax"+data.output);
+                $("#receiptTotal").html('<strong>' + $("#amountDue").text() +'</strong>');              
+                $("#receiptPaid").html('<strong>' + $("#paidAmt").val() +'</strong>');              
+                $("#receiptChange").html('<strong>' + $("#show_bal").text() +'</strong>');              
+                //$("#receiptModal").modal('show'); 
+
+                var $table = $("#sales");
+                $rowCells = $table.find("tbody tr td");
+                $rowFull = $table.find("tbody tr");
+                
+                var rows = [];
+                var raws = [];
+
+                $rowCells.each(function(k,v) {
+                   rows[rows.length] = $(this).text();
+                });
+                
+                $rowFull.each(function(k,v) {
+                   raws[raws.length] = $(this).attr('id');
+                });
+                
+                $.ajax({
+                      url:'{{ (path('get_additions')) }}',
+                      type: "POST",
+                      dataType: "json",
+                      data: {
+                          "rows": rows,
+                          "raws": raws,
+                      },
+                      async: true,
+                      success: function (data)
+                      {
+                        var arrayLength = data.output.chunks.length;
+                        var stock = new Array();
+                        for (var i = 0; i < arrayLength; i++) {                          
+                            data.output.chunks[i].splice(0, 1, data.output.products[i]);
+                            stock.push(data.output.chunks[i]);
+                        }
+                        var stockString = JSON.stringify(stock);
+                          $.ajax({
+                          url:'{{ (path('save_stock')) }}',
+                          type: "POST",
+                          dataType: "json",
+                          data: {
+                              "stock": stock,
+                          },
+                          async: true,
+                          success: function (data)
+                          {
+                            console.log("fromAjax: "+data.output);
+                          }
+                        });
+
+                      }
+                  });
+
+            }
+        });
+      }
+
+  });
+
   </script>
     </body>
 </html>

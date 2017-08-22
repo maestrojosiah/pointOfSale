@@ -20,9 +20,9 @@ class Product
     private $origId;
 
     /**
-     * @var integer
-	 *
-     * @ORM\Column(name="category_id", type="integer", nullable=false)
+     * @var string
+     *
+     * @ORM\Column(name="product_code", type="string", length=100, nullable=false)
      */
     private $productCode;
 
@@ -60,6 +60,20 @@ class Product
      * @ORM\Column(name="deleted", type="integer", nullable=false)
      */
     private $deleted;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="profit", type="integer", nullable=false)
+     */
+    private $profit;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="tax", type="integer", nullable=false)
+     */
+    private $tax;
 
     /**
      * @var integer
@@ -113,6 +127,30 @@ class Product
     public function getOrigId()
     {
         return $this->origId;
+    }
+
+    /**
+     * Set categoryId
+     *
+     * @param integer $categoryId
+     *
+     * @return Product
+     */
+    public function setCategoryId($categoryId)
+    {
+        $this->categoryId = $categoryId;
+
+        return $this;
+    }
+
+    /**
+     * Get categoryId
+     *
+     * @return integer
+     */
+    public function getCategoryId()
+    {
+        return $this->categoryId;
     }
 
     /**
@@ -315,5 +353,17 @@ class Product
     public function getUser()
     {
         return $this->user;
+    }
+
+    public function getTheProfit($bp, $sp, $qty = 1, $rate = 16){
+        $vat = round($sp * ($rate / 116), 2);
+        $diff = $sp - $bp;
+        $profit = ($diff - $vat) * $qty;
+        return round($profit, 2);
+    }
+    
+    public function getTheVat($bp, $sp, $qty = 1, $rate = 16) {
+        $vat = $sp * ($rate / 116) * $qty;
+        return round($vat, 2);
     }
 }

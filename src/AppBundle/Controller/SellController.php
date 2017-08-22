@@ -15,6 +15,7 @@ class SellController extends Controller
     public function indexAction(Request $request)
     {
         // replace this example code with whatever you need
+        $this->denyAccessUnlessGranted('ROLE_ADMIN', null, 'Unable to access this page!');
         $data = [];
         $user = $this->get('security.token_storage')->getToken()->getUser();
         $products = $this->getDoctrine()
@@ -26,7 +27,12 @@ class SellController extends Controller
             ->getRepository('AppBundle:Category')
             ->loadAllCategoriesFromThisUser($user);
 
+        $systSetting = $this->getDoctrine()
+            ->getRepository('AppBundle:SystSetting')
+            ->settingsForThisUser($user);
+
         $data['categories'] = $categories;
+        $data['systSetting'] = $systSetting;
 
         $chunks = array_chunk($products, 4);
         $data['chunks'] = $chunks;

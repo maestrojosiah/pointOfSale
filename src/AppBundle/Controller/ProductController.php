@@ -98,7 +98,12 @@ class ProductController extends Controller
 	            'Product edited successfully!'
         	);
 
-			return $this->redirectToRoute('product_list');
+            if($form->get('saveAndAdd')->isClicked()){
+                return $this->redirectToRoute('product_add');
+            } else {
+                return $this->redirectToRoute('product_list');
+            }
+
 		} else {
 			$form_data['product_code'] = $product->getProductCode();
 			$form_data['product_name'] = $product->getProductName();
@@ -123,7 +128,12 @@ class ProductController extends Controller
 			->getRepository('AppBundle:Product')
 			->loadAllProductsFromThisUser($user);
 
+		$systSetting = $this->getDoctrine()
+			->getRepository('AppBundle:systSetting')
+			->settingsForThisUser($user);
+
 		$data['products'] = $products;
+		$data['systSetting'] = $systSetting;
 
 		return $this->render('product/list.html.twig', ['data' => $data ] );
 

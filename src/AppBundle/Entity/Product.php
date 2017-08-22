@@ -340,4 +340,16 @@ class Product
     {
         return $this->user;
     }
+
+    public function getProfit($bp, $sp, $qty = 1, $rate = 16){
+        $vat = round($sp * ($rate / 116), 2);
+        $diff = $sp - $bp;
+        $profit = ($diff - $vat) * $qty;
+        return round($profit, 2);
+    }
+    
+    public function getVat($bp, $sp, $qty = 1, $rate = 16) {
+        $vat = $sp * ($rate / 116) * $qty;
+        return round($vat, 2);
+    }
 }

@@ -37,6 +37,7 @@
                         <table class="table table-hover" id="sales">
                             <thead>
                                 <tr>
+                                    <th></th>
                                     <th>Item Name</th>
                                     <th>Price</th>
                                     <th>Qty</th>
@@ -62,43 +63,49 @@
                 <!-- /.panel-heading -->
                 <div class="panel-body">
 					<!-- Dropdown button -->
-					<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<button type="button" class="btn btn-default" data-toggle="modal" data-target=".bd-suspend">
 						<strong>Suspend Sale</strong>
 					</button>							
-					<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<button type="button" class="btn btn-default" data-toggle="modal" data-target=".bd-cancel">
 						<strong>Cancel Sale</strong>
 					</button>	
 					<hr />
                     <div class="list-group">
                         <a href="#" class="list-group-item">
-                            <i class="fa fa-comment fa-fw"></i> New Comment
-                            <span class="pull-right text-muted small"><em>4 minutes ago</em>
+                            <i class="fa fa-comment fa-fw"></i> Tax
+                            <span class="pull-right text-muted small" id="show_tax"><em>Kes</em>
                             </span>
                         </a>
                         <a href="#" class="list-group-item">
-                            <i class="fa fa-twitter fa-fw"></i> 3 New Followers
-                            <span class="pull-right text-muted small"><em>12 minutes ago</em>
+                            <i class="fa fa-twitter fa-fw"></i> Items
+                            <span class="pull-right text-muted small" id="show_qty"><em>Qty</em>
                             </span>
                         </a>
                     </div>
                     <!-- /.list-group -->
-                    <p href="#" class="btn text-success btn-block btn-lg" id="amountDue">Amount Due:</p>
+                    <p href="#" class="btn text-success btn-lg">Amount Due:<span id="amountDue"></span></p>
+                    <p href="#" class="btn text-success btn-lg">Bal: <span id="show_bal"></span></p>
 					<br />
-					<a href="#" class="btn btn-primary" data-toggle="collapse">Cash</a>
-					<a href="#Foo" class="btn btn-default" data-toggle="collapse">Credit Card</a>
-					<a href="#Bar" class="btn btn-default" data-toggle="collapse">Check</a>
+{# 					<a href="#" class="btn btn-primary" data-toggle="collapse">Cash</a>
+ #}					<a href="#Foo" class="btn btn-default" data-toggle="collapse">C. Card</a>
+                    <a href="#Bar" class="btn btn-default" data-toggle="collapse">Check</a>
+					<a href="#FooBar" class="btn btn-default" data-toggle="collapse">Mpesa</a>
 					<hr />
 					<div id="Bar" class="main-container collapse">
-						<input class="form-control" type="text" placeholder="Check Number">
+						<input class="form-control" type="text" id="checkInput" placeholder="Check Number">
 					</div>
-					<div id="Foo" class="main-container collapse">
-						<input class="form-control" type="text" placeholder="Credit Card Number">
+                    <div id="Foo" class="main-container collapse">
+                        <input class="form-control" type="text" id="creditCardInput" placeholder="Credit Card Number">
+                    </div>
+					<div id="FooBar" class="main-container collapse">
+						<input class="form-control" type="text" id="mpesaInput" placeholder="Mpesa Code">
 					</div>
 					<hr />
 					<div class="form-group input-group">
 						<input class="form-control" type="text" id="paidAmt" placeholder="Paid Amt">
 						<a href="#category" class="btn btn-primary input-group-addon toggleButton" data-toggle="collapse" style="background-color: #337ab7; color:white;">Complete Sale</a>
 					</div>
+                    {# {{ dump(data.systSetting) }} #}
                 </div>
                 <!-- /.panel-body -->
             </div>
@@ -107,5 +114,120 @@
         <!-- /.col-lg-4 -->
     </div>
     <!-- /.row -->
+<div id="infoModal" class="modal fade bd-suspend" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Suspend Sale?</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="infoParagraph">Are you sure you want to suspend the sale? You can come back to it later by clicking on "Actions" then "Suspended Sales".</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <a href="{{ path('homepage') }}" id="suspendSale" class="btn btn-primary">Go Ahead</a>
+      </div> 
+    </div>
+  </div>
+</div>
+
+<div id="infoModal" class="modal fade bd-cancel" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Cancel Sale?</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="infoParagraph">Are you sure you want to cancel the sale? This means that you will start off another sale altogether.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" id="cancelSale" class="btn btn-primary">Go Ahead</button>
+      </div> 
+    </div>
+  </div>
+</div>
+
+<!-- Large modal -->
+<div id="receiptModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="container">
+        <div class="row">
+            <div class="well col-xs-10 col-sm-10 col-md-6 col-xs-offset-1 col-sm-offset-1 col-md-offset-3">
+                <div class="row">
+                    <div class="col-xs-6 col-sm-6 col-md-6">
+                        <address>
+                            {{ data.systSetting.receiptHeader|raw }}
+                        </address>
+                    </div>
+                    <div class="col-xs-6 col-sm-6 col-md-6 text-right">
+                        <p>
+                            <em>Date: {{ 'now'|date('d - m -Y') }}</em>
+                        </p>
+                        <p>
+                            <em>Receipt #: 34522677W</em>
+                        </p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="text-center">
+                        <h1>Receipt</h1>
+                    </div>
+                    <table class="table table-hover" id="receiptTable">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Qty</th>
+                                <th class="text-center">Price</th>
+                                <th class="text-center">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                        <tbody>
+                            <tr>
+                                <td>   </td>
+                                <td>   </td>
+                                <td class="text-right">
+                                <p>
+                                    <strong>Total: </strong>
+                                </p>
+                                <p>
+                                    <strong>Paid: </strong>
+                                </p></td>
+                                <td class="text-center">
+                                <p id="receiptTotal"></p>
+                                <p id="receiptPaid"></p></td>
+                            </tr>
+                            <tr>
+                                <td>   </td>
+                                <td>   </td>
+                                <td class="text-right"><p><strong>Change: </strong></p></td>
+                                <td class="text-center text-danger"><p id="receiptChange"></p></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="well col-xs-10 col-sm-10 col-md-6 col-xs-offset-1 col-sm-offset-1 col-md-offset-3">
+                <div class="btn-group" role="group" aria-label="...">
+                    <button type="button" class="btn btn-warning btn-lg" data-dismiss="modal">
+                        Close  <span class="glyphicon glyphicon-remove"></span>
+                    </button>
+                    <button type="button" class="btn btn-success btn-lg">
+                        Print  <span class="glyphicon glyphicon-chevron-right"></span>
+                    </button>
+                    <button type="button" class="btn btn-success btn-lg">
+                        Back to POS  <span class="glyphicon glyphicon-chevron-left"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </div>
 <!-- /#page-wrapper -->

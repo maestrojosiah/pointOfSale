@@ -39,9 +39,6 @@ function loadShortcuts() {
 	shortcut.add("F3", function() {
 		alert("F3 should redirect to new sale");
 	});
-	shortcut.add("F4", function() {
-		alert("F4 should complete sale");
-	});
 	shortcut.add("F2", function() {
 		$('#searchItem').focus();      
 	});

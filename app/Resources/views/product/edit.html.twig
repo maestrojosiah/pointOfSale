@@ -1,5 +1,69 @@
-{{ form_start(form) }}
-{{ form_widget(form) }}
+{% extends 'base.html.twig' %}
+{% block body %}
+{{ include('templates/nav.html.twig') }}			 
+<div id="page-wrapper">
+{{ form_start(form, {'attr': {'class': '' }} ) }}
+{# {{ dump(form) }}
+ #}<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                Edit Product | <a href="{{ path('upload_product') }}">Upload from Excel (.xls) file</a>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-lg-6">
+{#                         <form role="form">
+ #}                            <div class="form-group">
+                                <label>Product Code</label>
+						        {{ form_errors(form.product_code) }}
+						        {{ form_widget(form.product_code, {'attr': {'class': 'form-control', 'placeholder': 'Product Code', 'id': 'p_code' }} ) }}
+                            </div>
+                            <div class="form-group">
+                                <label>Product Name</label>
+						        {{ form_errors(form.product_name) }}
+						        {{ form_widget(form.product_name, {'attr': {'class': 'form-control', 'placeholder': 'Product Name', 'id': 'p_name' }} ) }}
+                            </div>
+                            <div class="form-group">
+                                <label>Product Cost</label>
+						        {{ form_errors(form.product_cost) }}
+						        {{ form_widget(form.product_cost, {'attr': {'class': 'form-control', 'placeholder': 'Product Cost', 'id': 'p_cost' }} ) }}
+                            </div>
+{#                         </form>
+ #}                    </div>
+                    <!-- /.col-lg-6 (nested) -->
+                    <div class="col-lg-6">
+{#                         <form role="form">
+ #}                            <div class="form-group">
+                                <label>Product Retail Price</label>
+						        {{ form_errors(form.product_retail_price) }}
+						        {{ form_widget(form.product_retail_price, {'attr': {'class': 'form-control', 'placeholder': 'Product Retail Price', 'id': 'p_retail' }} ) }}
+                            </div>
+                            <div class="form-group">
+                                <label>Tax</label>
+						        {{ form_errors(form.product_tax) }}
+						        {{ form_widget(form.product_tax, {'attr': {'class': 'form-control', 'id': 'p_tax' }} ) }}
+                            </div>
+                            <div class="form-group">
+                                <label>Category</label>
+						        {{ form_errors(form.category) }}
+						        {{ form_widget(form.category, {'attr': {'class': 'form-control', 'id': 'p_tax' }} ) }}
+                            </div>
+						        {{ form_widget(form.save, {'attr': {'class': 'btn btn-primary' }} ) }}
+						        {{ form_widget(form.saveAndAdd, {'attr': {'class': 'btn btn-primary' }} ) }}
+{#                         </form>
+ #}                    </div>
+                    <!-- /.col-lg-6 (nested) -->
+                </div>
+                <!-- /.row (nested) -->
+            </div>
+            <!-- /.panel-body -->
+        </div>
+        <!-- /.panel -->
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
 {{ form_end(form) }}
+</div>
 
-{# {{ dump(form) }} #}
+{% endblock %}
