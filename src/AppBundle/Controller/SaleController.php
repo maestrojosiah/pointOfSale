@@ -13,6 +13,83 @@ class SaleController extends Controller
 {
 
 	/**
+	 * @Route("sale/view/{saleId}", name="sale_view")
+	 */
+	public function viewAction(Request $request, $saleId)
+	{
+		$data = [];
+		$sale = $this->getDoctrine()
+			->getRepository('AppBundle:Sale')
+			->find($saleId);
+
+		$stocks = $this->getDoctrine()
+			->getRepository('AppBundle:Stock')
+			->findAllForThisSale($sale);
+		$data['sale'] = $sale;
+		$data['stocks'] = $stocks;
+
+		return $this->render('sale/view.html.twig', ['data' => $data,] );
+
+	}
+
+
+	/**
+	 * @Route("sale/complete/{saleId}", name="sale_view_complete")
+	 */
+	public function completeAction(Request $request, $saleId)
+	{
+		$data = [];
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+		$sale = $this->getDoctrine()
+			->getRepository('AppBundle:Sale')
+			->find($saleId);
+
+		$stocks = $this->getDoctrine()
+			->getRepository('AppBundle:Stock')
+			->findAllForThisSale($sale);
+
+        $products = $this->getDoctrine()
+            ->getRepository('AppBundle:Product')
+            ->loadAllProductsFromThisUser($user);
+
+        $categories = $this->getDoctrine()
+            ->getRepository('AppBundle:Category')
+            ->loadAllCategoriesFromThisUser($user);
+
+        $systSetting = $this->getDoctrine()
+            ->getRepository('AppBundle:SystSetting')
+            ->settingsForThisUser($user);
+
+		$data['sale'] = $sale;
+		$data['stocks'] = $stocks;
+		$data['categories'] = $categories;
+		$data['products'] = $products;
+		$data['systSetting'] = $systSetting;
+
+		return $this->render('sale/complete.html.twig', ['data' => $data,] );
+
+	}
+
+
+	/**
+	 * @Route("sale/sus", name="suspended_view")
+	 */
+	public function suspendedAction(Request $request)
+	{
+		$data = [];
+		$sales = $this->getDoctrine()
+			->getRepository('AppBundle:Sale')
+			->findAllSuspended();
+
+		$data['sales'] = $sales;
+
+		return $this->render('sale/sus.html.twig', ['data' => $data,] );
+
+	}
+
+
+
+	/**
 	 * @Route("/sale/edit/{saleId}", name="sale_edit")
 	 */
 	public function editAction(Request $request, $saleId)
@@ -109,7 +186,7 @@ class SaleController extends Controller
 		$em->persist($sale);
 		$em->flush(); 
 
-		return $this->redirectToRoute('sale_list');
+		return $this->redirectToRoute('suspended_view');
 	}
 
 	/**
@@ -139,6 +216,23 @@ class SaleController extends Controller
 		$em->flush(); 
 
 		return $this->redirectToRoute('restore_list');
+	}
+
+	/**
+	 * @Route("/sale/lastSale", name="last_sale")
+	 */
+	public function lastReceiptAction(){
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+        $systSetting = $this->getDoctrine()
+            ->getRepository('AppBundle:SystSetting')
+            ->settingsForThisUser($user);
+
+	    $em = $this->getDoctrine()->getManager();
+        $lastSale = $em->getRepository('AppBundle:Sale')
+        	->loadLastSaleEntry();
+    	$data['systSetting'] = $systSetting;
+    	$data['lastSale'] = $lastSale;
+		return $this->render('sale/lastSale.html.twig', ['data' => $data ] );
 	}
 
 }

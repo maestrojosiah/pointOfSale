@@ -83,7 +83,14 @@
 
 		<!-- Keyboard Shortcut Javascript -->
 			<script src="{{ asset('js/shortcut.js') }}"></script>
-
+      <script src="{{ asset('js/printThis.js') }}"></script>
+      <script>
+      $(document).ready(function() {
+        $('#sendPrint').on('click', function(e) {
+          $('#toPrint').printThis();
+        })
+      });
+      </script>
 			<script>
 			window.onload=loadShortcuts;
             $('#valueHolder').focus();
@@ -125,7 +132,6 @@
 			            if ( event.which == 13 ) {
 						    //$('#ajax_'+data.output.id).click();
 						    console.log('from#ajax_'+data.output.id);
-						    return false;
 						    $('#searchItem').val('');
 						}
 			        }
@@ -290,8 +296,8 @@
             async: true,
             success: function (data)
             {
-              // console.log("row:");
-              // console.log(data.output.chunks);
+              console.log("row:");
+              console.log(data.output.chunks);
               $("#amountDue").text(data.output.totalSum);
               $("#show_tax").text(data.output.tax);
               $("#show_qty").text(data.output.qtySum);
@@ -430,8 +436,17 @@
   });
 
   </script>
+
   <script type="text/javascript">
-  $(document).on('keypress', '#paidAmt', function(e){  
+    $( "#completeSale" ).click(function() {
+    var e = jQuery.Event("keypress");
+    e.which = 13; 
+    $("#paidAmt").trigger(e);
+  });
+  </script>
+
+  <script type="text/javascript">
+  $( "#paidAmt" ).keypress(function(e) {
       var key = e.which;
       if(key == 13) {
       var paidAmt =    $("#paidAmt").val();
@@ -637,6 +652,7 @@
                           success: function (data)
                           {
                             console.log("fromAjax: "+data.output);
+                            location.href = "{{ path('homepage') }}";
                           }
                         });
 
@@ -650,5 +666,16 @@
   });
 
   </script>
-    </body>
+  {# if the page is for completing suspended sales:...#}
+{% if data.stocks is defined %}
+  {% for stock in data.stocks %}
+  <script type="text/javascript">
+    $( document ).ready(function() {
+      $("#ajax_{{stock.product.id}}").click();
+      $('#tableToArray').click();
+    });
+  </script>
+  {% endfor %}
+{% endif %}
+</body>
 </html>

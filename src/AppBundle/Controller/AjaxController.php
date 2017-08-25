@@ -258,9 +258,8 @@ class AjaxController extends Controller
           $idArray[] = $stockItem[0];
           $today = date("d-m-Y h:i:s");
           $stock->setOnDate(new \DateTime($today));
-          $stock->setItemId($stockItem[0]);
+          $stock->setProduct($prod);
           $stock->setQuantity($stockItem[3]);
-          $stock->setTransaction("out");
           $last_entity = $em->getRepository('AppBundle:Stock')
             ->loadLastStockEntry();
           $lastSale = $em->getRepository('AppBundle:Sale')
@@ -277,6 +276,11 @@ class AjaxController extends Controller
           }
           $stock->setUnitCost($prod->getProductCost());
           $stock->setRetailCost($prod->getProductRetailPrice());
+          if($lastSale->getPaymentMode() == "suspended"){
+            $stock->setTransaction("sus");
+          } else {
+            $stock->setTransaction("out");
+          }
           $em->persist($stock);
           $em->flush();
         }

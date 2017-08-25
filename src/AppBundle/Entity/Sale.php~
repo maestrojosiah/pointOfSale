@@ -3,12 +3,13 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Sale
  *
  * @ORM\Table(name="sale")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\SaleRepository")
  */
 class Sale
 {
@@ -98,6 +99,7 @@ class Sale
     public function __construct()
     {
         $this->stocks = new ArrayCollection();
+        $this->deleted = false;
     }
 
 

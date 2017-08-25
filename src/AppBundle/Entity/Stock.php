@@ -20,13 +20,6 @@ class Stock
     private $onDate;
 
     /**
-     * @var integer
-     *
-     * @ORM\Column(name="item_id", type="integer", nullable=false)
-     */
-    private $itemId;
-
-    /**
      * @var string
      *
      * @ORM\Column(name="quantity", type="string", length=100, nullable=false)
@@ -75,6 +68,12 @@ class Stock
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
      */
     private $user;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Product", inversedBy="stocks")
+     * @ORM\JoinColumn(name="item_id", referencedColumnName="id")
+     */
+    private $product;
 
     /**
      * @ORM\ManyToOne(targetEntity="Sale", inversedBy="stocks")
@@ -308,5 +307,29 @@ class Stock
     public function getSale()
     {
         return $this->sale;
+    }
+
+    /**
+     * Set product
+     *
+     * @param \AppBundle\Entity\Product $product
+     *
+     * @return Stock
+     */
+    public function setProduct(\AppBundle\Entity\Product $product = null)
+    {
+        $this->product = $product;
+
+        return $this;
+    }
+
+    /**
+     * Get product
+     *
+     * @return \AppBundle\Entity\Product
+     */
+    public function getProduct()
+    {
+        return $this->product;
     }
 }

@@ -64,20 +64,6 @@ class Product
     /**
      * @var integer
      *
-     * @ORM\Column(name="profit", type="integer", nullable=false)
-     */
-    private $profit;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="tax", type="integer", nullable=false)
-     */
-    private $tax;
-
-    /**
-     * @var integer
-     *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -355,14 +341,14 @@ class Product
         return $this->user;
     }
 
-    public function getTheProfit($bp, $sp, $qty = 1, $rate = 16){
+    public function getProfit($bp, $sp, $qty = 1, $rate = 16){
         $vat = round($sp * ($rate / 116), 2);
         $diff = $sp - $bp;
         $profit = ($diff - $vat) * $qty;
         return round($profit, 2);
     }
     
-    public function getTheVat($bp, $sp, $qty = 1, $rate = 16) {
+    public function getVat($bp, $sp, $qty = 1, $rate = 16) {
         $vat = $sp * ($rate / 116) * $qty;
         return round($vat, 2);
     }

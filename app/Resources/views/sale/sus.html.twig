@@ -21,11 +21,11 @@
                 <td>{{ sale.totalSale }}</td>
                 <td>{{ sale.paymentMode }}</td>
                 <td class="center">
-                    <a type="button" class="btn btn-danger disabled" data-toggle="modal" data-target="#deleteModal{{ sale.id }}" data-saleId="{{ sale.id }}">
+                    <a type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal{{ sale.id }}" data-saleId="{{ sale.id }}">
                   Delete
                     </a>
-                    <a href="{{ path('sale_edit', { 'saleId': sale.id } ) }}" class="btn btn-info disabled">
-                  Edit
+                    <a href="{{ path('sale_view_complete', { 'saleId': sale.id } ) }}" class="btn btn-info">
+                  Complete
                     </a>
                     <a href="{{ path('sale_view', { 'saleId': sale.id } ) }}" class="btn btn-primary">
                   View

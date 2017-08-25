@@ -28,5 +28,17 @@ class StockRepository extends \Doctrine\ORM\EntityRepository
     }
 
 
+    public function findAllForThisSale($sale)
+    {
+        return $this->createQueryBuilder('s')
+		    ->select('s')
+		    ->where('s.sale = :sale')
+		    ->setParameter('sale', $sale)
+		    ->orderBy('s.id', 'ASC')
+		    ->getQuery()
+		    ->getResult();
+    }
+
+
 
 }

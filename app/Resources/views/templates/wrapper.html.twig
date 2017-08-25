@@ -22,9 +22,9 @@
                                 <span class="caret"></span>
                             </button>
 							  <ul class="dropdown-menu">
-								<li><a href="#">Suspended Sales</a></li>
-								<li><a href="#">Search Sales</a></li>
-								<li><a href="#">Show Last Sale Receipt</a></li>
+								<li><a href="{{ path('suspended_view') }}">Suspended Sales</a></li>
+								<li><a href="{{ path('sale_list') }}">Search Sales</a></li>
+								<li><a href="{{ path('last_sale') }}">Show Last Sale Receipt</a></li>
 								<li role="separator" class="divider"></li>
 								<li><a href="#">Open Cash Drawer</a></li>
 							  </ul>
@@ -72,12 +72,12 @@
 					<hr />
                     <div class="list-group">
                         <a href="#" class="list-group-item">
-                            <i class="fa fa-comment fa-fw"></i> Tax
+                            <i class="fa fa-money fa-fw"></i> Tax
                             <span class="pull-right text-muted small" id="show_tax"><em>Kes</em>
                             </span>
                         </a>
                         <a href="#" class="list-group-item">
-                            <i class="fa fa-twitter fa-fw"></i> Items
+                            <i class="fa fa-shopping-basket fa-fw"></i> Items
                             <span class="pull-right text-muted small" id="show_qty"><em>Qty</em>
                             </span>
                         </a>
@@ -103,7 +103,7 @@
 					<hr />
 					<div class="form-group input-group">
 						<input class="form-control" type="text" id="paidAmt" placeholder="Paid Amt">
-						<a href="#category" class="btn btn-primary input-group-addon toggleButton" data-toggle="collapse" style="background-color: #337ab7; color:white;">Complete Sale</a>
+						<butto id="completeSale" class="btn btn-primary input-group-addon" style="background-color: #337ab7; color:white;">Complete Sale</a>
 					</div>
                     {# {{ dump(data.systSetting) }} #}
                 </div>
@@ -128,7 +128,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <a href="{{ path('homepage') }}" id="suspendSale" class="btn btn-primary">Go Ahead</a>
+        <button {# href="{{ path('homepage') }}" #} data-dismiss="modal" id="suspendSale" class="btn btn-primary">Go Ahead</button>
       </div> 
     </div>
   </div>
@@ -148,17 +148,16 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" id="cancelSale" class="btn btn-primary">Go Ahead</button>
+        <a href="{{ path('homepage') }}" id="cancelSale" class="btn btn-primary">Go Ahead</a>
       </div> 
     </div>
   </div>
 </div>
-
 <!-- Large modal -->
 <div id="receiptModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
     <div class="container">
         <div class="row">
-            <div class="well col-xs-10 col-sm-10 col-md-6 col-xs-offset-1 col-sm-offset-1 col-md-offset-3">
+            <div id="toPrint" class="well col-xs-10 col-sm-10 col-md-6 col-xs-offset-1 col-sm-offset-1 col-md-offset-3">
                 <div class="row">
                     <div class="col-xs-6 col-sm-6 col-md-6">
                         <address>
@@ -218,12 +217,12 @@
                     <button type="button" class="btn btn-warning btn-lg" data-dismiss="modal">
                         Close  <span class="glyphicon glyphicon-remove"></span>
                     </button>
-                    <button type="button" class="btn btn-success btn-lg">
+                    <button type="button" class="btn btn-success btn-lg" id="sendPrint">
                         Print  <span class="glyphicon glyphicon-chevron-right"></span>
                     </button>
-                    <button type="button" class="btn btn-success btn-lg">
+                    <a href="{{path('homepage')}}" class="btn btn-success btn-lg">
                         Back to POS  <span class="glyphicon glyphicon-chevron-left"></span>
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>

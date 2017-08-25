@@ -31,6 +31,10 @@ class SellController extends Controller
             ->getRepository('AppBundle:SystSetting')
             ->settingsForThisUser($user);
 
+        if(!$systSetting){
+            return $this->redirectToRoute('systSetting_add');
+        }
+
         $data['categories'] = $categories;
         $data['systSetting'] = $systSetting;
 

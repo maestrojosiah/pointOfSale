@@ -82,6 +82,11 @@ class Product
 	 */
 	private $user;
 
+    /**
+     * @ORM\OneToMany(targetEntity="Stock", mappedBy="product")
+     */
+    private $stocks;
+
     public function __construct()
     {
         $this->deleted = false;

@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Stock
  *
  * @ORM\Table(name="stock")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\StockRepository")
  */
 class Stock
 {
@@ -18,13 +18,6 @@ class Stock
      * @ORM\Column(name="on_date", type="datetime", nullable=false)
      */
     private $onDate;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="item_id", type="integer", nullable=false)
-     */
-    private $itemId;
 
     /**
      * @var string
@@ -75,6 +68,12 @@ class Stock
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
      */
     private $user;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Product", inversedBy="stocks")
+     * @ORM\JoinColumn(name="item_id", referencedColumnName="id")
+     */
+    private $product;
 
     /**
      * @ORM\ManyToOne(targetEntity="Sale", inversedBy="stocks")
