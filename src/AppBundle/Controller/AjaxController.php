@@ -29,6 +29,7 @@ class AjaxController extends Controller
               $arrData = [];
             } else {
               $itemName   =     $product->getProductName();
+              $itemCode   =     $product->getProductCode();
               $price      =     $product->getProductRetailPrice();
               $quantity   =     "1";
               $total      =     $price*$quantity;
@@ -36,7 +37,7 @@ class AjaxController extends Controller
               $row = " 
               <tr id='Rw_$id'> 
                 <td><span id='Cl_$id' class='btn btn-secondary glyphicon glyphicon-remove' aria-hidden='true'></span></td>
-                <td><span id='IN_$id' class='btn btn-secondary'>".$itemName."</span></td>
+                <td><span id='IN_$id' class='btn btn-secondary'><b>".$itemCode."</b> | ".$itemName."</span></td>
                 <td><span id='Pr_$id' class='btn btn-secondary'>".$price."</span></td>
                 <td><span id='Qt_$id' class='btn btn-secondary'>".$quantity."</span></td>
                 <td><span id='Tl_$id' class='btn btn-secondary'>".$total."</span></td>
@@ -83,6 +84,7 @@ class AjaxController extends Controller
               $arrData = [];
             } else {
               $itemName   =     $product->getProductName();
+              $itemCode   =     $product->getProductCode();
               $price      =     $product->getProductRetailPrice();
               $quantity   =     "1";
               $total      =     $price*$quantity;
@@ -91,7 +93,7 @@ class AjaxController extends Controller
               $row = " 
               <tr id='Rw_$id'> 
                 <td><span id='Cl_$id' class='btn btn-secondary glyphicon glyphicon-remove' aria-hidden='true'></span></td>
-                <td><span id='IN_$id' class='btn btn-secondary'>".$itemName."</span></td>
+                <td><span id='IN_$id' class='btn btn-secondary'><b>".$itemCode."</b> | ".$itemName."</span></td>
                 <td><span id='Pr_$id' class='btn btn-secondary'>".$price."</span></td>
                 <td><span id='Qt_$id' class='btn btn-secondary'>".$quantity."</span></td>
                 <td><span id='Tl_$id' class='btn btn-secondary'>".$total."</span></td>
@@ -152,10 +154,24 @@ class AjaxController extends Controller
               ->findOneByProductCode($value);
 
             if(!$product){
-              $data['product'] = "No Matches";
+                $products = $this->getDoctrine()
+                  ->getRepository('AppBundle:Product')
+                  ->searchMatchingProducts($value);
+
+                $prodArray = [];
+
+                if(!$products){
+                  //do nothing
+                } else {
+                  foreach($products as $product){
+                    $prodArray[] = array($product->getId(), $product->getProductName(), $product->getProductCode());
+                  }
+                  $data['prodArray'] = $prodArray;
+                }
             } else {
               $data['product'] = $product->getProductName();
               $data['id'] = $product->getId();
+              $data['code'] = $product->getProductCode();
             }
 
             $arrData = ['output' => $data ];
@@ -197,13 +213,25 @@ class AjaxController extends Controller
           $paymentMode = $request->request->get('paymentMode');
         }
         
+        if($paymentMode == "check"){
+          $append = "|".$check;
+        } else if ($paymentMode == "creditCard"){
+          $append = "|".$creditCard;
+        } else if ($paymentMode == "mpesa"){
+          $append = "|".$mpesa;
+        } else {
+          $append = "";
+        }
+  
 
         if($paymentMode != "check" && $paymentMode != "creditCard" && $paymentMode != "mpesa" && $paymentMode != "suspended"){
           $paymentMode = "cash";
         }
-  
-        $user = $this->get('security.token_storage')->getToken()->getUser();
 
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+        $userFName = $user->getFName();
+        $userLName = $user->getLName();
+        $userNameAbbrev = $userFName[0].$userLName[0];
         $sale = new Sale();
         $em = $this->getDoctrine()->getManager();
 
@@ -218,24 +246,27 @@ class AjaxController extends Controller
             $thisId = $lastInputId + 1;
             $sale->setOrigId($thisId);
         }
+
         $today = date("d-m-Y h:i:s");
         $sale->setOnDate(new \DateTime($today));
         $sale->setCustomer("Walk In Client");
         $sale->setTax($tax);
         $sale->setDiscount("0");
-        $sale->setPaymentMode($paymentMode);
+        $sale->setPaymentMode($paymentMode.$append);
         $sale->setQty($qtyTotal);
         $sale->setTotalSale($total);
 
         $em->persist($sale);
         $em->flush();
+        $EntityId = $sale->getId();
+        $receiptNumber = date("ymd").$EntityId.$userNameAbbrev;
 
         //$array = explode(",", $finalArray);
 
         //$newArray = array_push($array, $paidAmt);
 
-        $arrData = ['output' => $paymentMode ];
-        return new JsonResponse($arrData);
+        $saleNumber = ['output' => $receiptNumber ];
+        return new JsonResponse($saleNumber);
     }
 
     /**
@@ -248,6 +279,7 @@ class AjaxController extends Controller
         $em = $this->getDoctrine()->getManager();
 
         $stockArray = $request->request->get('stock');
+        $thisSaleTransaction = $request->request->get('transaction');
         $idArray = [];
 
         foreach($stockArray as $stockItem){
@@ -278,8 +310,16 @@ class AjaxController extends Controller
           $stock->setRetailCost($prod->getProductRetailPrice());
           if($lastSale->getPaymentMode() == "suspended"){
             $stock->setTransaction("sus");
+          } elseif ($thisSaleTransaction == "Sale") {
+            $stock->setTransaction("sal");
+          } elseif ($thisSaleTransaction == "Return") {
+            $stock->setTransaction("ret");
+          } elseif ($thisSaleTransaction == "Stock In") {
+            $stock->setTransaction("sto");
+          } elseif ($thisSaleTransaction == "Return Compensation") {
+            $stock->setTransaction("com");
           } else {
-            $stock->setTransaction("out");
+            $stock->setTransaction("err");
           }
           $em->persist($stock);
           $em->flush();

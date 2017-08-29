@@ -21,23 +21,37 @@ $('.toggleButton').click(function(){
     }
 });
 
-$('.toggleSale').click(function(){
+$(document).on("click", '.toggleSale', function(){
     var $this = $(this);
-    $this.toggleClass('toggleSale');
-    if($this.hasClass('toggleSale')){
-        $this.text('Sale');         
-    } else {
-        $this.text('Return');
+    if($this.text() == 'Sale'){
+        $this.text('Return');   
+        console.log($this.text());
+        $("#action").html(
+            '<button type="button" id="salesReturn" class="btn btn-primary"><strong>Submit Return</strong></button>'
+        );
+    } else if($this.text() == 'Return') {
+        $this.text('Return Compensation');
+        console.log($this.text());      
+        $("#action").html(
+            '<button type="button" id="salesReturnCompensation" class="btn btn-primary"><strong>Submit Return Compensation</strong></button>'
+        );
+    } else if($this.text() == 'Return Compensation') {
+        $this.text('Stock In');
+        console.log($this.text());      
+        $("#action").html(
+            '<button type="button" id="stockIn" class="btn btn-primary"><strong>Submit Stock Received</strong></button>'
+        );
+    } else if($this.text() == 'Stock In') {
+        $this.text('Sale');
+        console.log($this.text());   
+        $("#action").html("");   
     }
 });
 
 
 function loadShortcuts() {
 	shortcut.add("F1", function() {
-		alert("F1 should redirect to new sale");
-	});
-	shortcut.add("F3", function() {
-		alert("F3 should redirect to new sale");
+		alert("F1 should do something");
 	});
 	shortcut.add("F2", function() {
 		$('#searchItem').focus();      

@@ -25,11 +25,11 @@
 			<!-- Morris Charts CSS -->
 			<link href="{{ asset('vendor/morrisjs/morris.css') }}" rel="stylesheet">
 
-		    <!-- DataTables CSS -->
-		    <link href="{{ asset('vendor/datatables-plugins/dataTables.bootstrap.css') }}" rel="stylesheet">
+	    <!-- DataTables CSS -->
+	    <link href="{{ asset('vendor/datatables-plugins/dataTables.bootstrap.css') }}" rel="stylesheet">
 
-		    <!-- DataTables Responsive CSS -->
-		    <link href="{{ asset('vendor/datatables-responsive/dataTables.responsive.css') }}" rel="stylesheet">
+	    <!-- DataTables Responsive CSS -->
+	    <link href="{{ asset('vendor/datatables-responsive/dataTables.responsive.css') }}" rel="stylesheet">
 
 			<!-- Custom Fonts -->
 			<link href="{{ asset('vendor/font-awesome/css/font-awesome.min.css') }}" rel="stylesheet" type="text/css">
@@ -76,10 +76,10 @@
 			<!-- Custom Theme JavaScript -->
 			<script src="{{ asset('dist/js/sb-admin-2.js') }}"></script>
 			
-	 	   <!-- DataTables JavaScript -->
-		    <script src="{{ asset('vendor/datatables/js/jquery.dataTables.min.js') }}"></script>
-		    <script src="{{ asset('vendor/datatables-plugins/dataTables.bootstrap.min.js') }}"></script>
-		    <script src="{{ asset('vendor/datatables-responsive/dataTables.responsive.js') }}"></script>
+ 	   <!-- DataTables JavaScript -->
+	    <script src="{{ asset('vendor/datatables/js/jquery.dataTables.min.js') }}"></script>
+	    <script src="{{ asset('vendor/datatables-plugins/dataTables.bootstrap.min.js') }}"></script>
+	    <script src="{{ asset('vendor/datatables-responsive/dataTables.responsive.js') }}"></script>
 
 		<!-- Keyboard Shortcut Javascript -->
 			<script src="{{ asset('js/shortcut.js') }}"></script>
@@ -88,15 +88,15 @@
       $(document).ready(function() {
         $('#sendPrint').on('click', function(e) {
           $('#toPrint').printThis();
-        })
+        });
       });
       </script>
 			<script>
-			window.onload=loadShortcuts;
-            $('#valueHolder').focus();
-			$("input[type='text']").focus(function () {
-			   $(this).select();
-			});
+		    window.onload=loadShortcuts;
+        $('#valueHolder').focus();
+  			$("input[type='text']").focus(function () {
+  			   $(this).select();
+  			});
 			</script>
 		    <script>
 		    $(document).ready(function() {
@@ -108,11 +108,7 @@
 		    </script>
 
 			<script>
-			var xTriggered = 0;
 			$( "#searchItem" ).keyup(function( event ) {
-			  xTriggered++;
-			  var msg = "Handler for .keyup() called " + xTriggered + " time(s).";
-			  console.log(msg);
 			  var value = $(this).val();
 			  console.log(value);
 			  var id = jQuery(this).attr("id");
@@ -126,19 +122,45 @@
 			        async: true,
 			        success: function (data)
 			        {
-			            console.log(data)
-			            $('.result').text(data.output.product);
-			            $('.result').attr('id', 'ajax_'+data.output.id);
-			            if ( event.which == 13 ) {
-						    //$('#ajax_'+data.output.id).click();
-						    console.log('from#ajax_'+data.output.id);
-						    $('#searchItem').val('');
-						}
+			            // console.log(data.output.prodArray);
+                  $( "#searchResults ul" ).empty();
+                  if (typeof data.output.prodArray != 'undefined'){
+                    $("#close").show();
+                    $("#searchResults").show();
+                    var codeArray = Array();
+                    $.each( data.output.prodArray, function( key, value) {
+                      $("#searchResults ul").append('<li id="ajax_'+value[0]+'" class="list-group-item"><span class="tab btn btn-default"><strong>'+value[2]+'</strong> | '+value[1]+'</span></li>');
+                      codeArray.push(value[2]);
+                    });
+                    $("#codeStore").text(codeArray[0]);                    
+                  } else {
+  			            $('.result').text(data.output.product);
+  			            $('.result').attr('id', 'ajax_'+data.output.id);
+                    $("#codeStore").text(data.output.code);                    
+  			            if ( event.which == 13 ) {
+    						    //$('#ajax_'+data.output.id).click();
+    						    console.log('from#ajax_'+data.output.id);
+    						    $('#searchItem').val('');
+                    $("#close").hide();
+                    $("#searchResults").hide();
+                  }
+						    }
+                if($("#searchItem").val() == ""){
+                  $("#searchResults").hide();
+                  $("#close").hide();
+                  $("#codeStore").text("");
+                  $(".result").hide();
+                }                                
 			        }
 			    });
 
 			});
 			</script>
+      <script type="text/javascript">
+        $(document).on('click', '#close', function () {
+            $(this).parent('div').fadeOut();
+        });
+      </script>
 			{% for message in app.flashes('success') %}
 				<script type="text/javascript">
 					$.notiny({ text: '{{ message }}' });
@@ -197,7 +219,7 @@
         $(document).on('keypress', '#searchItem', function(e){
            var key = e.which;
            if(key == 13){ 
-            var code = $(this).val();
+            var code = $("#codeStore").text();
             $.ajax({
                 url:'{{ (path('ajax_request_search')) }}',
                 type: "POST",
@@ -211,6 +233,7 @@
                     console.log("ajaxSearch"+data.output)
                     $('#sales > tbody:last-child').append(data.output);
                     $('#searchItem').val('');                    
+                    $("#searchResults").click();                    
                     $('#tableToArray').click();
                 }
             });
@@ -246,6 +269,30 @@
         });
         
       $('#searchItem').focus();      
+    });
+  </script>
+  <script>
+    $(document).on("click", '#salesReturn', function(){
+      console.log("clicked on sales return submit button")
+      var e = jQuery.Event("keypress");
+      e.which = 13; 
+      $("#paidAmt").trigger(e);      
+    });
+  </script>
+  <script>
+    $(document).on("click", '#salesReturnCompensation', function(){
+      console.log("clicked on sales return compensation submit button")
+      var e = jQuery.Event("keypress");
+      e.which = 13; 
+      $("#paidAmt").trigger(e);
+    });
+  </script>
+  <script>
+    $(document).on("click", '#stockIn', function(){
+      console.log("clicked on stock in submit button")
+      var e = jQuery.Event("keypress");
+      e.which = 13; 
+      $("#paidAmt").trigger(e);
     });
   </script>
   <script>
@@ -332,10 +379,12 @@
   <script type="text/javascript">
   shortcut.add("F4", function() {
       var paidAmt =    $("#paidAmt").val();
+      if($("#transaction").text() == "Sale"){
       if($("#paidAmt").val()==""){
         $("#infoParagraph").html("<span class='text-danger'>Please indicate how much has been paid?</span><br />Hit F7 to focus");
         $("#infoModal").modal('show');
 
+        }
       } else {
             var qtyTotal = $("#show_qty").text();
             var total = $("#amountDue").text();
@@ -374,10 +423,13 @@
               async: true,
               success: function (data) 
               {
-                //console.log("fromAjax"+data.output);
+                console.log("fromAjax"+data.output);
                 $("#receiptTotal").html('<strong>' + $("#amountDue").text() +'</strong>');              
                 $("#receiptPaid").html('<strong>' + $("#paidAmt").val() +'</strong>');              
                 $("#receiptChange").html('<strong>' + $("#show_bal").text() +'</strong>');              
+                $("#receiptTax").html('<strong>' + $("#show_tax").text() +'</strong>');   
+                $("#receiptNumber").text(data.output);           
+                $("#transactionTitle").text($("#transaction").text());           
                 $("#receiptModal").modal('show'); 
 
                 var $table = $("#sales");
@@ -406,6 +458,7 @@
                       async: true,
                       success: function (data)
                       {
+                        var transaction = $("#transaction").text();
                         var arrayLength = data.output.chunks.length;
                         var stock = new Array();
                         for (var i = 0; i < arrayLength; i++) {                          
@@ -419,11 +472,12 @@
                           dataType: "json",
                           data: {
                               "stock": stock,
+                              "transaction": transaction,
                           },
                           async: true,
                           success: function (data)
                           {
-                            console.log("fromAjax: "+data.output);
+                            //console.log("fromAjax: "+data.output);
                           }
                         });
 
@@ -439,10 +493,10 @@
 
   <script type="text/javascript">
     $( "#completeSale" ).click(function() {
-    var e = jQuery.Event("keypress");
-    e.which = 13; 
-    $("#paidAmt").trigger(e);
-  });
+      var e = jQuery.Event("keypress");
+      e.which = 13; 
+      $("#paidAmt").trigger(e);
+    });
   </script>
 
   <script type="text/javascript">
@@ -450,11 +504,15 @@
       var key = e.which;
       if(key == 13) {
       var paidAmt =    $("#paidAmt").val();
-      if($("#paidAmt").val()==""){
-        $("#infoParagraph").html("<span class='text-danger'>Please indicate how much has been paid?</span><br />Hit F7 to focus");
-        $("#infoModal").modal('show');
+      if($("#transaction").text() == "Sale"){
+        console.log("paidAmt keypress called");
+        if($("#paidAmt").val()==""){
+          $("#infoParagraph").html("<span class='text-danger'>Please indicate how much has been paid?</span><br />Hit F7 to focus");
+          $("#infoModal").modal('show');
 
-      } else {
+          }
+      }
+
             var qtyTotal = $("#show_qty").text();
             var total = $("#amountDue").text();
             var tax = $("#show_tax").text();
@@ -492,10 +550,13 @@
               async: true,
               success: function (data) 
               {
-                //console.log("fromAjax"+data.output);
+                console.log("fromAjax"+data.output);
                 $("#receiptTotal").html('<strong>' + $("#amountDue").text() +'</strong>');              
                 $("#receiptPaid").html('<strong>' + $("#paidAmt").val() +'</strong>');              
                 $("#receiptChange").html('<strong>' + $("#show_bal").text() +'</strong>');              
+                $("#receiptTax").html('<strong>' + $("#show_tax").text() +'</strong>');              
+                $("#transactionTitle").text($("#transaction").text());           
+                $("#receiptNumber").text(data.output);           
                 $("#receiptModal").modal('show'); 
 
                 var $table = $("#sales");
@@ -524,6 +585,7 @@
                       async: true,
                       success: function (data)
                       {
+                        var transaction = $("#transaction").text();
                         var arrayLength = data.output.chunks.length;
                         var stock = new Array();
                         for (var i = 0; i < arrayLength; i++) {                          
@@ -537,11 +599,12 @@
                           dataType: "json",
                           data: {
                               "stock": stock,
+                              "transaction": transaction,
                           },
                           async: true,
                           success: function (data)
                           {
-                            console.log("fromAjax: "+data.output);
+                            //console.log("fromAjax: "+data.output);
                           }
                         });
 
@@ -550,7 +613,7 @@
 
             }
         });
-      }
+      
     }
   });
 
@@ -634,6 +697,7 @@
                       async: true,
                       success: function (data)
                       {
+                        var transaction = $("#transaction").text();
                         var arrayLength = data.output.chunks.length;
                         var stock = new Array();
                         for (var i = 0; i < arrayLength; i++) {                          
@@ -647,11 +711,12 @@
                           dataType: "json",
                           data: {
                               "stock": stock,
+                              "transaction": transaction,
                           },
                           async: true,
                           success: function (data)
                           {
-                            console.log("fromAjax: "+data.output);
+                            //console.log("fromAjax: "+data.output);
                             location.href = "{{ path('homepage') }}";
                           }
                         });
@@ -666,6 +731,11 @@
   });
 
   </script>
+<script type="text/javascript">
+  shortcut.add("F3", function() {
+        location.href = "{{ path('homepage') }}";
+  });
+</script>
   {# if the page is for completing suspended sales:...#}
 {% if data.stocks is defined %}
   {% for stock in data.stocks %}

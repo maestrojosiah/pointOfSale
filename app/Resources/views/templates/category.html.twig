@@ -1,8 +1,8 @@
 <div class="row collapse" id="category" style="color:black; text-shadow:none;">
   {% for category in data.categories %}
     {% if category is not null %}
-        <button type="button" class="btn btn-info`" data-toggle="modal" data-target="#deleteModal{{ category.id }}" data-clientId="{{ category.id }}" style="margin-top:5px;">
-          {{category.categoryName}}
+        <button type="button" class="btn btn-info col-xs-6 col-sm-4" data-toggle="modal" data-target="#deleteModal{{ category.id }}" data-clientId="{{ category.id }}" style="margin-top:5px;">
+          <strong>{{category.categoryName}}</strong>
         </button>
     <!-- Modal -->
     <div class="modal fade" id="deleteModal{{ category.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="color:black; text-shadow:none;">
@@ -18,7 +18,7 @@
             {% for product in data.products %}
             {% if product.category is not null %}
                 {% if category.id == product.category.id %}
-                    <a class="btn btn-info" id="ajax_{{product.id}}" style="margin-top:5px; margin-bottom:5px;" href="#" data-dismiss="modal">{{ product.productName }}</a>
+                    <div class="btn btn-default col-xs-6 col-sm-4" id="ajax_{{product.id}}" style="margin-top:5px; margin-bottom:5px;" data-dismiss="modal">{{ product.productName }}</div>
                 {% endif %}
             {% endif %}
             {% endfor %}
