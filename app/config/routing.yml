@@ -7,20 +7,20 @@ logout:
     
 excel_product_stream:
     path:      /product/excel
-    defaults:  { _controller: LiuggioExcelBundle:Fake:stream }
+    defaults:  { _controller: AppBundle:Fake:stream }
 
 pdf_product_stream:
     path:      /product/pdf
-    defaults:  { _controller: LiuggioExcelBundle:Fake:streamPDF }
+    defaults:  { _controller: AppBundle:Fake:streamPDF }
 
 fake_route_store:
     path:      /fake/store
-    defaults:  { _controller: LiuggioExcelBundle:Fake:store }
+    defaults:  { _controller: AppBundle:Fake:store }
 
 fake_route_read:
     path:      /fake/read
-    defaults:  { _controller: LiuggioExcelBundle:Fake:readAndSave }
+    defaults:  { _controller: AppBundle:Fake:readAndSave }
 
 fake_route_insert:
     path:      /fake/insert/{file}
-    defaults:  { _controller: LiuggioExcelBundle:Fake:insert }
+    defaults:  { _controller: AppBundle:Fake:insert }

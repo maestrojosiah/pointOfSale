@@ -90,6 +90,7 @@ class Product
     public function __construct()
     {
         $this->deleted = false;
+        $this->stocks = new ArrayCollection();
     }
 
     public function __toString() {
@@ -356,5 +357,39 @@ class Product
     public function getVat($bp, $sp, $qty = 1, $rate = 16) {
         $vat = $sp * ($rate / 116) * $qty;
         return round($vat, 2);
+    }
+
+    /**
+     * Add stock
+     *
+     * @param \AppBundle\Entity\Stock $stock
+     *
+     * @return Product
+     */
+    public function addStock(\AppBundle\Entity\Stock $stock)
+    {
+        $this->stocks[] = $stock;
+
+        return $this;
+    }
+
+    /**
+     * Remove stock
+     *
+     * @param \AppBundle\Entity\Stock $stock
+     */
+    public function removeStock(\AppBundle\Entity\Stock $stock)
+    {
+        $this->stocks->removeElement($stock);
+    }
+
+    /**
+     * Get stocks
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getStocks()
+    {
+        return $this->stocks;
     }
 }

@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <title>{% block title %}ABC - POS{% endblock %}</title>
-        {% block stylesheets %}
+        {% block stylesheets %}   {% endblock %}
 			<meta charset="utf-8">
 			<meta http-equiv="X-UA-Compatible" content="IE=edge">
 			<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,18 +12,12 @@
 		    <!-- Bootstrap Core CSS -->
 			<link href="{{ asset('vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
 
-			<!-- MetisMenu CSS -->
-			<link href="{{ asset('vendor/metisMenu/metisMenu.min.css') }}" rel="stylesheet">
-
 			<!-- notiny CSS -->
 			<link href="{{ asset('notiny/notiny.min.css') }}" rel="stylesheet">
 
 			<!-- Custom CSS -->
 			<link href="{{ asset('dist/css/sb-admin-2.css') }}" rel="stylesheet">
 			<link href="{{ asset('css/pos.css') }}" rel="stylesheet">
-
-			<!-- Morris Charts CSS -->
-			<link href="{{ asset('vendor/morrisjs/morris.css') }}" rel="stylesheet">
 
 	    <!-- DataTables CSS -->
 	    <link href="{{ asset('vendor/datatables-plugins/dataTables.bootstrap.css') }}" rel="stylesheet">
@@ -34,13 +28,16 @@
 			<!-- Custom Fonts -->
 			<link href="{{ asset('vendor/font-awesome/css/font-awesome.min.css') }}" rel="stylesheet" type="text/css">
 
+      <!-- datepicker styles -->
+      <link rel="stylesheet" href="{{ asset('pickadate/lib/themes/default.css') }}">
+      <link rel="stylesheet" href="{{ asset('pickadate/lib/themes/default.date.css') }}">
+
 			<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 			<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 			<!--[if lt IE 9]>
 				<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
 				<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
 			<![endif]-->
-		{% endblock %}
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
     </head>
     <body>
@@ -62,17 +59,9 @@
 			<!-- Bootstrap Core JavaScript -->
 			<script src="{{ asset('vendor/bootstrap/js/bootstrap.min.js') }}"></script>
 
-			<!-- Metis Menu Plugin JavaScript -->
-			<script src="{{ asset('vendor/metisMenu/metisMenu.min.js') }}"></script>
-
 			<!-- Notification javascript - notiny -->
 			<script src="{{ asset('notiny/notiny.min.js') }}"></script>
 
-			<!-- Morris Charts JavaScript -->
-			<script src="{{ asset('vendor/raphael/raphael.min.js') }}"></script>
-			<script src="{{ asset('vendor/morrisjs/morris.min.js') }}"></script>
-			{# <script src="{{ asset('data/morris-data.js') }}"></script>
-			#}
 			<!-- Custom Theme JavaScript -->
 			<script src="{{ asset('dist/js/sb-admin-2.js') }}"></script>
 			
@@ -84,6 +73,17 @@
 		<!-- Keyboard Shortcut Javascript -->
 			<script src="{{ asset('js/shortcut.js') }}"></script>
       <script src="{{ asset('js/printThis.js') }}"></script>
+      <script src="{{ asset('pickadate/lib/picker.js') }}"></script>
+      <script src="{{ asset('pickadate/lib/picker.date.js') }}"></script>
+      <script>
+        $('.datepicker').pickadate(
+          { 
+            format: 'yyyy-mm-dd',
+            formatSubmit: 'yyyy-mm-dd' 
+          }
+        );
+      </script>
+
       <script>
       $(document).ready(function() {
         $('#sendPrint').on('click', function(e) {
@@ -98,14 +98,17 @@
   			   $(this).select();
   			});
 			</script>
-		    <script>
-		    $(document).ready(function() {
-		        $('#niceTable').DataTable({
-		            responsive: true,
-                "pageLength": "{{limitRows}}",
-		        });
-		    });
-		    </script>
+	    <script>
+	    $(document).ready(function() {
+	        $('#niceTable').DataTable({
+	            responsive: true,
+              "pageLength": "{{limitRows}}",
+	        });
+          $(document).ready(function() {
+              $('table.display').DataTable();
+          } );          
+	    });
+	    </script>
 
 			<script>
 			$( "#searchItem" ).keyup(function( event ) {
@@ -129,11 +132,14 @@
                     $("#searchResults").show();
                     var codeArray = Array();
                     $.each( data.output.prodArray, function( key, value) {
-                      $("#searchResults ul").append('<li id="ajax_'+value[0]+'" class="list-group-item"><span class="tab btn btn-default"><strong>'+value[2]+'</strong> | '+value[1]+'</span></li>');
+                      console.log("this is why"+value);
+                      $("#searchResults ul").append('<li id="ajax_'+value[0]+'" class="list-group-item"><span class="tab btn btn-default"><strong>'+value[2]+'</strong> | '+value[1]+'</span><span class="badge">'+value[3]+'</span></li>');
                       codeArray.push(value[2]);
                     });
                     $("#codeStore").text(codeArray[0]);                    
                   } else {
+                    $(".result").show();
+                    $("#close").hide();
   			            $('.result').text(data.output.product);
   			            $('.result').attr('id', 'ajax_'+data.output.id);
                     $("#codeStore").text(data.output.code);                    
@@ -613,7 +619,7 @@
 
             }
         });
-      
+    $("#searchItem").focus();      
     }
   });
 
@@ -732,7 +738,7 @@
 
   </script>
 <script type="text/javascript">
-  shortcut.add("F3", function() {
+  shortcut.add("ESC", function() {
         location.href = "{{ path('homepage') }}";
   });
 </script>

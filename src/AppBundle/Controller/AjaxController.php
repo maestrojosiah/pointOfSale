@@ -164,7 +164,7 @@ class AjaxController extends Controller
                   //do nothing
                 } else {
                   foreach($products as $product){
-                    $prodArray[] = array($product->getId(), $product->getProductName(), $product->getProductCode());
+                    $prodArray[] = array($product->getId(), $product->getProductName(), $product->getProductCode(), $product->getProductRetailPrice());
                   }
                   $data['prodArray'] = $prodArray;
                 }
@@ -172,6 +172,7 @@ class AjaxController extends Controller
               $data['product'] = $product->getProductName();
               $data['id'] = $product->getId();
               $data['code'] = $product->getProductCode();
+              $data['price'] = $product->getProductRetailPrice();
             }
 
             $arrData = ['output' => $data ];
@@ -361,8 +362,12 @@ class AjaxController extends Controller
               $product = $this->getDoctrine()
                 ->getRepository('AppBundle:Product')
                 ->find($id);
-
-              $tax += $this->getVat($product->getProductCost(), $product->getProductRetailPrice(), $chunk[3]);
+              if($product->getProductTax() == 1.16){
+                $tax += $this->getVat($product->getProductCost(), $product->getProductRetailPrice(), $chunk[3]);
+              } 
+              if($product->getProductTax() == 1) {
+                $tax += 0;
+              }
               $profit += $this->getProfit($product->getProductCost(), $product->getProductRetailPrice(), $chunk[3]);
               $products[] = $product->getId();
             }

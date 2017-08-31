@@ -24,7 +24,6 @@
             <th>Name</th>
             <th>Cost</th>
             <th>Retail</th>
-            <th>Tax </th>
             <th>Manage</th>
         </tr>
     </thead>
@@ -32,10 +31,9 @@
 
 {% for product in data.products %}
             <tr class="odd gradeX">
-                <td>{{ product.productName }}</td>
+                <td><b>{{ product.productCode }}</b> | {{ product.productName }}</td>
                 <td>{{ product.productCost }}</td>
                 <td>{{ product.productRetailPrice }}</td>
-                <td class="center">NA</td>
                 <td class="center">
                     <a type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal{{ product.id }}" data-productId="{{ product.id }}">
                   Delete

@@ -63,5 +63,10 @@
 </div>
 
 <!-- /.panel-body -->
-{# {{ dump(form) }} #}
+{# {% for sale in data.sales %}
+  {% for stock in sale.stocks %}
+    {{ dump(stock.product.productName)}}
+  {% endfor %}
+
+{% endfor %} #}
 {% endblock %}

@@ -59,8 +59,8 @@ function loadShortcuts() {
 	shortcut.add("F7", function() {
         $('#paidAmt').focus();      
 	});
-    shortcut.add("ESC", function() {
-        alert("ESC should cancel the current sale");
+    shortcut.add("F3", function() {
+        alert("ESC should do something");
     });
 	shortcut.add("F6", function() {
         var lastQtySpan = $('#sales tr:last td:nth-last-child(2) span');

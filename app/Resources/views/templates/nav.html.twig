@@ -130,13 +130,15 @@
                         <i class="fa fa-money fa-fw"></i> <i class="fa fa-caret-down"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-user">
-                        <li><a href="{{ path('sale_list') }}"><i class="fa fa-user fa-fw"></i> Sales </a>
-                        </li>
-                        <li><a href="#"><i class="fa fa-gear fa-fw"></i> Settings</a>
-                        </li>
+                        <li><a href="{{ path('sale_list') }}"><i class="fa fa-user fa-fw"></i> Sales </a></li>
+                        <li><a href="{{ path('items_received') }}"><i class="fa fa-gear fa-fw"></i> Received Items</a></li>
+                        <li><a href="{{ path('items_sold') }}"><i class="fa fa-gear fa-fw"></i> Sales Report (Individual)</a></li>
+                        <li><a href="{{ path('items_sold_grouped') }}"><i class="fa fa-gear fa-fw"></i> Sales Report (Grouped)</a></li>
+                        <li><a href="{{ path('tax_report') }}"><i class="fa fa-gear fa-fw"></i> Tax Report (Individual)</a></li>
+                        <li><a href="{{ path('items_returned') }}"><i class="fa fa-gear fa-fw"></i> Returns </a></li>
+                        <li><a href="{{ path('items_compensated') }}"><i class="fa fa-gear fa-fw"></i> Return Compensations </a></li>
                         <li class="divider"></li>
-                        <li><a href="login.html"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
-                        </li>
+                        <li><a href="login.html"><i class="fa fa-sign-out fa-fw"></i> Logout</a></li>
                     </ul>
                     <!-- /.dropdown-user -->
                 </li>
