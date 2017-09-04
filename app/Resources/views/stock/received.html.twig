@@ -83,7 +83,7 @@
 	{% set total = total+stock.retailCost*stock.quantity %}
     <tr class="odd gradeX">
         <td>{{ stock.product }}</td>
-        <td>{{ stock.onDate | date('d-m-Y') }}</td>
+        <td>{{ stock.onDate | date('Y-m-d') }}</td>
         <td>{{ stock.quantity }}</td>
         <td class="center">{{ stock.retailCost * stock.quantity }}</td>
         <td class="center">
@@ -165,7 +165,7 @@
 	{% set total = total+stock.retailCost*stock.quantity %}
         <tr class="odd gradeX">
             <td>{{ stock.product }}</td>
-            <td>{{ stock.onDate | date('d-m-Y') }}</td>
+            <td>{{ stock.onDate | date('Y-m-d') }}</td>
             <td>{{ stock.quantity }}</td>
             <td class="center">{{ stock.retailCost * stock.quantity }}</td>
             <td class="center">

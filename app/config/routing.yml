@@ -5,11 +5,11 @@ app:
 logout:
     path: /logout
     
-excel_product_stream:
-    path:      /product/excel
+excel_stream:
+    path:      /product/excel/{entity}
     defaults:  { _controller: AppBundle:Fake:stream }
 
-pdf_product_stream:
+pdf_stream:
     path:      /product/pdf
     defaults:  { _controller: AppBundle:Fake:streamPDF }
 

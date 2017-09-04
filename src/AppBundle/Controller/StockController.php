@@ -130,15 +130,91 @@ class StockController extends Controller
 
     }
 
+    /**
+     * @Route("/stock", name="stock_movement")
+     */
+    public function stockAction(Request $request)
+    {
+        $data = [];
+        $em = $this->getDoctrine()->getManager();
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+
+        $data['specificStock'] = [];
+        $data['rangeStock'] = [];
+        $data['dates']['specific'] = '';
+        $data['dates']['from'] = '';
+        $data['dates']['to'] = '';
+        $form = $this   ->createFormBuilder()
+                        ->add('dateSpecific')
+                        ->add('dateFrom')
+                        ->add('dateTo')
+                        ->getForm();
+     
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted()) {
+            $form_data = $form->getData();
+
+            $data['dates']['specific'] = $form_data['dateSpecific'];
+            $data['dates']['from'] = $form_data['dateFrom'];
+            $data['dates']['to'] = $form_data['dateTo'];
+
+            $em = $this->getDoctrine()->getManager();
+
+            if($data['dates']['specific']){
+                $from = new \DateTime($data['dates']['specific']);
+                $from ->setTime(0, 0, 0);
+
+                $to = clone $from;
+                $to->modify('+1 day'); 
+                $stocks = $em->getRepository('AppBundle:Stock')
+                    ->loadAllStocksFromThisUserWithRange($from, $to, $user);
+                $data['specificStock'] = $stocks;
+            } 
+
+            if ($data['dates']['from']) {
+                $from = new \DateTime($data['dates']['from']);
+                $to = new \DateTime($data['dates']['to']);
+                $from ->setTime(0, 0, 0);
+                $to ->setTime(0, 0, 0);
+                $to -> modify('+1 day');
+                $stocks = $em->getRepository('AppBundle:Stock')
+                    ->loadAllStocksFromThisUserWithRange($from, $to, $user);
+                $data['rangeStock'] = $stocks;
+            }           
+
+        } else {
+            $stocks = $em->getRepository('AppBundle:Stock')
+                ->loadAllStocksFromThisUser($user);
+            $data['allStock'] = $stocks;
+        }
+
+        $returnsSoFar = $em->getRepository('AppBundle:Stock')
+            ->calculateStockMovementBeforeThisDate($data['dates']['from'], "ret");
+        $stockInSoFar = $em->getRepository('AppBundle:Stock')
+            ->calculateStockMovementBeforeThisDate($data['dates']['from'], "sto");
+        $salesSoFar = $em->getRepository('AppBundle:Stock')
+            ->calculateStockMovementBeforeThisDate($data['dates']['from'], "sal");
+        
+        $data['returns'] = $returnsSoFar[0]['total'];
+        $data['sales'] = $salesSoFar[0]['total'];
+        $data['stockIn'] = $stockInSoFar[0]['total'];
+
+        return $this->render('stock/stock.html.twig', $data );
+
+    }
+
 	/**
-	 * @Route("/stock/compensated", name="items_compensated")
+	 * @Route("/stock/item/{id}", name="stock_movement_item")
 	 */
-	public function compensatedAction(Request $request)
+	public function stockItemAction(Request $request, $id)
 	{
 		$data = [];
 		$em = $this->getDoctrine()->getManager();
         $user = $this->get('security.token_storage')->getToken()->getUser();
 
+        $product = $em->getRepository('AppBundle:product')
+                ->find($id);
         $data['specificStock'] = [];
         $data['rangeStock'] = [];
     	$data['dates']['specific'] = '';
@@ -160,14 +236,15 @@ class StockController extends Controller
         	$data['dates']['to'] = $form_data['dateTo'];
 
         	$em = $this->getDoctrine()->getManager();
-        	if($data['dates']['specific']){
-        		$startDay = new \DateTime($data['dates']['specific']);
-        		$startDay ->setTime(0, 0, 0);
 
-        		$endDay = clone $startDay;
-				$endDay->modify('+1 day'); 
+        	if($data['dates']['specific']){
+        		$from = new \DateTime($data['dates']['specific']);
+        		$from ->setTime(0, 0, 0);
+
+        		$to = clone $from;
+				$to->modify('+1 day'); 
         		$stocks = $em->getRepository('AppBundle:Stock')
-        			->findAllForThisDate($startDay, $endDay, "com");
+        			->loadAllStocksMovementForThisItem($from, $to, $user, $product);
         		$data['specificStock'] = $stocks;
         	} 
 
@@ -178,14 +255,28 @@ class StockController extends Controller
         		$to ->setTime(0, 0, 0);
         		$to -> modify('+1 day');
         		$stocks = $em->getRepository('AppBundle:Stock')
-        			->findAllForThisRange($from, $to, "com");
+        			->loadAllStocksMovementForThisItem($from, $to, $user, $product);
         		$data['rangeStock'] = $stocks;
-        	}
-        	
+        	}        	
 
-    	}
+    	} else {
+            $stocks = $em->getRepository('AppBundle:Stock')
+                ->loadAllStocksFromThisItem($user, $product);
+            $data['allStock'] = $stocks;
+        }
 
-		return $this->render('stock/compensate.html.twig', $data );
+        $returnsSoFar = $em->getRepository('AppBundle:Stock')
+            ->calculateStockMovementBeforeThisDate($data['dates']['from'], "ret");
+        $stockInSoFar = $em->getRepository('AppBundle:Stock')
+            ->calculateStockMovementBeforeThisDate($data['dates']['from'], "sto");
+        $salesSoFar = $em->getRepository('AppBundle:Stock')
+            ->calculateStockMovementBeforeThisDate($data['dates']['from'], "sal");
+        
+        $data['returns'] = $returnsSoFar[0]['total'];
+        $data['sales'] = $salesSoFar[0]['total'];
+        $data['stockIn'] = $stockInSoFar[0]['total'];
+
+		return $this->render('stock/stockItem.html.twig', $data );
 
 	}
 
@@ -348,7 +439,7 @@ class StockController extends Controller
 
                 $arrayValues = [];
                 foreach($stocks as $stock){
-                    $arrayValues[]  = [$stock->getProduct()->getId(), $stock->getQuantity(), $stock->getId()];
+                    $arrayValues[]  = [$stock->getProduct()->getId(), $stock->getId()];
                 }
                 $vals = [];
                 foreach($arrayValues as $val){
@@ -360,9 +451,7 @@ class StockController extends Controller
                 $relatedStock = [];
                 foreach($vals as $key => $value){
                     $id = array_keys($value)[0];
-                    $qty = array_keys($value)[1];
-                    $sId = array_keys($value)[2];
-                    $relatedArray[] = [$id=>$qty];
+                    $sId = array_keys($value)[1];
                     $relatedStock[] = [$id=>$sId];
                 }
 
@@ -420,7 +509,7 @@ class StockController extends Controller
 
                 $arrayValues = [];
                 foreach($stocks as $stock){
-                    $arrayValues[]  = [$stock->getProduct()->getId(), $stock->getQuantity(), $stock->getId()];
+                    $arrayValues[]  = [$stock->getProduct()->getId(), $stock->getId()];
                 }
                 $vals = [];
                 foreach($arrayValues as $val){
@@ -432,9 +521,7 @@ class StockController extends Controller
                 $relatedStock = [];
                 foreach($vals as $key => $value){
                     $id = array_keys($value)[0];
-                    $qty = array_keys($value)[1];
-                    $sId = array_keys($value)[2];
-                    $relatedArray[] = [$id=>$qty];
+                    $sId = array_keys($value)[1];
                     $relatedStock[] = [$id=>$sId];
                 }
 
@@ -461,6 +548,7 @@ class StockController extends Controller
                         $prod['productId'] = $stock->getProduct()->getId();
                         $prod['productCode'] = $stock->getProduct()->getProductCode();
                         $prod['productName'] = $stock->getProduct()->getProductName();
+                        $prod['productTax'] = $stock->getProduct()->getProductTax();
                         $prod['productSales'] = $stock->getRetailCost()*$quantity;
                         $prod['productCost'] = $stock->getUnitCost()*$quantity;
                         $bp = $prod['productCost'];
@@ -484,7 +572,12 @@ class StockController extends Controller
 	}
 
 
+    /**
+     * @Route("/sth", name="stg")
+     */
+    public function somethingAction(){
 
+    }
 
 
 }

@@ -29,22 +29,19 @@ $(document).on("click", '.toggleSale', function(){
         $("#action").html(
             '<button type="button" id="salesReturn" class="btn btn-primary"><strong>Submit Return</strong></button>'
         );
+        $("#rightSide").hide();
     } else if($this.text() == 'Return') {
-        $this.text('Return Compensation');
-        console.log($this.text());      
-        $("#action").html(
-            '<button type="button" id="salesReturnCompensation" class="btn btn-primary"><strong>Submit Return Compensation</strong></button>'
-        );
-    } else if($this.text() == 'Return Compensation') {
         $this.text('Stock In');
         console.log($this.text());      
         $("#action").html(
             '<button type="button" id="stockIn" class="btn btn-primary"><strong>Submit Stock Received</strong></button>'
         );
+        $("#rightSide").hide();
     } else if($this.text() == 'Stock In') {
         $this.text('Sale');
         console.log($this.text());   
         $("#action").html("");   
+        $("#rightSide").show();
     }
 });
 

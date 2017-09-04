@@ -149,6 +149,7 @@ class AjaxController extends Controller
 
             $user = $this->get('security.token_storage')->getToken()->getUser();
             $data['user'] = $user;
+            $em = $this->getDoctrine()->getManager();
             $product = $this->getDoctrine()
               ->getRepository('AppBundle:Product')
               ->findOneByProductCode($value);
@@ -164,7 +165,23 @@ class AjaxController extends Controller
                   //do nothing
                 } else {
                   foreach($products as $product){
-                    $prodArray[] = array($product->getId(), $product->getProductName(), $product->getProductCode(), $product->getProductRetailPrice());
+                    $stockIn = $em->getRepository('AppBundle:Stock')
+                        ->findAllStockForThisProduct($product, "sto");
+                    $stockSold = $em->getRepository('AppBundle:Stock')
+                        ->findAllStockForThisProduct($product, "sal");
+                    $stockReturned = $em->getRepository('AppBundle:Stock')
+                        ->findAllStockForThisProduct($product, "ret");
+
+                    $returns  =  $stockReturned[0]['total'];
+                    $sales    =  $stockSold[0]['total'];
+                    $stock    =  $stockIn[0]['total'];
+
+                    $goodsAvailable = $returns + $stock;
+                    $goodsSold      = $sales - $returns;
+                    $balance        = $goodsAvailable - $goodsSold; 
+                    $remainingStock = $balance / $product->getProductRetailPrice();       
+
+                    $prodArray[] = array($product->getId(), $product->getProductName(), $product->getProductCode(), $product->getProductRetailPrice(), $remainingStock );
                   }
                   $data['prodArray'] = $prodArray;
                 }
@@ -307,8 +324,10 @@ class AjaxController extends Controller
               $thisId = $lastInputId + 1;
               $stock->setOrigId($thisId);
           }
+          $totalCost = $prod->getProductRetailPrice()*$stockItem[3];
           $stock->setUnitCost($prod->getProductCost());
           $stock->setRetailCost($prod->getProductRetailPrice());
+          $stock->setTotalCost($totalCost);
           if($lastSale->getPaymentMode() == "suspended"){
             $stock->setTransaction("sus");
           } elseif ($thisSaleTransaction == "Sale") {
@@ -317,8 +336,6 @@ class AjaxController extends Controller
             $stock->setTransaction("ret");
           } elseif ($thisSaleTransaction == "Stock In") {
             $stock->setTransaction("sto");
-          } elseif ($thisSaleTransaction == "Return Compensation") {
-            $stock->setTransaction("com");
           } else {
             $stock->setTransaction("err");
           }

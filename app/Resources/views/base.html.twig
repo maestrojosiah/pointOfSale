@@ -3,12 +3,12 @@
     <head>
         <meta charset="UTF-8" />
         <title>{% block title %}ABC - POS{% endblock %}</title>
-        {% block stylesheets %}   {% endblock %}
 			<meta charset="utf-8">
 			<meta http-equiv="X-UA-Compatible" content="IE=edge">
 			<meta name="viewport" content="width=device-width, initial-scale=1">
 			<meta name="description" content="">
 			<meta name="author" content="">
+      {% block stylesheets %}   
 		    <!-- Bootstrap Core CSS -->
 			<link href="{{ asset('vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
 
@@ -31,7 +31,7 @@
       <!-- datepicker styles -->
       <link rel="stylesheet" href="{{ asset('pickadate/lib/themes/default.css') }}">
       <link rel="stylesheet" href="{{ asset('pickadate/lib/themes/default.date.css') }}">
-
+      {% endblock %}
 			<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 			<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 			<!--[if lt IE 9]>
@@ -104,10 +104,13 @@
 	            responsive: true,
               "pageLength": "{{limitRows}}",
 	        });
-          $(document).ready(function() {
-              $('table.display').DataTable();
-          } );          
-	    });
+      });
+      $(document).ready(function() {
+          $('table.display').DataTable({
+              "order": [[ 1, "asc" ]],
+            });
+        });  
+
 	    </script>
 
 			<script>
@@ -132,8 +135,18 @@
                     $("#searchResults").show();
                     var codeArray = Array();
                     $.each( data.output.prodArray, function( key, value) {
-                      console.log("this is why"+value);
-                      $("#searchResults ul").append('<li id="ajax_'+value[0]+'" class="list-group-item"><span class="tab btn btn-default"><strong>'+value[2]+'</strong> | '+value[1]+'</span><span class="badge">'+value[3]+'</span></li>');
+                      console.log("this is why "+value[4]);
+                      if(value[4] <= 30 ){
+                        var myClass = "warning";
+                      } 
+                      if (value[4] <= 0){
+                        var myClass = "danger";
+                      } 
+                      if (value[4] > 30){
+                        var myClass = "success";
+                      } 
+                      
+                      $("#searchResults ul").append('<li id="ajax_'+value[0]+'" class="list-group-item" onclick="dismiss(this);"><span class="tab btn btn-'+myClass+'"><strong>'+value[2]+'</strong> | '+value[1]+'</span><span class="badge">'+value[3]+'</span></li>');
                       codeArray.push(value[2]);
                     });
                     $("#codeStore").text(codeArray[0]);                    
@@ -166,6 +179,10 @@
         $(document).on('click', '#close', function () {
             $(this).parent('div').fadeOut();
         });
+        function dismiss(el){
+          //el.parentNode.style.display='none';
+          $(el).parent().parent().hide();
+        };
       </script>
 			{% for message in app.flashes('success') %}
 				<script type="text/javascript">

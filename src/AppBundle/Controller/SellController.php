@@ -17,18 +17,17 @@ class SellController extends Controller
         // replace this example code with whatever you need
         $this->denyAccessUnlessGranted('ROLE_ADMIN', null, 'Unable to access this page!');
         $data = [];
+        $em = $this->getDoctrine()->getManager();
         $user = $this->get('security.token_storage')->getToken()->getUser();
-        $products = $this->getDoctrine()
-            ->getRepository('AppBundle:Product')
+        
+        $products = $em->getRepository('AppBundle:Product')
             ->loadAllProductsFromThisUser($user);
         $data['products'] = $products;
 
-        $categories = $this->getDoctrine()
-            ->getRepository('AppBundle:Category')
+        $categories = $em->getRepository('AppBundle:Category')
             ->loadAllCategoriesFromThisUser($user);
 
-        $systSetting = $this->getDoctrine()
-            ->getRepository('AppBundle:SystSetting')
+        $systSetting = $em->getRepository('AppBundle:SystSetting')
             ->settingsForThisUser($user);
 
         if(!$systSetting){

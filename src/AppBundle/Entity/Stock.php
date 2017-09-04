@@ -55,6 +55,20 @@ class Stock
     private $retailCost;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="total_cost", type="string", length=100, nullable=false)
+     */
+    private $totalCost;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="deleted", type="integer", nullable=false)
+     */
+    private $deleted;
+
+    /**
      * @var integer
      *
      * @ORM\Column(name="id", type="integer")
@@ -81,6 +95,10 @@ class Stock
      */
     private $sale;
 
+    public function __construct()
+    {
+        $this->deleted = false;
+    }
 
 
     /**
@@ -331,5 +349,53 @@ class Stock
     public function getProduct()
     {
         return $this->product;
+    }
+
+    /**
+     * Set deleted
+     *
+     * @param integer $deleted
+     *
+     * @return Stock
+     */
+    public function setDeleted($deleted)
+    {
+        $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    /**
+     * Get deleted
+     *
+     * @return integer
+     */
+    public function getDeleted()
+    {
+        return $this->deleted;
+    }
+
+    /**
+     * Set totalCost
+     *
+     * @param string $totalCost
+     *
+     * @return Stock
+     */
+    public function setTotalCost($totalCost)
+    {
+        $this->totalCost = $totalCost;
+
+        return $this;
+    }
+
+    /**
+     * Get totalCost
+     *
+     * @return string
+     */
+    public function getTotalCost()
+    {
+        return $this->totalCost;
     }
 }

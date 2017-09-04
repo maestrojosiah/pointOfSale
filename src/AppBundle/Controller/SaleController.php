@@ -174,8 +174,12 @@ class SaleController extends Controller
 				'No sale for this id'
 			);
 		}
+		$stocks = $sale->getStocks();
+		foreach($stocks as $stock){
+			$stock->setDeleted(true);
+		}
 
-		$sale->setDeleted(1);
+		$sale->setDeleted(true);
  
         	$this->addFlash(
 	            'success',
@@ -186,7 +190,7 @@ class SaleController extends Controller
 		$em->persist($sale);
 		$em->flush(); 
 
-		return $this->redirectToRoute('suspended_view');
+		return $this->redirectToRoute('sale_list');
 	}
 
 	/**
@@ -205,7 +209,12 @@ class SaleController extends Controller
 			);
 		}
 
-		$sale->setDeleted(0);
+		$stocks = $sale->getStocks();
+		foreach($stocks as $stock){
+			$stock->setDeleted(false);
+		}
+
+		$sale->setDeleted(false);
 
         	$this->addFlash(
 	            'success',

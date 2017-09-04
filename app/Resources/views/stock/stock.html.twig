@@ -1,0 +1,275 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+{{ include('templates/nav.html.twig') }}
+
+{% set goodsAvailable = returns + stockIn %}       
+{% set goodsSold = sales - returns %}
+{% set balance = goodsAvailable - goodsSold %}			 
+<div id="page-wrapper">
+<div class="panel-body">
+<form action="" method="post">
+<div class="row">
+	<div class="col-lg-4">
+	    <div class="panel panel-default">
+	        <div class="panel-heading">
+	            Specific Date
+	        </div>
+	        <div class="panel-body">
+          		<input name="form[dateSpecific]" value="{{dates.specific}}" type="text" class="datepicker" />
+	        </div>
+	        <div class="panel-footer">
+	            One day report
+	        </div>
+	    </div>
+	</div>
+	<div class="col-lg-4">
+	    <div class="panel panel-success">
+	        <div class="panel-heading">
+	            Range
+	        </div>
+	        <div class="panel-body">
+	            <input name="form[dateFrom]" value="{{dates.from}}" type="text" class="datepicker" />
+	        </div>
+	        <div class="panel-footer">
+	            Start Date
+	        </div>
+	    </div>
+	</div>
+	<!-- /.col-lg-4 -->
+	<div class="col-lg-4">
+	    <div class="panel panel-success">
+	        <div class="panel-heading">
+	            Range
+	        </div>
+	        <div class="panel-body">
+	            <input name="form[dateTo]" value="{{dates.to}}" type="text" class="datepicker" />
+	        </div>
+	        <div class="panel-footer">
+	            End date
+	        </div>
+	    </div>
+	</div>
+	<!-- /.col-lg-4 -->
+</div>
+<input class="btn btn-outline btn-primary btn-lg btn-block" type="submit" value="SHOW STOCK RECORDS" />
+</form>
+{% if specificStock is defined and specificStock is not empty%}
+{% set total = 0 %}
+{% set changingStock = balance %}
+<div class="panel-body">
+<table width="100%" class="table table-striped table-bordered table-hover display" id="">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Date</th>
+            <th>Quantity</th>
+            <th>Transaction</th>
+            <th>Balance</th>
+            <th>Manage</th>
+        </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <th>Balance as on {{ dates.from }}</th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th>{{ balance }}</th>
+        <th></th>
+    </tr>
+{% set total = 0 %}
+{% for stock in specificStock %}
+	<!--calculations-->
+  {% if stock.transaction == "sto" %}
+    {% set transaction = "Re-stock" %}
+    {% set changingStock = changingStock + stock.retailCost * stock.quantity %}
+  {% elseif stock.transaction == "ret" %}
+    {% set transaction = "Returns" %}
+    {% set changingStock = changingStock + stock.retailCost * stock.quantity %}
+  {% elseif stock.transaction == "sus" %}
+    {% set transaction = "Suspended" %}
+  {% elseif stock.transaction == "sal" %}
+    {% set transaction = "Sale" %}
+    {% set changingStock = changingStock - stock.retailCost * stock.quantity %}
+  {% endif %}
+    <tr class="odd gradeX">
+        <td><b>{{ stock.product.productCode }}</b> | {{ stock.product }}</td>
+        <td>{{ stock.onDate | date('Y-m-d') }}</td>
+        <td>{{ stock.quantity }}</td>
+        <td class="center">{{ transaction }}</td>
+        <td class="center">{{ changingStock }}</td>
+        <td class="center">
+            <a href="{{ path('stock_movement_item', { 'id':stock.product.id } ) }}" class="btn btn-info">
+          View History
+            </a>
+            <a href="" class="btn btn-info">
+          Edit
+            </a>
+        </td>
+    </tr>
+{% endfor %}
+  </tbody>
+  <tbody>
+    <tr class="odd gradeX">
+        <td>Balance as on {{dates.to}}</td>
+        <td></td>
+        <td></td>
+        <td class="center"></td>
+        <td class="center">{{ changingStock|round(2) }}</td>
+        <td class="center"></td>
+    </tr>
+  </tbody>
+</table>
+</div>
+{% endif %}
+{% if rangeStock is defined and rangeStock is not empty %}
+{% set total = 0 %}
+{% set changingStock = balance %}
+<div class="panel-body">
+<table width="100%" class="table table-striped table-bordered table-hover display" id="">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Date</th>
+            <th>Quantity</th>
+            <th>Transaction</th>
+            <th>Balance</th>
+            <th>Manage</th>
+        </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <th>Balance as on {{ dates.from }}</th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th>{{ balance }}</th>
+        <th></th>
+    </tr>
+{% set total = 0 %}
+{% for stock in rangeStock %}
+  {% if stock.transaction == "sto" %}
+    {% set transaction = "Re-stock" %}
+    {% set changingStock = changingStock + stock.retailCost * stock.quantity %}
+  {% elseif stock.transaction == "ret" %}
+    {% set transaction = "Returns" %}
+    {% set changingStock = changingStock + stock.retailCost * stock.quantity %}
+  {% elseif stock.transaction == "sus" %}
+    {% set transaction = "Suspended" %}
+  {% elseif stock.transaction == "sal" %}
+    {% set transaction = "Sale" %}
+    {% set changingStock = changingStock - stock.retailCost * stock.quantity %}
+  {% endif %}
+  {% set total = total + changingStock %}
+        <tr class="odd gradeX">
+            <td>{{ stock.product }}</td>
+            <td>{{ stock.onDate | date('Y-m-d') }}</td>
+            <td>{{ stock.quantity }}</td>
+            <td class="center">{{ transaction }}</td>
+            <td class="center">{{ changingStock }}</td>
+            <td class="center">
+              <a href="{{ path('stock_movement_item', { 'id':stock.product.id } ) }}" class="btn btn-info">
+            View History
+              </a>
+              <a href="" class="btn btn-info">
+            Edit
+              </a>
+            </td>
+        </tr>
+{% endfor %}
+  </tbody>
+  <tbody>
+    <tr class="odd gradeX">
+        <td>Balance as on {{dates.to}}</td>
+        <td></td>
+        <td></td>
+        <td class="center"></td>
+        <td class="center">{{ changingStock|round(2) }}</td>
+        <td class="center"></td>
+    </tr>
+  </tbody>
+</table>
+<a href="">Restore deleted Stocks</a>
+</div>
+</div>
+</div>
+{% endif %}
+{% if allStock is defined and allStock is not empty %}
+{% set changingStock = balance %}
+<div class="panel-body">
+<table width="100%" class="table table-striped table-bordered table-hover display" id="">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Date</th>
+            <th>Quantity</th>
+            <th>Transaction</th>
+            <th>Balance</th>
+            <th>Manage</th>
+        </tr>
+    </thead>
+<tbody>
+        <tr>
+            <th>Balance as on {{ dates.from }}</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th>{{ balance }}</th>
+            <th></th>
+        </tr>
+{% for stock in allStock %}
+  {% if stock.transaction == "sto" %}
+    {% set transaction = "Re-stock" %}
+    {% set changingStock = changingStock + stock.retailCost * stock.quantity %}
+  {% elseif stock.transaction == "ret" %}
+    {% set transaction = "Returns" %}
+    {% set changingStock = changingStock + stock.retailCost * stock.quantity %}
+  {% elseif stock.transaction == "sus" %}
+    {% set transaction = "Suspended" %}
+  {% elseif stock.transaction == "sal" %}
+    {% set transaction = "Sale" %}
+    {% set changingStock = changingStock - stock.retailCost * stock.quantity %}
+  {% endif %}
+        <tr class="odd gradeX">
+            <td>{{ stock.product }}</td>
+            <td>{{ stock.onDate | date('Y-m-d') }}</td>
+            <td>{{ stock.quantity }}</td>
+            <td class="center">{{ transaction }}</td>
+            <td class="center">{{ changingStock }}</td>
+            <td class="center">
+              <a href="{{ path('stock_movement_item', { 'id':stock.product.id } ) }}" class="btn btn-info">
+            View History
+              </a>
+              <a href="" class="btn btn-info">
+            Edit
+              </a>
+            </td>
+        </tr>
+{% endfor %}
+  </tbody>
+  <tbody>
+    <tr class="odd gradeX">
+        <td>Balance as on {{dates.to}}</td>
+        <td></td>
+        <td></td>
+        <td class="center"></td>
+        <td class="center">{{ changingStock|round(2) }}</td>
+        <td class="center"></td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+{% endif %}
+{# returns
+{{ dump(returns) }}
+sales
+{{ dump(sales) }}
+stock in
+{{ dump(stockIn) }}
+goods available 
+{{ dump(goodsAvailable) }}
+goods sold
+{{ dump(goodsSold) }}
+ #}{% endblock %}

@@ -91,7 +91,7 @@
 	{% set taxTotal = taxTotal + thisTax %}
     <tr class="odd gradeX">
         <td><b>{{ stock.product.productCode }}</b> {{ stock.product }}</td>
-        <td>{{ stock.onDate | date('d-m-Y') }}</td>
+        <td>{{ stock.onDate | date('Y-m-d') }}</td>
         <td>{{ stock.quantity }}</td>
         <td class="center">{{ stock.retailCost * stock.quantity }}</td>
         <td class="center">{{ thisTax|round(2) }}</td>
@@ -183,7 +183,7 @@
 	{% set taxTotal = taxTotal + thisTax %}
         <tr class="odd gradeX">
         	<td><b>{{ stock.product.productCode }}</b> {{ stock.product }}</td>
-            <td>{{ stock.onDate | date('d-m-Y') }}</td>
+            <td>{{ stock.onDate | date('Y-m-d') }}</td>
             <td>{{ stock.quantity }}</td>
             <td class="center">{{ stock.retailCost * stock.quantity }}</td>
 	        <td class="center">{{ thisTax|round(2) }}</td>

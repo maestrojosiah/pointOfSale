@@ -8,21 +8,24 @@ use AppBundle\Entity\Product;
 
 class FakeController extends Controller
 {
-    public function streamAction()
+    public function streamAction($entity)
     {
         // create an empty object
-        $phpExcelObject = $this->createXSLObject();
+        $phpExcelObject = $this->createXSLObject($entity);
+        //$data = $phpExcelObject = $this->createXSLObject("Product");
+
         // create the writer
         $writer = $this->get('phpexcel')->createWriter($phpExcelObject, 'Excel5');
         // create the response
         $response = $this->get('phpexcel')->createStreamedResponse($writer);
         // adding headers
         $response->headers->set('Content-Type', 'text/vnd.ms-excel; charset=utf-8');
-        $response->headers->set('Content-Disposition', 'attachment;filename=stream-file.xls');
+        $response->headers->set('Content-Disposition', 'attachment;filename='.$entity.'.xls');
         $response->headers->set('Pragma', 'public');
         $response->headers->set('Cache-Control', 'maxage=1');
 
         return $response;
+        //return $this->render('excel/test.html.twig', ['data'=>$data] ); 
     }
 
     public function storeAction()
@@ -56,13 +59,15 @@ class FakeController extends Controller
      * utility class
      * @return mixed
      */
-    private function createXSLObject()
+    private function createXSLObject($entity)
     {
+        $data = [];
+
         $phpExcelObject = $this->get('phpexcel')->createPHPExcelObject();
 
         $htmlHelper = $this->get('phpexcel')->createHelperHTML();
 
-        $phpExcelObject->getProperties()->setCreator("liuggio")
+        $phpExcelObject->getProperties()->setCreator("AdvBkCntr")
             ->setLastModifiedBy("Adventist Book Center")
             ->setTitle("Office 2005 XLSX Test Document")
             ->setSubject("Office 2005 XLSX Test Document")
@@ -71,39 +76,95 @@ class FakeController extends Controller
             ->setCategory("Products list file");
 
         $em = $this->getDoctrine()->getManager();
-        $products = $em->getRepository('AppBundle:Product')
+        $records = $em->getRepository("AppBundle:$entity")
             ->findAll();
+        $data['records'] = $records;
+        if($entity == "Product"){
 
-        $phpExcelObject->setActiveSheetIndex(0)
-            ->setCellValue('A1', $htmlHelper->toRichTextObject('<b>Code</b>'))
-            ->setCellValue('B1', $htmlHelper->toRichTextObject('<b>Name</b>'))
-            ->setCellValue('C1', $htmlHelper->toRichTextObject('<b>Cost</b>'))
-            ->setCellValue('D1', $htmlHelper->toRichTextObject('<b>Taxable</b>'))
-            ->setCellValue('E1', $htmlHelper->toRichTextObject('<b>Retail</b>'))
-            ->setCellValue('G1', $htmlHelper->toRichTextObject('<b>Category</b>'));
+            $phpExcelObject->setActiveSheetIndex(0)
+                ->setCellValue('A1', $htmlHelper->toRichTextObject('<b>Code</b>'))
+                ->setCellValue('B1', $htmlHelper->toRichTextObject('<b>Name</b>'))
+                ->setCellValue('C1', $htmlHelper->toRichTextObject('<b>Cost</b>'))
+                ->setCellValue('D1', $htmlHelper->toRichTextObject('<b>Taxable</b>'))
+                ->setCellValue('E1', $htmlHelper->toRichTextObject('<b>Retail</b>'))
+                ->setCellValue('G1', $htmlHelper->toRichTextObject('<b>Category</b>'));
 
-        $counter = 2;
-        foreach($products as $product){
-            $phpExcelObject->getActiveSheet()
-                ->setCellValue("A$counter", $product->getProductCode())
-                ->setCellValue("B$counter", $product->getProductName())
-                ->setCellValue("C$counter", $product->getProductCost())
-                ->setCellValue("D$counter", $product->getProductTax())
-                ->setCellValue("E$counter", $product->getProductRetailPrice())
-                ->setCellValue("G$counter", $product->getCategory());
-            $counter++;
+            $counter = 2;
+            foreach($records as $product){
+                $phpExcelObject->getActiveSheet()
+                    ->setCellValue("A$counter", $product->getProductCode())
+                    ->setCellValue("B$counter", $product->getProductName())
+                    ->setCellValue("C$counter", $product->getProductCost())
+                    ->setCellValue("D$counter", $product->getProductTax())
+                    ->setCellValue("E$counter", $product->getProductRetailPrice())
+                    ->setCellValue("G$counter", $product->getCategory()->getId());
+                $counter++;
+            }
+
+            foreach(range('B','G') as $columnID) {
+                $phpExcelObject->getActiveSheet()->getColumnDimension($columnID)
+                    ->setAutoSize(true);
+            }
+
+            $phpExcelObject->getActiveSheet()->setTitle('Products');
+            // Set active sheet index to the first sheet, so Excel opens this as the first sheet
+            $phpExcelObject->setActiveSheetIndex(0);            
         }
 
-        foreach(range('B','G') as $columnID) {
-            $phpExcelObject->getActiveSheet()->getColumnDimension($columnID)
-                ->setAutoSize(true);
+        if($entity == "Sale"){
+
+            $phpExcelObject->setActiveSheetIndex(0)
+                ->setCellValue('A1', $htmlHelper->toRichTextObject('<b>Receipt#</b>'))
+                ->setCellValue('B1', $htmlHelper->toRichTextObject('<b>Date</b>'))
+                ->setCellValue('C1', $htmlHelper->toRichTextObject('<b>Sale Total</b>'))
+                ->setCellValue('D1', $htmlHelper->toRichTextObject('<b>Payment Mode</b>'));
+
+            $counter = 2;
+            foreach($records as $entry){
+                $datePrefix = $entry->getOnDate()->format('ymd');
+                $phpExcelObject->getActiveSheet()
+                    ->setCellValue("A$counter", $datePrefix.$entry->getId())
+                    ->setCellValue("B$counter", $entry->getOnDate())
+                    ->setCellValue("C$counter", $entry->getTotalSale())
+                    ->setCellValue("D$counter", $entry->getPaymentMode());
+                $counter++;
+            }
+
+            foreach(range('B','G') as $columnID) {
+                $phpExcelObject->getActiveSheet()->getColumnDimension($columnID)
+                    ->setAutoSize(true);
+            }
+
+            $phpExcelObject->getActiveSheet()->setTitle('Sales');
+            // Set active sheet index to the first sheet, so Excel opens this as the first sheet
+            $phpExcelObject->setActiveSheetIndex(0);            
         }
 
-        $phpExcelObject->getActiveSheet()->setTitle('Simple');
-        // Set active sheet index to the first sheet, so Excel opens this as the first sheet
-        $phpExcelObject->setActiveSheetIndex(0);
+        if($entity == "Category"){
+
+            $phpExcelObject->setActiveSheetIndex(0)
+                ->setCellValue('A1', $htmlHelper->toRichTextObject('<b>Title</b>'))
+                ->setCellValue('B1', $htmlHelper->toRichTextObject('<b>Code</b>'));
+            $counter = 2;
+            foreach($records as $entry){
+                $phpExcelObject->getActiveSheet()
+                    ->setCellValue("A$counter", $entry->getCategoryName())
+                    ->setCellValue("B$counter", $entry->getId());
+                $counter++;
+            }
+
+            foreach(range('A','C') as $columnID) {
+                $phpExcelObject->getActiveSheet()->getColumnDimension($columnID)
+                    ->setAutoSize(true);
+            }
+
+            $phpExcelObject->getActiveSheet()->setTitle('Categories');
+            // Set active sheet index to the first sheet, so Excel opens this as the first sheet
+            $phpExcelObject->setActiveSheetIndex(0);            
+        }
 
         return $phpExcelObject;
+        // return $data;           
     }
 
     public function insertAction($file)

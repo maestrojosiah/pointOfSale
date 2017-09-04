@@ -17,7 +17,7 @@
 
 {% for sale in data.sales %}
             <tr class="odd gradeX">
-                <td>{{ sale.onDate|date('d-m-Y') }}</td>
+                <td>{{ sale.onDate|date('Y-m-d') }}</td>
                 <td>{{ sale.totalSale }}</td>
                 <td>{{ sale.paymentMode }}</td>
                 <td class="center">
