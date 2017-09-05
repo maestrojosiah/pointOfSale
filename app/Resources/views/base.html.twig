@@ -41,10 +41,80 @@
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
     </head>
     <body>
-        {% block body %}
-		     <div id="wrapper">
+    {% block body %}
+		  <div id="wrapper">
 				{{ include('templates/nav.html.twig') }}			 
-			 </div>
+			</div>
+    <footer class="footer">
+      <div class="container">
+        <div class="col-lg-2 col-md-6">
+            <div class="panel panel-primary">
+                <a href="#">
+                    <div class="panel-footer">
+                        <span class="pull-left">Focus Search</span>
+                        <span class="pull-right">F2</span>
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-6">
+            <div class="panel panel-primary">
+                <a href="#">
+                    <div class="panel-footer">
+                        <span class="pull-left">Complete Sale</span>
+                        <span class="pull-right">F4</span>
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-6">
+            <div class="panel panel-primary">
+                <a href="#">
+                    <div class="panel-footer">
+                        <span class="pull-left">Reset Page</span>
+                        <span class="pull-right">ESC</span>
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-6">
+            <div class="panel panel-primary">
+                <a href="#">
+                    <div class="panel-footer">
+                        <span class="pull-left">Focus Paid Amt</span>
+                        <span class="pull-right">F7</span>
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-6">
+            <div class="panel panel-primary">
+                <a href="#">
+                    <div class="panel-footer">
+                        <span class="pull-left">Suspend Sale</span>
+                        <span class="pull-right">F3</span>
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-6">
+            <div class="panel panel-primary">
+                <a href="#">
+                    <div class="panel-footer">
+                        <span class="pull-left">Last Sale Qty</span>
+                        <span class="pull-right">F6</span>
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+      </div>
+    </footer>
 		{% endblock %}
         {% if data.systSetting is defined %}
             {% set limitRows = data.systSetting.rowsPerPage %}
@@ -52,7 +122,7 @@
             {% set limitRows = '20' %}
         {% endif %}
 
-        {% block javascripts %}	{% endblock %}   
+        {% block javascripts %}	   
 		    <!-- jQuery -->
 			<script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
 
@@ -86,7 +156,7 @@
 
       <script>
       $(document).ready(function() {
-        $('#sendPrint').on('click', function(e) {
+        $( "#sendPrint" ).click(function(e) {
           $('#toPrint').printThis();
         });
       });
@@ -97,6 +167,9 @@
   			$("input[type='text']").focus(function () {
   			   $(this).select();
   			});
+        $('#infoModalAuto').on('shown.bs.modal', function () {
+          $('.go-ahead').focus();
+        })                  
 			</script>
 	    <script>
 	    $(document).ready(function() {
@@ -182,6 +255,7 @@
         function dismiss(el){
           //el.parentNode.style.display='none';
           $(el).parent().parent().hide();
+          $('#searchItem').focus();                
         };
       </script>
 			{% for message in app.flashes('success') %}
@@ -209,6 +283,7 @@
                     $('#tableToArray').click();
                 }
             });
+            $('#searchItem').focus(); 
             return false;
 
         });
@@ -286,12 +361,14 @@
                     return (className.match (/(^|\s)changeRow_Qt_\S+/g) || []).join(' ');
                 });
                 $('#valueHolder').addClass('changeRow_'+id);
-                $('#valueHolder').focus().select();
+                $('#changeValueModal').on('shown.bs.modal', function () {
+                  $('#valueHolder').focus().select();
+                })                  
                 $('#tableToArray').click();
             }
         });
         
-      $('#searchItem').focus();      
+      //$('#valueHolder').focus().select();      
     });
   </script>
   <script>
@@ -337,6 +414,32 @@
       $('#searchItem').focus(); 
       $('#tableToArray').click();     
     });
+  </script>
+
+  <script>
+    $(document).on('keypress', '#valueHolder', function(e){
+      var key = e.which;
+      if(key == 13){ 
+      var classNames = $("#valueHolder").attr("class").toString().split(' ');
+      var thirdClass = classNames[2];
+      var newValue = $("#valueHolder").val();
+
+      var thirdClassArray = thirdClass.split('_'); //changeRow_Qt_1504
+      var id = thirdClassArray[2] //1504
+
+      var price = $("#Pr_"+id).text();
+      var total = $("#Tl_"+id);
+      var qty = $("#Qt_"+id);
+      qty.text(newValue);
+      total.text(price*newValue)
+
+      $("#changeValueModal").modal('hide');
+      $('#searchItem').focus(); 
+      $('#tableToArray').click();                 
+        return false;
+      }
+    });
+
   </script>
   <script>
     $( "#tableToArray" ).click(function() {
@@ -404,9 +507,8 @@
       var paidAmt =    $("#paidAmt").val();
       if($("#transaction").text() == "Sale"){
       if($("#paidAmt").val()==""){
-        $("#infoParagraph").html("<span class='text-danger'>Please indicate how much has been paid?</span><br />Hit F7 to focus");
-        $("#infoModal").modal('show');
-
+        $("#infoParagraphAuto").html("<span class='text-danger'>Please indicate how much has been paid</span><br />Hit F7 to focus");
+        $("#infoModalAuto").modal('show');
         }
       } else {
             var qtyTotal = $("#show_qty").text();
@@ -530,8 +632,8 @@
       if($("#transaction").text() == "Sale"){
         console.log("paidAmt keypress called");
         if($("#paidAmt").val()==""){
-          $("#infoParagraph").html("<span class='text-danger'>Please indicate how much has been paid?</span><br />Hit F7 to focus");
-          $("#infoModal").modal('show');
+          $("#infoParagraphAuto").html("<span class='text-danger'>Please indicate how much has been paid</span><br />Hit F7 to focus");
+          $("#infoModalAuto").modal('show');
 
           }
       }
@@ -646,9 +748,11 @@
 
       var paidAmt =    $("#paidAmt").val();
       if($("#amountDue").text()==""){
-        $("#infoParagraph").html("<span class='text-danger'>No sale exists to cancel?</span><br />Hit F7 to focus");
-        $("#infoModal").modal('show');
-
+        $("#infoParagraphAuto").html("<span class='text-danger'>No sale exists to suspend!</span><br />Hit F7 to focus");
+        $("#infoModalAuto").modal('show');
+        $('#infoModalAuto').on('shown.bs.modal', function () {
+          $('#closeAutoModal').focus();
+        })                  
       } else {
             var qtyTotal = $("#show_qty").text();
             var total = $("#amountDue").text();
@@ -770,5 +874,6 @@
   </script>
   {% endfor %}
 {% endif %}
+{% endblock %}
 </body>
 </html>

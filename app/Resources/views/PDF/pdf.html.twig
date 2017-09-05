@@ -1,0 +1,56 @@
+{% extends 'layout-pdf.html.twig' %}
+{% block stylesheets %}
+<style type="text/css">
+ 	table {
+    	border-collapse: collapse;
+	}
+
+	table, th, td {
+	    border: 1px solid black;
+	} 
+
+	th {
+	    text-align: left;
+	} 
+	th, td {
+	    padding: 5px;
+	    text-align: left;
+    	border-bottom: 1px solid #ddd;
+   	} 
+ 	tr:nth-child(even) {background-color: #f2f2f2} 
+
+</style>
+{% endblock %}
+{% block content %}
+
+<div class="panel-body">
+<table width="100%" class="table table-striped table-bordered table-hover display" id="">
+    <thead>
+        <tr>
+            {% for key in entity[0]|keys %}
+			    <th>{{ key }}</th>
+			{% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+{% set total = 0 %}
+{% for entry in entity %}
+    <tr class="odd gradeX">
+    	{% for key,value in entry %}
+    		{% if key == "date" %}
+    			<td>{{ value | date('Y-m-d') }}</td>
+    		{% else %}
+    			<td class="center">{{ value }}</td>
+    		{% endif %}
+        {% endfor %}
+    </tr>
+{% endfor %}
+  </tbody>
+</table>
+
+{#     <figure>
+        <img src="{{ absolute_url(asset('images/chimay.jpg')) }}" alt="">
+        <figcaption>A picture with an absolute URL</figcaption>
+    </figure>
+ #}
+{% endblock %}

@@ -6,11 +6,11 @@
  <nav class="navbar navbar-default">
   <div class="container-fluid">
     <div class="navbar-header">
-      <a class="navbar-brand" href="#">Product List Documents</a>
+      <a class="navbar-brand" href="#">Sales List</a>
     </div>
     <ul class="nav navbar-nav">
       <li class="nav-item active">
-        <a class="nav-link" href="{{ path('pdf_stream') }}">Download PDF <span class="sr-only"></span></a>
+        <a class="nav-link" href="{{ path('download_sales_pdf') }}">Download PDF <span class="sr-only"></span></a>
       </li>
       <li class="nav-item active">
         <a class="nav-link" href="{{ path('excel_stream', { 'entity': 'Sale' }) }}">Download Excel <span class="sr-only"></span></a>

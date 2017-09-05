@@ -18,7 +18,8 @@ class AppKernel extends Kernel
             new AppBundle\AppBundle(),
             new Liuggio\ExcelBundle\LiuggioExcelBundle(),
             new WhiteOctober\TCPDFBundle\WhiteOctoberTCPDFBundle(),
-            new Ivory\CKEditorBundle\IvoryCKEditorBundle(),            
+            new Ivory\CKEditorBundle\IvoryCKEditorBundle(), 
+            new Knp\Bundle\SnappyBundle\KnpSnappyBundle(),           
         ];
 
         if (in_array($this->getEnvironment(), ['dev', 'test'], true)) {

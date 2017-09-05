@@ -48,7 +48,12 @@ $(document).on("click", '.toggleSale', function(){
 
 function loadShortcuts() {
 	shortcut.add("F1", function() {
-		alert("F1 should do something");
+        if($("#amountDue").text() == ""){
+            $("#infoParagraphAuto").html("<span class='text-danger'>There is no receipt to print. Please make a sale first</span><br />Hit F7 to focus");
+            $("#infoModalAuto").modal('show');
+        } else {
+		  $("#sendPrint").click();
+        }
 	});
 	shortcut.add("F2", function() {
 		$('#searchItem').focus();      
@@ -57,22 +62,30 @@ function loadShortcuts() {
         $('#paidAmt').focus();      
 	});
     shortcut.add("F3", function() {
-        alert("ESC should do something");
+        $("#showSuspendModal").click();
     });
 	shortcut.add("F6", function() {
-        var lastQtySpan = $('#sales tr:last td:nth-last-child(2) span');
-        var lastQtyColumn = $('#sales tr:last td:nth-last-child(2)');
-        var lastQtyValue = lastQtyColumn.text();
-        var trimmedValue = $.trim(lastQtyValue);
-        var id = lastQtySpan.attr("id");
-        console.log(lastQtyValue);
-        $("#changeValueModal").modal('show');
-        $("#valueHolder").val(trimmedValue);
-        $("#valueHolder").removeClass (function (index, className) {
-            return (className.match (/(^|\s)changeRow_Qt_\S+/g) || []).join(' ');
-        });
-        $('#valueHolder').addClass('changeRow_'+id);
-        $('#valueHolder').focus().select();
+        if($("#amountDue").text() == ""){
+            $("#infoParagraphAuto").html("<span class='text-danger'>No sale to update quantity</span><br />Hit F7 to focus");
+            $("#infoModalAuto").modal('show');
+        } else {
+            var lastQtySpan = $('#sales tr:last td:nth-last-child(2) span');
+            var lastQtyColumn = $('#sales tr:last td:nth-last-child(2)');
+            var lastQtyValue = lastQtyColumn.text();
+            var trimmedValue = $.trim(lastQtyValue);
+            var id = lastQtySpan.attr("id");
+            console.log(lastQtyValue);
+            $("#changeValueModal").modal('show');
+            $("#valueHolder").val(trimmedValue);
+            $("#valueHolder").removeClass (function (index, className) {
+                return (className.match (/(^|\s)changeRow_Qt_\S+/g) || []).join(' ');
+            });
+            $('#changeValueModal').on('shown.bs.modal', function () {
+              $('#valueHolder').focus().select();
+            })                  
+            $('#valueHolder').addClass('changeRow_'+id);
+            $('#valueHolder').focus().select();
+        }
 	});
 }
 

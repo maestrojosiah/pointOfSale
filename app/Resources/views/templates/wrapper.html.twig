@@ -70,7 +70,7 @@
                 <!-- /.panel-heading -->
                 <div class="panel-body" id="rightSide">
 					<!-- Dropdown button -->
-					<button type="button" class="btn btn-default" data-toggle="modal" data-target=".bd-suspend">
+					<button type="button" id="showSuspendModal" class="btn btn-default" data-toggle="modal" data-target=".bd-suspend">
 						<strong>Suspend Sale</strong>
 					</button>							
 					<button type="button" class="btn btn-default" data-toggle="modal" data-target=".bd-cancel">
@@ -110,7 +110,7 @@
 					<hr />
 					<div class="form-group input-group">
 						<input class="form-control" type="text" id="paidAmt" placeholder="Paid Amt">
-						<butto id="completeSale" class="btn btn-primary input-group-addon" style="background-color: #337ab7; color:white;">Complete Sale</a>
+						<a id="completeSale" class="btn btn-primary input-group-addon" style="background-color: #337ab7; color:white;">Complete Sale</a>
 					</div>
                     {# {{ dump(data.systSetting) }} #}
                 </div>
@@ -135,7 +135,25 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button {# href="{{ path('homepage') }}" #} data-dismiss="modal" id="suspendSale" class="btn btn-primary">Go Ahead</button>
+        <button data-dismiss="modal" id="suspendSale" class="btn btn-primary go-ahead">Go Ahead</button>
+      </div> 
+    </div>
+  </div>
+</div>
+<div id="infoModalAuto" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Notice!</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="infoParagraphAuto"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary go-ahead" data-dismiss="modal">Close</button>
       </div> 
     </div>
   </div>
@@ -155,13 +173,13 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <a href="{{ path('homepage') }}" id="cancelSale" class="btn btn-primary">Go Ahead</a>
+        <a href="{{ path('homepage') }}" id="cancelSale" class="btn btn-primary go-ahead">Go Ahead</a>
       </div> 
     </div>
   </div>
 </div>
 <!-- Large modal -->
-<div id="receiptModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+<div id="receiptModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
     <div class="container">
         <div class="row">
             <div id="toPrint" class="well col-xs-10 col-sm-10 col-md-6 col-xs-offset-1 col-sm-offset-1 col-md-offset-3">
@@ -223,18 +241,16 @@
                             </tr>
                         </tbody>
                     </table>
+                    <p>{{ data.systSetting.receiptFooter|raw }}</p>
                 </div>
             </div>
             <div class="well col-xs-10 col-sm-10 col-md-6 col-xs-offset-1 col-sm-offset-1 col-md-offset-3">
                 <div class="btn-group" role="group" aria-label="...">
-                    <button type="button" class="btn btn-warning btn-lg" data-dismiss="modal">
-                        Close  <span class="glyphicon glyphicon-remove"></span>
-                    </button>
-                    <button type="button" class="btn btn-success btn-lg" id="sendPrint">
-                        Print  <span class="glyphicon glyphicon-chevron-right"></span>
+                    <button type="button" class="btn btn-info btn-lg" id="sendPrint">
+                        Print [F1]  <span class="glyphicon glyphicon-chevron-right"></span>
                     </button>
                     <a href="{{path('homepage')}}" class="btn btn-success btn-lg">
-                        Back to POS  <span class="glyphicon glyphicon-chevron-left"></span>
+                        Back to POS [ESC]  <span class="glyphicon glyphicon-chevron-left"></span>
                     </a>
                 </div>
             </div>
