@@ -147,6 +147,20 @@ class StockRepository extends \Doctrine\ORM\EntityRepository
 		    ->getResult();
     }
 
+    public function calculateStockMovementBeforeThisDateItem($date, $transaction, $product)
+    {
+    	return $this->createQueryBuilder('s')
+    		->select('s')
+		    ->where('s.onDate < :date AND s.transaction = :trans AND s.deleted = 0')
+		    ->andWhere('s.product = :product')
+		    ->setParameter('product', $product)
+		    ->setParameter('date', $date)
+		    ->setParameter('trans', $transaction)
+		    ->select('SUM(s.totalCost) AS total')
+		    ->getQuery()
+		    ->getResult();
+    }
+
     public function findAllStockForThisProduct($product, $transaction)
     {
     	return $this->createQueryBuilder('s')

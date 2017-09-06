@@ -1,6 +1,9 @@
 {% extends 'layout-pdf.html.twig' %}
 {% block stylesheets %}
 <style type="text/css">
+    body {
+        font-size: 8px;
+    }
  	table {
     	border-collapse: collapse;
 	}
@@ -24,9 +27,11 @@
 {% block content %}
 
 <div class="panel-body">
+
 <table width="100%" class="table table-striped table-bordered table-hover display" id="">
     <thead>
         <tr>
+            <th>#</th>
             {% for key in entity[0]|keys %}
 			    <th>{{ key }}</th>
 			{% endfor %}
@@ -34,17 +39,33 @@
     </thead>
     <tbody>
 {% set total = 0 %}
+{% set counter = 1 %}
 {% for entry in entity %}
     <tr class="odd gradeX">
+        <td>{{ counter }}</td>
     	{% for key,value in entry %}
     		{% if key == "date" %}
     			<td>{{ value | date('Y-m-d') }}</td>
+            {% elseif key == "cost" or key == "sales" or key == "tax" %}
+                {% set total = total + value * entry.quantity %}
+                <td>{{ value|round(2) * entry.quantity }}</td>
     		{% else %}
     			<td class="center">{{ value }}</td>
     		{% endif %}
         {% endfor %}
+        {% set counter = counter + 1 %}
     </tr>
 {% endfor %}
+    <tr>
+        <th>Total</th>
+        {% for key,value in entity[0] %}
+            {% if key == "cost" or key == "sales" or key == "tax" %}
+                <td>{{ total|round(2) }}</td> 
+            {% else %}           
+                <th>...</th>
+            {% endif %}
+        {% endfor %}
+    </tr>
   </tbody>
 </table>
 

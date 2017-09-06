@@ -1,77 +1,39 @@
-{% extends 'base.html.twig' %}
-{% block body %}
-{{ include('templates/nav.html.twig') }}
+{% extends 'layout-pdf.html.twig' %}
+{% block stylesheets %}
+<style type="text/css">
+    body {
+        font-size: 8px;
+    }
+    table {
+        border-collapse: collapse;
+    }
 
+    table, th, td {
+        border: 1px solid black;
+    } 
+
+    th {
+        text-align: left;
+    } 
+    th, td {
+        padding: 5px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    } 
+    tr:nth-child(even) {background-color: #f2f2f2} 
+
+</style>
+{% endblock %}
+{% block content %}
 {% set goodsAvailable = returns + stockIn %}       
 {% set goodsSold = sales - returns %}
-{% set balance = goodsAvailable - goodsSold %}			 
+{% set balance = goodsAvailable - goodsSold %}       
 <div id="page-wrapper">
 <div class="panel-body">
-<form action="" method="post">
-<div class="row">
-  <div class="col-lg-4">
-      <div class="panel panel-default">
-          <div class="panel-heading">
-              Specific Date
-          </div>
-          <div class="panel-body">
-              <input name="form[dateSpecific]" value="{{ dates.specific }}" type="text" class="datepicker" />
-          </div>
-          <div class="panel-footer">
-              One day report
-          </div>
-      </div>
-  </div>
-  <div class="col-lg-4">
-      <div class="panel panel-success">
-          <div class="panel-heading">
-              Range
-          </div>
-          <div class="panel-body">
-              <input name="form[dateFrom]" value="{{ dates.from }}" type="text" class="datepicker" />
-          </div>
-          <div class="panel-footer">
-              Start Date
-          </div>
-      </div>
-  </div>
-  <!-- /.col-lg-4 -->
-  <div class="col-lg-4">
-      <div class="panel panel-success">
-          <div class="panel-heading">
-              Range
-          </div>
-          <div class="panel-body">
-              <input name="form[dateTo]" value="{{ dates.to }}" type="text" class="datepicker" />
-          </div>
-          <div class="panel-footer">
-              End date
-          </div>
-      </div>
-  </div>
-  <!-- /.col-lg-4 -->
-</div>
-<input class="btn btn-outline btn-primary btn-lg btn-block" type="submit" {% if app.request.query.get("from") is not empty or app.request.query.get("specific") is not empty %} value = "CLICK HERE TO DOWNLOAD" {% else %} value="SHOW STOCK RECORDS" {% endif %} />
-</form>
 {% if specificStock is defined and specificStock is not empty%}
 {% set total = 0 %}
 {% set changingStock = balance %}
 <div class="panel-body">
- <nav class="navbar navbar-default">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <a class="navbar-brand" href="#">Items Returned on {{ dates.specific }}</a>
-    </div>
-    <ul class="nav navbar-nav">
-      <li class="nav-item active">
-        <a class="nav-link" href="{{ path('stock_movement', {'download':'True', 'from':dates.from, 'to':dates.to, 'specific':dates.specific } ) }}">Download PDF <span class="sr-only"></span></a>
-      </li>
-      <li class="nav-item active">
-        <a class="nav-link" href="">Download Excel <span class="sr-only"></span></a>
-      </li>
-    </ul>
-  </div>
-</nav>
 <table width="100%" class="table table-striped table-bordered table-hover display" id="">
     <thead>
         <tr>
@@ -80,21 +42,19 @@
             <th>Quantity</th>
             <th>Transaction</th>
             <th>Balance</th>
-            <th>Manage</th>
         </tr>
     </thead>
     <tbody>
     <tr>
-        <th>Balance as on {{ dates.from }}</th>
+        <th>Balance as on {{ app.request.query.get("from") }}</th>
         <th></th>
         <th></th>
         <th></th>
         <th>{{ balance }}</th>
-        <th></th>
     </tr>
 {% set total = 0 %}
 {% for stock in specificStock %}
-	<!--calculations-->
+  <!--calculations-->
   {% if stock.transaction == "sto" %}
     {% set transaction = "Re-stock" %}
     {% set changingStock = changingStock + stock.retailCost * stock.quantity %}
@@ -113,20 +73,12 @@
         <td>{{ stock.quantity }}</td>
         <td class="center">{{ transaction }}</td>
         <td class="center">{{ changingStock }}</td>
-        <td class="center">
-            <a href="{{ path('stock_movement_item', { 'id':stock.product.id } ) }}" class="btn btn-info">
-          View History
-            </a>
-            <a href="" class="btn btn-info">
-          Edit
-            </a>
-        </td>
     </tr>
 {% endfor %}
   </tbody>
   <tbody>
     <tr class="odd gradeX">
-        <td>Balance as on {{dates.to}}</td>
+        <td>Balance as on {{app.request.query.get("to")}}</td>
         <td></td>
         <td></td>
         <td class="center"></td>
@@ -141,21 +93,6 @@
 {% set total = 0 %}
 {% set changingStock = balance %}
 <div class="panel-body">
- <nav class="navbar navbar-default">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <a class="navbar-brand" href="#">Items Returned on {{ dates.specific }}</a>
-    </div>
-    <ul class="nav navbar-nav">
-      <li class="nav-item active">
-        <a class="nav-link" href="{{ path('stock_movement', {'download':'True', 'from':dates.from, 'to':dates.to, 'specific':dates.specific } ) }}">Download PDF <span class="sr-only"></span></a>
-      </li>
-      <li class="nav-item active">
-        <a class="nav-link" href="">Download Excel <span class="sr-only"></span></a>
-      </li>
-    </ul>
-  </div>
-</nav>
 <table width="100%" class="table table-striped table-bordered table-hover display" id="">
     <thead>
         <tr>
@@ -164,17 +101,15 @@
             <th>Quantity</th>
             <th>Transaction</th>
             <th>Balance</th>
-            <th>Manage</th>
         </tr>
     </thead>
     <tbody>
     <tr>
-        <th>Balance as on {{ dates.from }}</th>
+        <th>Balance as on {{ app.request.query.get("from") }}</th>
         <th></th>
         <th></th>
         <th></th>
         <th>{{ balance }}</th>
-        <th></th>
     </tr>
 {% set total = 0 %}
 {% for stock in rangeStock %}
@@ -197,20 +132,12 @@
             <td>{{ stock.quantity }}</td>
             <td class="center">{{ transaction }}</td>
             <td class="center">{{ changingStock }}</td>
-            <td class="center">
-              <a href="{{ path('stock_movement_item', { 'id':stock.product.id } ) }}" class="btn btn-info">
-            View History
-              </a>
-              <a href="" class="btn btn-info">
-            Edit
-              </a>
-            </td>
         </tr>
 {% endfor %}
   </tbody>
   <tbody>
     <tr class="odd gradeX">
-        <td>Balance as on {{dates.to}}</td>
+        <td>Balance as on {{app.request.query.get("to")}}</td>
         <td></td>
         <td></td>
         <td class="center"></td>
@@ -219,7 +146,6 @@
     </tr>
   </tbody>
 </table>
-<a href="">Restore deleted Stocks</a>
 </div>
 </div>
 </div>
@@ -227,21 +153,6 @@
 {% if allStock is defined and allStock is not empty %}
 {% set changingStock = balance %}
 <div class="panel-body">
- <nav class="navbar navbar-default">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <a class="navbar-brand" href="#">Items Returned on {{ dates.specific }}</a>
-    </div>
-    <ul class="nav navbar-nav">
-      <li class="nav-item active">
-        <a class="nav-link" href="{{ path('stock_movement', {'download':'True', 'from':dates.from, 'to':dates.to, 'specific':dates.specific } ) }}">Download PDF <span class="sr-only"></span></a>
-      </li>
-      <li class="nav-item active">
-        <a class="nav-link" href="">Download Excel <span class="sr-only"></span></a>
-      </li>
-    </ul>
-  </div>
-</nav>
 <table width="100%" class="table table-striped table-bordered table-hover display" id="">
     <thead>
         <tr>
@@ -250,17 +161,15 @@
             <th>Quantity</th>
             <th>Transaction</th>
             <th>Balance</th>
-            <th>Manage</th>
         </tr>
     </thead>
 <tbody>
         <tr>
-            <th>Balance as on {{ dates.from }}</th>
+            <th>Balance as on {{ app.request.query.get("from") }}</th>
             <th></th>
             <th></th>
             <th></th>
             <th>{{ balance }}</th>
-            <th></th>
         </tr>
 {% for stock in allStock %}
   {% if stock.transaction == "sto" %}
@@ -281,20 +190,12 @@
             <td>{{ stock.quantity }}</td>
             <td class="center">{{ transaction }}</td>
             <td class="center">{{ changingStock }}</td>
-            <td class="center">
-              <a href="{{ path('stock_movement_item', { 'id':stock.product.id } ) }}" class="btn btn-info">
-            View History
-              </a>
-              <a href="" class="btn btn-info">
-            Edit
-              </a>
-            </td>
         </tr>
 {% endfor %}
   </tbody>
   <tbody>
     <tr class="odd gradeX">
-        <td>Balance as on {{dates.to}}</td>
+        <td>Balance as on {{app.request.query.get("to")}}</td>
         <td></td>
         <td></td>
         <td class="center"></td>

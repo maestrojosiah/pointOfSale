@@ -5,49 +5,49 @@
 <div class="panel-body">
 <form action="" method="post">
 <div class="row">
-	<div class="col-lg-4">
-	    <div class="panel panel-default">
-	        <div class="panel-heading">
-	            Specific Date
-	        </div>
-	        <div class="panel-body">
-          		<input name="form[dateSpecific]" value="{{dates.specific}}" type="text" class="datepicker" />
-	        </div>
-	        <div class="panel-footer">
-	            One day report
-	        </div>
-	    </div>
-	</div>
-	<div class="col-lg-4">
-	    <div class="panel panel-success">
-	        <div class="panel-heading">
-	            Range
-	        </div>
-	        <div class="panel-body">
-	            <input name="form[dateFrom]" value="{{dates.from}}" type="text" class="datepicker" />
-	        </div>
-	        <div class="panel-footer">
-	            Start Date
-	        </div>
-	    </div>
-	</div>
-	<!-- /.col-lg-4 -->
-	<div class="col-lg-4">
-	    <div class="panel panel-success">
-	        <div class="panel-heading">
-	            Range
-	        </div>
-	        <div class="panel-body">
-	            <input name="form[dateTo]" value="{{dates.to}}" type="text" class="datepicker" />
-	        </div>
-	        <div class="panel-footer">
-	            End date
-	        </div>
-	    </div>
-	</div>
-	<!-- /.col-lg-4 -->
+  <div class="col-lg-4">
+      <div class="panel panel-default">
+          <div class="panel-heading">
+              Specific Date
+          </div>
+          <div class="panel-body">
+              <input name="form[dateSpecific]" value="{{ app.request.query.get("specific") }}" type="text" class="datepicker" />
+          </div>
+          <div class="panel-footer">
+              One day report
+          </div>
+      </div>
+  </div>
+  <div class="col-lg-4">
+      <div class="panel panel-success">
+          <div class="panel-heading">
+              Range
+          </div>
+          <div class="panel-body">
+              <input name="form[dateFrom]" value="{{ app.request.query.get("from") }}" type="text" class="datepicker" />
+          </div>
+          <div class="panel-footer">
+              Start Date
+          </div>
+      </div>
+  </div>
+  <!-- /.col-lg-4 -->
+  <div class="col-lg-4">
+      <div class="panel panel-success">
+          <div class="panel-heading">
+              Range
+          </div>
+          <div class="panel-body">
+              <input name="form[dateTo]" value="{{ app.request.query.get("to") }}" type="text" class="datepicker" />
+          </div>
+          <div class="panel-footer">
+              End date
+          </div>
+      </div>
+  </div>
+  <!-- /.col-lg-4 -->
 </div>
-<input class="btn btn-outline btn-primary btn-lg btn-block" type="submit" value="SHOW SALES SUMMARY RECORDS" />
+<input class="btn btn-outline btn-primary btn-lg btn-block" type="submit" {% if app.request.query.get("from") is not empty or app.request.query.get("specific") is not empty %} value = "CLICK HERE TO DOWNLOAD" {% else %} value="SHOW SALES SUMMARY RECORDS" {% endif %} />
 </form>
 {% if specificStock is defined and specificStock is not empty%}
 <div class="panel-body">
@@ -58,7 +58,7 @@
     </div>
     <ul class="nav navbar-nav">
       <li class="nav-item active">
-        <a class="nav-link" href="">Download PDF <span class="sr-only"></span></a>
+        <a class="nav-link" href="{{ path('items_sold_grouped', {'download':'True', 'from':dates.from, 'to':dates.to, 'specific':dates.specific } ) }}">Download PDF <span class="sr-only"></span></a>
       </li>
       <li class="nav-item active">
         <a class="nav-link" href="">Download Excel <span class="sr-only"></span></a>
@@ -136,7 +136,7 @@
     </div>
     <ul class="nav navbar-nav">
       <li class="nav-item active">
-        <a class="nav-link" href="">Download PDF <span class="sr-only"></span></a>
+        <a class="nav-link" href="{{ path('items_sold_grouped', {'download':'True', 'from':dates.from, 'to':dates.to, 'specific':dates.specific } ) }}">Download PDF <span class="sr-only"></span></a>
       </li>
       <li class="nav-item active">
         <a class="nav-link" href="">Download Excel <span class="sr-only"></span></a>
@@ -207,4 +207,7 @@
 </div>
 </div>
 {% endif %}
-{% endblock %}
+{# {% if rangeStock is defined %}
+  {{ dump(rangeStock) }}
+{% endif %}
+ #}{% endblock %}

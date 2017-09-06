@@ -12,24 +12,54 @@ class PDFController extends Controller
     /**
      * Export to PDF
      * 
-     * @Route("sale/pdf/download", name="download_sales_pdf")
+     * @Route("pdf/download/{Entity}", name="download_pdf")
      */
-    public function downloadPDFAction()
+    public function downloadPDFAction($Entity)
     {
 		$data = [];
         $user = $this->get('security.token_storage')->getToken()->getUser();
-		$entity = $this->getDoctrine()
-			->getRepository('AppBundle:Sale')
-			->loadAllSalesFromThisUser($user);
-
 		$dataArray = [];
 		$dataInfo = [];
-		foreach($entity as $entry){
-			$dataInfo['date'] = $entry->getOnDate();
-			$dataInfo['receipt'] = $entry->getId();
-			$dataInfo['saleTotal'] = $entry->getTotalSale();
-			$dataInfo['paymentMode'] = $entry->getPaymentMode();
-			$dataArray[] = $dataInfo;
+
+
+		if($Entity == "Sale"){
+			$entity = $this->getDoctrine()
+				->getRepository("AppBundle:Sale")
+				->loadAllSalesFromThisUser($user);
+
+			foreach($entity as $entry){
+				$dataInfo['date'] = $entry->getOnDate();
+				$dataInfo['receipt'] = $entry->getId();
+				$dataInfo['saleTotal'] = $entry->getTotalSale();
+				$dataInfo['paymentMode'] = $entry->getPaymentMode();
+				$dataArray[] = $dataInfo;
+			}
+		}
+
+		if($Entity == "Product"){
+			$entity = $this->getDoctrine()
+				->getRepository('AppBundle:Product')
+				->loadAllProductsFromThisUser($user);
+
+			foreach($entity as $entry){
+				$dataInfo['name'] = $entry->getProductName();
+				$dataInfo['cost'] = $entry->getProductCost();
+				$dataInfo['retail'] = $entry->getProductRetailPrice();
+				$dataInfo['code'] = $entry->getProductCode();
+				$dataArray[] = $dataInfo;
+			}
+		}
+
+		if($Entity == "Category"){
+			$entity = $this->getDoctrine()
+				->getRepository('AppBundle:Category')
+				->loadAllCategoriesFromThisUser($user);
+
+			foreach($entity as $entry){
+				$dataInfo['name'] = $entry->getCategoryName();
+				$dataInfo['id'] = $entry->getId();
+				$dataArray[] = $dataInfo;
+			}
 		}
 
 		$data['entity'] = $dataArray;
@@ -38,7 +68,7 @@ class PDFController extends Controller
 
         $html = $this->renderView('PDF/pdf.html.twig', $data);
 
-        $filename = sprintf('sale-%s.pdf', date('Ymd~his'));
+        $filename = sprintf("$Entity-%s.pdf", date('Ymd~his'));
 
         return new Response(
             $this->get('knp_snappy.pdf')->getOutputFromHtml($html),

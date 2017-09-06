@@ -189,7 +189,7 @@ class StockController extends Controller
     }
 
     /**
-     * @Route("/stock/movement/{download}", name="stock_movement")
+     * @Route("/stock/{download}", name="stock_movement")
      */
     public function stockAction(Request $request, $download = "False")
     {
@@ -303,7 +303,7 @@ class StockController extends Controller
 
                 $html = $this->renderView('PDF/stock_mov.html.twig', $data );
 
-                $filename = sprintf("stockMovAll-%s.pdf", date('Ymd~his'));
+                $filename = sprintf("returns-%s.pdf", date('Ymd~his'));
 
                 return new Response(
                     $this->get('knp_snappy.pdf')->getOutputFromHtml($html),
@@ -320,129 +320,9 @@ class StockController extends Controller
     }
 
     /**
-     * @Route("/stock/item/{id}{download}", name="stock_movement_item")
+     * @Route("/stock/sold", name="items_sold")
      */
-    public function stockItemAction(Request $request, $id, $download = "False")
-    {
-        $data = [];
-        $em = $this->getDoctrine()->getManager();
-        $user = $this->get('security.token_storage')->getToken()->getUser();
-        $product = $em->getRepository('AppBundle:product')
-                ->find($id);
-        $data['specificStock'] = [];
-        $data['rangeStock'] = [];
-        $data['dates']['specific'] = '';
-        $data['dates']['from'] = '';
-        $data['dates']['to'] = '';
-        $from = $data['dates']['from'];
-        $form = $this   ->createFormBuilder()
-                        ->add('dateSpecific')
-                        ->add('dateFrom')
-                        ->add('dateTo')
-                        ->getForm();
-     
-        $form->handleRequest($request);
-        if ($form->isSubmitted()) {
-            $form_data = $form->getData();
-            $data['dates']['specific'] = $form_data['dateSpecific'];
-            $data['dates']['from'] = $form_data['dateFrom'];
-            $data['dates']['to'] = $form_data['dateTo'];
-            $em = $this->getDoctrine()->getManager();
-            if($data['dates']['specific']){
-                $from = new \DateTime($data['dates']['specific']);
-                $from ->setTime(0, 0, 0);
-                $to = clone $from;
-                $to->modify('+1 day'); 
-                $stocks = $em->getRepository('AppBundle:Stock')
-                    ->loadAllStocksMovementForThisItem($from, $to, $user, $product);
-                $data['specificStock'] = $stocks;
-            } 
-            if ($data['dates']['from']) {
-                $from = new \DateTime($data['dates']['from']);
-                $to = new \DateTime($data['dates']['to']);
-                $from ->setTime(0, 0, 0);
-                $to ->setTime(0, 0, 0);
-                $to -> modify('+1 day');
-                $stocks = $em->getRepository('AppBundle:Stock')
-                    ->loadAllStocksMovementForThisItem($from, $to, $user, $product);
-                $data['rangeStock'] = $stocks;
-            }           
-        } else {
-            $stocks = $em->getRepository('AppBundle:Stock')
-                ->loadAllStocksFromThisItem($user, $product);
-            $data['allStock'] = $stocks;
-        }
-        $returnsSoFar = $em->getRepository('AppBundle:Stock')
-            ->calculateStockMovementBeforeThisDateItem($data['dates']['from'], "ret", $product);
-        $stockInSoFar = $em->getRepository('AppBundle:Stock')
-            ->calculateStockMovementBeforeThisDateItem($data['dates']['from'], "sto", $product);
-        $salesSoFar = $em->getRepository('AppBundle:Stock')
-            ->calculateStockMovementBeforeThisDateItem($data['dates']['from'], "sal", $product);
-        
-        $data['returns'] = $returnsSoFar[0]['total'];
-        $data['sales'] = $salesSoFar[0]['total'];
-        $data['stockIn'] = $stockInSoFar[0]['total'];
-
-        if($download == "True" ){
-
-            if( $request->query->get('specific') ){
-                $data['allStock'] = null;
-                $from = new \DateTime($data['dates']['specific']);
-                $from ->setTime(0, 0, 0);
-                $to = clone $from;
-                $to->modify('+1 day'); 
-                $stocks = $em->getRepository('AppBundle:Stock')
-                    ->loadAllStocksMovementForThisItem($from, $to, $user, $product);
-                $data['specificStock'] = $stocks;
-            } 
-
-            if ( $request->query->get('from') ) {
-                $data['allStock'] = null;
-                $from = new \DateTime($data['dates']['from']);
-                $to = new \DateTime($data['dates']['to']);
-                $from ->setTime(0, 0, 0);
-                $to ->setTime(0, 0, 0);
-                $to -> modify('+1 day');
-                $stocks = $em->getRepository('AppBundle:Stock')
-                    ->loadAllStocksMovementForThisItem($from, $to, $user, $product);
-                $data['rangeStock'] = $stocks;
-            } 
-
-            $returnsSoFar = $em->getRepository('AppBundle:Stock')
-                ->calculateStockMovementBeforeThisDateItem($from, "ret", $product);
-            $stockInSoFar = $em->getRepository('AppBundle:Stock')
-                ->calculateStockMovementBeforeThisDateItem($from, "sto", $product);
-            $salesSoFar = $em->getRepository('AppBundle:Stock')
-                ->calculateStockMovementBeforeThisDateItem($from, "sal", $product);
-            
-            $data['returns'] = $returnsSoFar[0]['total'];
-            $data['sales'] = $salesSoFar[0]['total'];
-            $data['stockIn'] = $stockInSoFar[0]['total'];
-
-
-            $appPath = $this->container->getParameter('kernel.root_dir');
-
-            $html = $this->renderView('PDF/stock_mov.html.twig', $data );
-
-            $filename = sprintf("stockMov-%s.pdf", date('Ymd~his'));
-
-            return new Response(
-                $this->get('knp_snappy.pdf')->getOutputFromHtml($html),
-                200,
-                [
-                    'Content-Type'        => 'application/pdf',
-                    'Content-Disposition' => sprintf('attachment; filename="%s"', $filename),
-                ]
-            );
-        }
-
-        return $this->render('stock/stockItem.html.twig', $data );
-    }
-
-    /**
-     * @Route("/stock/sold/{download}", name="items_sold")
-     */
-    public function soldAction(Request $request, $download = "False")
+    public function soldAction(Request $request)
     {
         $data = [];
         $em = $this->getDoctrine()->getManager();
@@ -490,36 +370,6 @@ class StockController extends Controller
                     ->findAllForThisRange($from, $to, "sal");
                 $data['rangeStock'] = $stocks;
             }
-
-            if($download == "True" ){
-                $entity = $stocks;
-
-                foreach($entity as $entry){
-                    $dataInfo['name'] = $entry->getProduct();
-                    $dataInfo['date'] = $entry->getOnDate();
-                    $dataInfo['quantity'] = $entry->getQuantity();
-                    $dataInfo['cost'] = $entry->getRetailCost();
-                    $dataArray[] = $dataInfo;
-                }
-
-                $data['entity'] = $dataArray;
-                $data['property'] = $download;
-
-                $appPath = $this->container->getParameter('kernel.root_dir');
-
-                $html = $this->renderView('PDF/pdf.html.twig', $data);
-
-                $filename = sprintf("sold-%s.pdf", date('Ymd~his'));
-
-                return new Response(
-                    $this->get('knp_snappy.pdf')->getOutputFromHtml($html),
-                    200,
-                    [
-                        'Content-Type'        => 'application/pdf',
-                        'Content-Disposition' => sprintf('attachment; filename="%s"', $filename),
-                    ]
-                );
-            }
             
 
         }
@@ -529,9 +379,9 @@ class StockController extends Controller
     }
 
 	/**
-	 * @Route("/stock/tax/{download}", name="tax_report")
+	 * @Route("/stock/tax", name="tax_report")
 	 */
-	public function taxAction(Request $request, $download = "False")
+	public function taxAction(Request $request)
 	{
 		$data = [];
 		$em = $this->getDoctrine()->getManager();
@@ -576,40 +426,10 @@ class StockController extends Controller
         		$to ->setTime(0, 0, 0);
         		$to -> modify('+1 day');
         		$stocks = $em->getRepository('AppBundle:Stock')
-        			->findAllForThisRange($from, $to, "sal");
+        			->findAllSoldForThisRange($from, $to, "sal");
         		$data['rangeStock'] = $stocks;
         	}
         	
-            if($download == "True" ){
-                $entity = $stocks;
-
-                foreach($entity as $entry){
-                    $dataInfo['name'] = $entry->getProduct();
-                    $dataInfo['date'] = $entry->getOnDate();
-                    $dataInfo['quantity'] = $entry->getQuantity();
-                    $dataInfo['tax'] = $entry->getRetailCost() * 16/116;
-                    $dataArray[] = $dataInfo;
-                }
-
-                $data['entity'] = $dataArray;
-                $data['property'] = $download;
-
-                $appPath = $this->container->getParameter('kernel.root_dir');
-
-                $html = $this->renderView('PDF/pdf.html.twig', $data);
-
-                $filename = sprintf("sold-%s.pdf", date('Ymd~his'));
-
-                return new Response(
-                    $this->get('knp_snappy.pdf')->getOutputFromHtml($html),
-                    200,
-                    [
-                        'Content-Type'        => 'application/pdf',
-                        'Content-Disposition' => sprintf('attachment; filename="%s"', $filename),
-                    ]
-                );
-            }
-            
 
     	}
 
@@ -618,9 +438,9 @@ class StockController extends Controller
 	}
 
 	/**
-	 * @Route("/stock/grouped/{download}", name="items_sold_grouped")
+	 * @Route("/stock/grouped", name="items_sold_grouped")
 	 */
-	public function soldGroupedAction(Request $request, $download = "False")
+	public function soldGroupedAction(Request $request)
 	{
 		$data = [];
 		$em = $this->getDoctrine()->getManager();
@@ -782,25 +602,7 @@ class StockController extends Controller
         		$data['rangeStock'] = $prodArray;
 
         	}
-
-            if($download == "True" ){
-
-                $appPath = $this->container->getParameter('kernel.root_dir');
-
-                $html = $this->renderView('PDF/saleGrouped.html.twig', $data);
-
-                $filename = sprintf("sold-%s.pdf", date('Ymd~his'));
-
-                return new Response(
-                    $this->get('knp_snappy.pdf')->getOutputFromHtml($html),
-                    200,
-                    [
-                        'Content-Type'        => 'application/pdf',
-                        'Content-Disposition' => sprintf('attachment; filename="%s"', $filename),
-                    ]
-                );
-            }
-                    	
+        	
 
     	}
 

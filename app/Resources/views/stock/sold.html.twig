@@ -5,49 +5,49 @@
 <div class="panel-body">
 <form action="" method="post">
 <div class="row">
-	<div class="col-lg-4">
-	    <div class="panel panel-default">
-	        <div class="panel-heading">
-	            Specific Date
-	        </div>
-	        <div class="panel-body">
-          		<input name="form[dateSpecific]" value="{{dates.specific}}" type="text" class="datepicker" />
-	        </div>
-	        <div class="panel-footer">
-	            One day report
-	        </div>
-	    </div>
-	</div>
-	<div class="col-lg-4">
-	    <div class="panel panel-success">
-	        <div class="panel-heading">
-	            Range
-	        </div>
-	        <div class="panel-body">
-	            <input name="form[dateFrom]" value="{{dates.from}}" type="text" class="datepicker" />
-	        </div>
-	        <div class="panel-footer">
-	            Start Date
-	        </div>
-	    </div>
-	</div>
-	<!-- /.col-lg-4 -->
-	<div class="col-lg-4">
-	    <div class="panel panel-success">
-	        <div class="panel-heading">
-	            Range
-	        </div>
-	        <div class="panel-body">
-	            <input name="form[dateTo]" value="{{dates.to}}" type="text" class="datepicker" />
-	        </div>
-	        <div class="panel-footer">
-	            End date
-	        </div>
-	    </div>
-	</div>
-	<!-- /.col-lg-4 -->
+  <div class="col-lg-4">
+      <div class="panel panel-default">
+          <div class="panel-heading">
+              Specific Date
+          </div>
+          <div class="panel-body">
+              <input name="form[dateSpecific]" value="{{ app.request.query.get("specific") }}" type="text" class="datepicker" />
+          </div>
+          <div class="panel-footer">
+              One day report
+          </div>
+      </div>
+  </div>
+  <div class="col-lg-4">
+      <div class="panel panel-success">
+          <div class="panel-heading">
+              Range
+          </div>
+          <div class="panel-body">
+              <input name="form[dateFrom]" value="{{ app.request.query.get("from") }}" type="text" class="datepicker" />
+          </div>
+          <div class="panel-footer">
+              Start Date
+          </div>
+      </div>
+  </div>
+  <!-- /.col-lg-4 -->
+  <div class="col-lg-4">
+      <div class="panel panel-success">
+          <div class="panel-heading">
+              Range
+          </div>
+          <div class="panel-body">
+              <input name="form[dateTo]" value="{{ app.request.query.get("to") }}" type="text" class="datepicker" />
+          </div>
+          <div class="panel-footer">
+              End date
+          </div>
+      </div>
+  </div>
+  <!-- /.col-lg-4 -->
 </div>
-<input class="btn btn-outline btn-primary btn-lg btn-block" type="submit" value="SHOW SALES SUMMARY RECORDS" />
+<input class="btn btn-outline btn-primary btn-lg btn-block" type="submit" {% if app.request.query.get("from") is not empty or app.request.query.get("specific") is not empty %} value = "CLICK HERE TO DOWNLOAD" {% else %} value="SHOW SALES SUMMARY RECORDS" {% endif %} />
 </form>
 {% if specificStock is defined and specificStock is not empty%}
 <div class="panel-body">
@@ -58,7 +58,7 @@
     </div>
     <ul class="nav navbar-nav">
       <li class="nav-item active">
-        <a class="nav-link" href="">Download PDF <span class="sr-only"></span></a>
+        <a class="nav-link" href="{{ path('items_sold', {'download':'True', 'from':dates.from, 'to':dates.to, 'specific':dates.specific } ) }}">Download PDF <span class="sr-only"></span></a>
       </li>
       <li class="nav-item active">
         <a class="nav-link" href="">Download Excel <span class="sr-only"></span></a>
@@ -73,28 +73,19 @@
             <th>Date</th>
             <th>Quantity</th>
             <th>Sales</th>
-            <th>Tax</th>
             <th>Manage</th>
         </tr>
     </thead>
     <tbody>
 {% set total = 0 %}
-{% set taxTotal = 0 %}
 {% for stock in specificStock %}
 	<!--calculations-->
-  {% if stock.product.productTax == 1.16 %}
-     {% set thisTax = stock.retailCost * (16 / 116) * stock.quantity %}
-  {% else %}
-     {% set thisTax = 0 %}
-  {% endif %}
 	{% set total = total+stock.retailCost*stock.quantity %}
-	{% set taxTotal = taxTotal + thisTax %}
     <tr class="odd gradeX">
         <td><b>{{ stock.product.productCode }}</b> {{ stock.product }}</td>
         <td>{{ stock.onDate | date('Y-m-d') }}</td>
         <td>{{ stock.quantity }}</td>
         <td class="center">{{ stock.retailCost * stock.quantity }}</td>
-        <td class="center">{{ thisTax|round(2) }}</td>
         <td class="center">
             <a type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal{{ stock.id }}" data-stockId="{{ stock.id }}">
           Delete
@@ -133,7 +124,6 @@
         <td></td>
         <td>Total</td>
         <td class="center">{{ total|round(2) }}</td>
-        <td class="center">{{ taxTotal|round(2) }}</td>
         <td class="center"></td>
     </tr>
   </tbody>
@@ -150,7 +140,7 @@
     </div>
     <ul class="nav navbar-nav">
       <li class="nav-item active">
-        <a class="nav-link" href="">Download PDF <span class="sr-only"></span></a>
+        <a class="nav-link" href="{{ path('items_sold', {'download':'True', 'from':dates.from, 'to':dates.to, 'specific':dates.specific } ) }}">Download PDF <span class="sr-only"></span></a>
       </li>
       <li class="nav-item active">
         <a class="nav-link" href="">Download Excel <span class="sr-only"></span></a>
@@ -165,28 +155,19 @@
             <th>Date</th>
             <th>Quantity</th>
             <th>Sales</th>
-            <th>Tax</th>
             <th>Manage</th>
         </tr>
     </thead>
     <tbody>
 
 {% set total = 0 %}
-{% set taxTotal = 0 %}
 {% for stock in rangeStock %}
-  {% if stock.product.productTax == 1.16 %}
-     {% set thisTax = stock.retailCost * (16 / 116) * stock.quantity %}
-  {% else %}
-     {% set thisTax = 0 %}
-  {% endif %}
 	{% set total = total+stock.retailCost*stock.quantity %}
-	{% set taxTotal = taxTotal + thisTax %}
         <tr class="odd gradeX">
         	<td><b>{{ stock.product.productCode }}</b> {{ stock.product }}</td>
             <td>{{ stock.onDate | date('Y-m-d') }}</td>
             <td>{{ stock.quantity }}</td>
             <td class="center">{{ stock.retailCost * stock.quantity }}</td>
-	        <td class="center">{{ thisTax|round(2) }}</td>
             <td class="center">
                 <a type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal{{ stock.id }}" data-stockId="{{ stock.id }}">
               Delete
@@ -225,7 +206,6 @@
         <td></td>
         <td>Total</td>
         <td class="center">{{ total|round(2) }}</td>
-        <td class="center">{{ taxTotal|round(2) }}</td>
         <td class="center"></td>
     </tr>
   </tbody>
