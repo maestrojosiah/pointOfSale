@@ -75,7 +75,7 @@
             <th>Cost</th>
             <th>Tax</th>
             <th>Profit</th>
-            <th>Manage</th>
+            {# <th>Manage</th> #}
         </tr>
     </thead>
     <tbody>
@@ -101,7 +101,7 @@
         <td class="center">{{ stock.productCost }}</td>
 	      <td class="center">{{ thisTax|round(2) }}</td>
         <td class="center">{{ stock.profit }}</td>
-        <td class="center">
+{#         <td class="center">
             <a href="" class="btn btn-info">
           View
             </a>
@@ -109,7 +109,7 @@
           Edit
             </a>
         </td>
-    </tr>
+ #}    </tr>
 {% endfor %}
   </tbody>
   <tbody>
@@ -120,11 +120,10 @@
         <td>{{ costTotal|round(2) }}</td>
         <td class="center">{{ taxTotal|round(2) }}</td>
         <td class="center">{{ profitTotal|round(2) }}</td>
-        <td class="center"></td>
+        {# <td class="center"></td> #}
     </tr>
   </tbody>
 </table>
-<a href="">Restore deleted Products</a>
 </div>
 {% endif %}
 {% if rangeStock is defined and rangeStock is not empty %}
@@ -153,7 +152,7 @@
             <th>Cost</th>
             <th>Tax</th>
             <th>Profit</th>
-            <th>Manage</th>
+            {# <th>Manage</th> #}
         </tr>
     </thead>
     <tbody>
@@ -179,14 +178,14 @@
         	<td class="center">{{ stock.productCost }}</td>
 	        <td class="center">{{ thisTax|round(2) }}</td>
         	<td class="center">{{ stock.profit }}</td>
-            <td class="center">
+           {#  <td class="center">
                 <a href="" class="btn btn-info">
               View
                 </a>
                 <a href="" class="btn btn-info">
               Edit
                 </a>
-            </td>
+            </td> #}
         </tr>
 {% endfor %}
   </tbody>
@@ -198,11 +197,10 @@
         <td>{{ costTotal|round(2) }}</td>
         <td class="center">{{ taxTotal|round(2) }}</td>
         <td class="center">{{ profitTotal|round(2) }}</td>
-        <td class="center"></td>
+        {# <td class="center"></td> #}
     </tr>
   </tbody>
 </table>
-<a href="">Restore deleted Products</a>
 </div>
 </div>
 </div>

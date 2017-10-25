@@ -64,10 +64,16 @@ class CategoryController extends Controller
                 return $this->redirectToRoute('homepage');
             }
         }
+        $em = $this->getDoctrine()->getManager();
+
+        $categories = $em->getRepository('AppBundle:Category')
+        	->findAll();
+
+        $data['categories'] = $categories;
 
         return $this->render(
-            'category/add.html.twig',
-            array('form' => $form->createView())
+            'category/add.html.twig', 
+            array('form' => $form->createView(), 'data' => $data )
         );
 
 

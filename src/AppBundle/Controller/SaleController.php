@@ -8,6 +8,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class SaleController extends Controller
 {
@@ -48,10 +49,6 @@ class SaleController extends Controller
 			->getRepository('AppBundle:Stock')
 			->findAllForThisSale($sale);
 
-        $products = $this->getDoctrine()
-            ->getRepository('AppBundle:Product')
-            ->loadAllProductsFromThisUser($user);
-
         $categories = $this->getDoctrine()
             ->getRepository('AppBundle:Category')
             ->loadAllCategoriesFromThisUser($user);
@@ -63,7 +60,6 @@ class SaleController extends Controller
 		$data['sale'] = $sale;
 		$data['stocks'] = $stocks;
 		$data['categories'] = $categories;
-		$data['products'] = $products;
 		$data['systSetting'] = $systSetting;
 
 		return $this->render('sale/complete.html.twig', ['data' => $data,] );
@@ -136,6 +132,7 @@ class SaleController extends Controller
 			->getRepository('AppBundle:Sale')
 			->loadAllSalesFromThisUser($user);
 
+
 		$data['sales'] = $sales;
 
 		return $this->render('sale/list.html.twig', ['data' => $data ] );
@@ -191,6 +188,74 @@ class SaleController extends Controller
 		$em->flush(); 
 
 		return $this->redirectToRoute('sale_list');
+	}
+
+	/**
+	 * @Route("/sale/suspended/delete/{saleId}", name="sale_suspended_delete")
+	 */
+	public function deleteSusAction($saleId)
+	{
+		$em = $this->getDoctrine()->getManager();
+
+		$sale = $em->getRepository('AppBundle:Sale')
+			->find($saleId);
+
+		if(!$sale) {
+			throw $this->createNotFoundException(
+				'No sale for this id'
+			);
+		}
+		$stocks = $sale->getStocks();
+		foreach($stocks as $stock){
+			$stock->setDeleted(true);
+		}
+
+		$sale->setDeleted(true);
+ 
+        	$this->addFlash(
+	            'success',
+	            'Sale deleted successfully!'
+        	);
+
+
+		$em->persist($sale);
+		$em->flush(); 
+
+		return $this->redirectToRoute('suspended_view');
+	}
+
+	/**
+	 * @Route("/sale/ajax/delete", name="delete_sale_ajax")
+	 */
+	public function deleteAjaxAction(Request $request)
+	{
+		$em = $this->getDoctrine()->getManager();
+		$saleId = $request->request->get('id');
+		$sale = $em->getRepository('AppBundle:Sale')
+			->find($saleId);
+
+		if(!$sale) {
+			throw $this->createNotFoundException(
+				'No sale for this id'
+			);
+		}
+		$stocks = $sale->getStocks();
+		foreach($stocks as $stock){
+			$stock->setDeleted(true);
+		}
+
+		$sale->setDeleted(true);
+ 
+        	$this->addFlash(
+	            'success',
+	            'Suspended sale completed successfully!'
+        	);
+
+
+		$em->persist($sale);
+		$em->flush(); 
+
+        return new JsonResponse($saleId);
 	}
 
 	/**

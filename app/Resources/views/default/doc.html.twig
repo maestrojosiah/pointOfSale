@@ -1,0 +1,194 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+{{ parent() }}
+<div id="page-wrapper">
+
+<div class="col-lg-12">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3>Adventist Book Center Point Of Sale Documentation</h3>
+        </div>
+        <!-- .panel-heading -->
+        <div class="panel-body">
+            <div class="panel-group" id="accordion">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion" href="#introduction" class="" aria-expanded="false">Introduction</a>
+                        </h4>
+                    </div>
+                    <div id="introduction" class="panel-collapse collapse in" aria-expanded="false" style="">
+                        <div class="panel-body">
+                            <p>Welcome to Adventist Book Center Point of Sale. This application is designed using PHP language, incorporated with Javascript. This means that it can be used with any operating system.</p>
+                            <p><a href="https://symfony.com/">Symfony</a> Framework was used to develop this website. Security is in the foundation for symfony.</p>
+                            <p>An initiative by HHES Manager 2017, the project for this application was started because of a need of a personalized application that will suit the needs of the Home Health Ecucation Service company.</p>
+                            <p>This page contains documentation on how to use this application.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion" href="#authentication" aria-expanded="false" class="collapsed">Authentication</a>
+                        </h4>
+                    </div>
+                    <div id="authentication" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
+                        <div class="panel-body">
+                            <p>Authentication is an important part of this application (POS). To be able to use this application, you need to be an authenticated user. To become a user, you need to <a href="{{ path('user_registration') }}">register</a> by clicking on the "new user?" link below the start screen</p>
+                            <p>After registration, you will be taken to a login screen where you will be required to enter the credentials that you created in the prevous screen (registration).</p>
+                            <p>If you are already a registered user, you need to <a href="{{ path('login') }}">login</a> to use this application</p>
+                            <p>When creating an account, please use a strong password. You don't want people to be able to guess your password and mess up with your records.</p>
+                            <p>Please make sure you use a password you can remember.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion" href="#features" class="collapsed" aria-expanded="false">Features</a>
+                        </h4>
+                    </div>
+                    <div id="features" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
+                        <div class="panel-body">
+                            <p>The features of this website include:</p>
+                            <ol>
+                            	<li>Addition and deletion (not permanent) of product <mark>categories</mark></li>
+                            	<li>Addition and deletion (not permanent) of <mark>products</mark></li>
+                            	<li>Recording for <mark>sales </mark>, <mark>stock in </mark> and <mark>stock returns </mark></li>
+                            	<li>Powerful search feature for products</li>
+                            	<li>Sale Transaction</li>
+                            	<li>Sale Suspension and resumint</li>
+                            	<li>Cancellation of sale</li>
+                            	<li>Useful keyboard shortcuts (displayed at the bottom of the sale screen)</li>
+                            	<li>Email support</li>
+                            	<li>Summary reports</li>
+                            	<li>Powerful pagination for tables</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion" href="#faq" class="collapsed" aria-expanded="false">Frequently Asked Questions (faq)</a>
+                        </h4>
+                    </div>
+                    <div id="faq" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
+                        <div class="panel-body">
+                            <h3>Common problems that you can encounter:</h3>
+                            <h4>Can't upload products from excel (.xls) file</h4>
+                            <p> If you keep getting redirected to the "Add Category" page, this is because you have not added enough categories. Your excel (.xls) file has more categories than what you have added as categories.</p>
+                            <p>Another problem might be the format of the xls file that you are importing products from. The format should be as follows: </p>
+                            <img style="width:100%" src="{{ asset('images/xls_example.png') }}" />
+                            <p>Where: </p>
+                            <ul>
+                            	<li>Row A: product code</li>
+                            	<li>Row B: product name</li>
+                            	<li>Row C: product retail price (selling price)</li>
+                            	<li>Row D: product cost (buying price)</li>
+                            	<li>Row E: initial stock quantity for product</li>
+                            	<li>Row F: leave the values at '0'</li>
+                            	<li>Row G: taxable. 'T' for taxable 'E' for non-taxable</li>
+                            	<li>Row H: category ID. This should be in the order that you insert categories. Should be numeral see <a data-toggle="collapse" data-parent="#accordion" href="#first_steps" class="collapsed" aria-expanded="false">First steps</a> information about inserting categories in preparation for product upload.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion" href="#first_steps" class="collapsed" aria-expanded="false">First Steps</a>
+                        </h4>
+                    </div>
+                    <div id="first_steps" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
+                        <div class="panel-body">
+                            <p>Setting up the application</p>
+                            <ol>
+                                <li>The very first thing to do is to <a href="{{ path('user_registration') }}">register</a> by clicking on the "new user?" link below the start screen</li>
+                                <li>After <span class="bg-primary text-white">registration</span>, you will be taken to a login screen where you will be required to enter the credentials that you created in the prevous screen (registration).</li>
+                                <li>If the <span class="bg-primary text-white">login</span> was successful, you will be directed to the settings page.</li>
+                                <li>The <span class="bg-primary text-white">settings</span> page will require you to set up the basic information for the application to run smoothly.</li>
+                                	<ul>
+                                		<li>Site Name: What you want the application to display at the top-left corner of the screen. Example: "Nakuru ABC"</li>
+                                		<li>Telephone: The telephone number that will be displayed in receipts and documents generated by the application</li>
+                                		<li>Minimum Stock: The minimum amount of stock that should be in the shop, for any item/product. When the minimum number is reached, the product will display in an amber color</li>
+                                		<li>Currency: The currency to use. For now, leave it at Kenya Shillings</li>
+                                		<li>Items per page: In summary lists, each page will contain this number of items per page.</li>
+                                		<li>Upload duration: This is the amount of time that it will take before records are uploaded. (not functional yet)</li>
+                                		<li>Receipt Header: What will display at the top of receipts. Should have company name, address and phone number</li>
+                                		<li>Receipt Footer: What will display at the bottom of receipts. eg. 'Thank you for your business'</li>
+                                	</ul>
+                                <li>After filling in the settings form, click on "Save Settings"</li>
+                                <li>If everything is done correctly, you will be directed to a page where you are required to <span class="bg-primary text-white">add categories</span>.<span class="bg-danger">If you are going to add products from an excel file (.xls), you should add all categories that are in that file. Otherwise, you will not be able to add the products</span></li>
+                                <li>To add more than one <span class="bg-primary text-white">category</span>, use the button "Save and Add". <strong>To come back to this page, use the second icon (from left) from the navigation</strong> : <i class="fa fa-tasks fa-fw"></i></li>
+                                <li>As you add categories, you will see them displaying on the right side of the page.</li>
+                                <li>When you are done, you will need to <span class="bg-primary text-white">add products</span> before you can start selling. You can click on "Add products" button below the categories list or click on the navigation link <i class="fa fa-product-hunt fa-fw"></i> and choose "Add product"</li>
+                                <li>In the products page, you will have the option to add products <span class="bg-primary text-white">one by one</span> or you can <span class="bg-primary text-white">import</span> them using an <span class="bg-primary text-white">excel file (.xls)</span>. If you want to use the latter method, you will click on " Upload from Excel (.xls) file"</li>
+                                <li>If you choose <span class="bg-primary text-white">to add products individually</span>, you will fill the form every time you are adding a new product. The details to fill the form are as follows:</li>
+                                	<ul>
+                                		<li>Product Code: This is a unique code assigned to each product. You can search for the code or the product name when you are selling with this application.</li>
+                                		<li>Product Name: This is the label of the product. eg. "Gifted Hands". Keep the names short and clear.</li>
+                                		<li>Product Cost: This is the cost at which the product was purchased with. The buying price of the product</li>
+                                		<li>Product Retail Price: This is the cost at which the product will be sold. (Selling price)</li>
+                                		<li>Tax: Select whether the product is taxable or not</li>
+                                		<li>Category: Here you should select a suitable category for the product. The list in the drop down is a list of the categories you added in the previous step.</li>
+                                	</ul>
+                                <li>To add products using <span class="bg-primary text-white">excel file  (.xls)</span>, click on the link "Upload from excel (.xls) file". Then click on "Browse" to select a file that should be in the <a data-toggle="collapse" data-parent="#accordion" href="#faq" class="collapsed" aria-expanded="false">format shown here.</a></li>
+                                <li>Click on "Insert Data To Database" then relax and wait. It may take time, depending on the amount of products in your excel file.</li>
+                                <li>This will automatically update your stock entries according to the stock column of your excel (.xls) file. </li>
+                                <li>You are now ready to start selling.</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion" href="#selling" aria-expanded="false" class="collapsed">Making a sale</a>
+                        </h4>
+                    </div>
+                    <div id="selling" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
+                        <div class="panel-body">
+                          <ol>
+                            <li>To make a sale, you should be at the following page: </li>
+                            <img style="width:100%" src="{{ asset('images/sell.png') }}" />
+                            <li>If you're not at the page, click on "Sell" at the left side navigation</li>
+                            <li>To search for a product to sell, you have different options:</li>
+                            <ol type="a">
+                            	<li>Use the Search textbox</li>
+                            	<ul>
+                            		<li>You can use the mouse to focus the textbox. Use [F2] as the shortcut key to focus</li>
+                            		<li>Start typing the barcode or name of a product</li>
+                            		<li>When the product you want is visible, you can use the mouse to click it or,</li>
+                            		<li>When the product you want is the first one in the result list, just press [ENTER] and the item will be added to the sale list. (the figure besides the product name in the search result list is the price)</li>
+                            		<li>To be more accurate and have only one result, use the product code.</li>                                            		
+                            	</ul>
+                            	<li>Manually look for the product</li>
+                            	<ul>
+                            		<li>Click on the button labelled "Show Items". Product categories will display at the top of the page.</li>
+                            		<li>Click on the category you need to pick the product from. A list of products will be displayed. </li>
+                            		<li>Scroll and click on the desired product. <em>This method is slower, so use the first method above as the main way of searching for product</em></li>
+                            		<li>Click on "Hide Items" to hide the categories</li>
+                            	</ul>
+                            </ol>
+                            <li>After you have selected the desired items to sell, you can select the mode of payment (only if you are not selling by cash should you do this) at the bottom right side. </li>
+                            <li>Cash sale is the default method, and so you will not find this in the list of mode of payment. If it is a cash sale, proceed to next step.</li>
+                            <li>Press [F7] to focus on the paid amount section. You can do this with your mouse.</li>
+                            <li>Enter the amount paid by the client</li>
+                          </ol>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-- .panel-body -->
+    </div>
+    <!-- /.panel -->
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+{% endblock %}

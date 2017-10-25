@@ -52,7 +52,7 @@ class ProductRepository extends \Doctrine\ORM\EntityRepository
     {
     	return $this->createQueryBuilder('p')
                ->where('p.productName LIKE :input OR p.productCode LIKE :input')
-               ->setParameter('input', $searchText.'%')
+               ->setParameter('input', '%'.$searchText.'%')
                ->setMaxResults(10)
                ->getQuery()
                ->getResult();

@@ -5,16 +5,28 @@
 <div class="panel-body">
     <div class="row">
         <div class="col-lg-6">
-			{{ form_start(form) }}
+            <h3>Please add a category</h3>
+            {{ form_start(form) }}
                 <div class="form-group">
                     <label>{{ form_label(form.category_name) }}</label>
-        			{{ form_widget(form.category_name, {'attr': {'class': 'form-control', 'placeholder': 'Category Name', 'id': 'category_name' }} ) }}
+                    {{ form_widget(form.category_name, {'attr': {'class': 'form-control', 'placeholder': 'Category Name', 'id': 'category_name' }} ) }}
                     <p class="help-block">Write the name of the new category.</p>
                 </div>
                 {{ form_widget(form.save, {'attr': {'class': 'btn btn-primary' }} ) }}
                 {{ form_widget(form.saveAndAdd, {'attr': {'class': 'btn btn-primary' }} ) }}
-			{{ form_end(form) }}
+            {{ form_end(form) }}
         </div>
+        {% if data.categories is defined and data.categories is not empty %}
+        <div class="col-lg-6">
+            <h3>Categories</h3>
+            <ol>
+                {% for category in data.categories %}
+                    <li>{{ category.categoryName }}</li>
+                {% endfor %}
+            </ol>
+            <a href="{{ path('product_add') }}" class="btn btn-primary">Add products</a>
+        </div>
+        {% endif %}
     </div>
     <!-- /.row (nested) -->
 </div>

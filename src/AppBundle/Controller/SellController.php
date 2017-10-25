@@ -21,11 +21,19 @@ class SellController extends Controller
         $user = $this->get('security.token_storage')->getToken()->getUser();
         
         $products = $em->getRepository('AppBundle:Product')
-            ->loadAllProductsFromThisUser($user);
+            ->findBy(
+                array('user' => $user),
+                array('id' => 'ASC'),
+                1
+            );
         $data['products'] = $products;
 
         $categories = $em->getRepository('AppBundle:Category')
-            ->loadAllCategoriesFromThisUser($user);
+            ->findBy(
+                array('user' => $user),
+                array('id' => 'ASC'),
+                1
+            );
 
         $systSetting = $em->getRepository('AppBundle:SystSetting')
             ->settingsForThisUser($user);
@@ -33,6 +41,13 @@ class SellController extends Controller
         if(!$systSetting){
             return $this->redirectToRoute('systSetting_add');
         }
+        if(!$categories){
+            return $this->redirectToRoute('category_add');
+        }
+        if(!$products){
+            return $this->redirectToRoute('product_add');
+        }
+
 
         $data['categories'] = $categories;
         $data['systSetting'] = $systSetting;

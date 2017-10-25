@@ -3,9 +3,9 @@
  * Copyright 2013-2016 Start Bootstrap
  * Licensed under MIT (https://github.com/BlackrockDigital/startbootstrap/blob/gh-pages/LICENSE)
  */
-$(function() {
-    $('#side-menu').metisMenu();
-});
+// $(function() {
+//     $('#side-menu').metisMenu();
+// });
 
 $('.toggleButton').click(function(){
     var $this = $(this);
@@ -30,6 +30,9 @@ $(document).on("click", '.toggleSale', function(){
             '<button type="button" id="salesReturn" class="btn btn-primary"><strong>Submit Return</strong></button>'
         );
         $("#rightSide").hide();
+        $("#totalsRecord").hide()
+        $("#changeRecord").hide()
+
     } else if($this.text() == 'Return') {
         $this.text('Stock In');
         console.log($this.text());      
@@ -37,11 +40,15 @@ $(document).on("click", '.toggleSale', function(){
             '<button type="button" id="stockIn" class="btn btn-primary"><strong>Submit Stock Received</strong></button>'
         );
         $("#rightSide").hide();
+        $("#totalsRecord").hide()
+        $("#changeRecord").hide()
     } else if($this.text() == 'Stock In') {
         $this.text('Sale');
         console.log($this.text());   
         $("#action").html("");   
         $("#rightSide").show();
+        $("#totalsRecord").show()
+        $("#changeRecord").show()
     }
 });
 

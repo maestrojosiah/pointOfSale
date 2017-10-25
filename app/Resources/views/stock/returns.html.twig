@@ -74,7 +74,7 @@
             <th>Date</th>
             <th>Quantity</th>
             <th>Cost</th>
-            <th>Manage</th>
+            {# <th>Manage</th> #}
         </tr>
     </thead>
     <tbody>
@@ -87,14 +87,14 @@
         <td>{{ stock.onDate | date('Y-m-d') }}</td>
         <td>{{ stock.quantity }}</td>
         <td class="center">{{ stock.retailCost * stock.quantity }}</td>
-        <td class="center">
+        {# <td class="center">
             <a type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal{{ stock.id }}" data-stockId="{{ stock.id }}">
           Delete
             </a>
             <a href="" class="btn btn-info">
           Edit
             </a>
-        </td>
+        </td> #}
     </tr>
 
     <!-- Modal -->
@@ -125,11 +125,10 @@
         <td></td>
         <td>Total</td>
         <td class="center">{{ total|round(2) }}</td>
-        <td class="center"></td>
+        {# <td class="center"></td> #}
     </tr>
   </tbody>
 </table>
-<a href="">Restore deleted Products</a>
 </div>
 {% endif %}
 {% if rangeStock is defined and rangeStock is not empty %}
@@ -156,7 +155,7 @@
             <th>Date</th>
             <th>Quantity</th>
             <th>Cost</th>
-            <th>Manage</th>
+            {# <th>Manage</th> #}
         </tr>
     </thead>
     <tbody>
@@ -169,14 +168,14 @@
             <td>{{ stock.onDate | date('Y-m-d') }}</td>
             <td>{{ stock.quantity }}</td>
             <td class="center">{{ stock.retailCost * stock.quantity }}</td>
-            <td class="center">
+           {#  <td class="center">
                 <a type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal{{ stock.id }}" data-stockId="{{ stock.id }}">
               Delete
                 </a>
                 <a href="" class="btn btn-info">
               Edit
                 </a>
-            </td>
+            </td> #}
         </tr>
 
     <!-- Modal -->
@@ -207,11 +206,10 @@
         <td></td>
         <td>Total</td>
         <td class="center">{{ total|round(2) }}</td>
-        <td class="center"></td>
+        {# <td class="center"></td> #}
     </tr>
   </tbody>
 </table>
-<a href="">Restore deleted Products</a>
 </div>
 </div>
 </div>

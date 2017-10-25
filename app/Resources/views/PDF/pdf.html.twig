@@ -21,10 +21,19 @@
     	border-bottom: 1px solid #ddd;
    	} 
  	tr:nth-child(even) {background-color: #f2f2f2} 
+     
+    table thead tr {
+        page-break-inside: avoid;
+    }
+    table tbody tr {
+        page-break-inside: avoid;
+    }
 
 </style>
 {% endblock %}
 {% block content %}
+<h3>{{ systSetting.receiptHeader|raw }}</h3>
+<p>{{ report }}{% if no_dates is not defined %} as from {{ app.request.query.get("from") }} to {{ app.request.query.get("to") }}{% endif %}</p>
 
 <div class="panel-body">
 
@@ -47,8 +56,17 @@
     		{% if key == "date" %}
     			<td>{{ value | date('Y-m-d') }}</td>
             {% elseif key == "cost" or key == "sales" or key == "tax" %}
-                {% set total = total + value * entry.quantity %}
-                <td>{{ value|round(2) * entry.quantity }}</td>
+                {% if entry.quantity is defined %}
+                  {% set total = total + value * entry.quantity %}
+                {% else %}
+                  {% set total = total + value %}
+                {% endif %}
+                
+                {% if entry.quantity is defined %}
+                  <td>{{ value|round(2) * entry.quantity }}</td>
+                {% else %}
+                  <td>{{ value|round(2) }}</td>
+                {% endif %}
     		{% else %}
     			<td class="center">{{ value }}</td>
     		{% endif %}

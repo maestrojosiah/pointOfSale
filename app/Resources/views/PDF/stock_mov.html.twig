@@ -21,7 +21,13 @@
         border-bottom: 1px solid #ddd;
     } 
     tr:nth-child(even) {background-color: #f2f2f2} 
-
+    
+    table thead tr {
+        page-break-inside: avoid;
+    }
+    table tbody tr {
+        page-break-inside: avoid;
+    }
 </style>
 {% endblock %}
 {% block content %}
@@ -29,6 +35,8 @@
 {% set goodsSold = sales - returns %}
 {% set balance = goodsAvailable - goodsSold %}       
 <div id="page-wrapper">
+<h3>{{ systSetting.receiptHeader|raw }}</h3>
+<p>Stock movement summary report as {% if app.request.query.get("specific") %} on {{ app.request.query.get("specific") }} {% else %} from {{ app.request.query.get("from") }} to {{ app.request.query.get("to") }}{% endif %} </p>
 <div class="panel-body">
 {% if specificStock is defined and specificStock is not empty%}
 {% set total = 0 %}

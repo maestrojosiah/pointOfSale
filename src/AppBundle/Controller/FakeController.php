@@ -5,6 +5,7 @@ namespace AppBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use AppBundle\Entity\Product;
+use AppBundle\Entity\Stock;
 
 class FakeController extends Controller
 {
@@ -84,20 +85,29 @@ class FakeController extends Controller
             $phpExcelObject->setActiveSheetIndex(0)
                 ->setCellValue('A1', $htmlHelper->toRichTextObject('<b>Code</b>'))
                 ->setCellValue('B1', $htmlHelper->toRichTextObject('<b>Name</b>'))
-                ->setCellValue('C1', $htmlHelper->toRichTextObject('<b>Cost</b>'))
-                ->setCellValue('D1', $htmlHelper->toRichTextObject('<b>Taxable</b>'))
-                ->setCellValue('E1', $htmlHelper->toRichTextObject('<b>Retail</b>'))
-                ->setCellValue('G1', $htmlHelper->toRichTextObject('<b>Category</b>'));
+                ->setCellValue('C1', $htmlHelper->toRichTextObject('<b>Retail</b>'))
+                ->setCellValue('D1', $htmlHelper->toRichTextObject('<b>Cost</b>'))
+                ->setCellValue('E1', $htmlHelper->toRichTextObject('<b>Quantity</b>'))
+                ->setCellValue('F1', $htmlHelper->toRichTextObject('<b>Tax</b>'))
+                ->setCellValue('G1', $htmlHelper->toRichTextObject('<b>Taxable</b>'))
+                ->setCellValue('H1', $htmlHelper->toRichTextObject('<b>Category</b>'));
 
             $counter = 2;
             foreach($records as $product){
+                if($product->getProductTax() == "1.16"){
+                    $taxable = "T";
+                } else {
+                    $taxable = "";
+                }
                 $phpExcelObject->getActiveSheet()
                     ->setCellValue("A$counter", $product->getProductCode())
                     ->setCellValue("B$counter", $product->getProductName())
-                    ->setCellValue("C$counter", $product->getProductCost())
-                    ->setCellValue("D$counter", $product->getProductTax())
-                    ->setCellValue("E$counter", $product->getProductRetailPrice())
-                    ->setCellValue("G$counter", $product->getCategory()->getId());
+                    ->setCellValue("C$counter", $product->getProductRetailPrice())
+                    ->setCellValue("D$counter", $product->getProductCost())
+                    ->setCellValue("E$counter", 0 )
+                    ->setCellValue("F$counter", $product->getProductTax())
+                    ->setCellValue("G$counter", $taxable)
+                    ->setCellValue("H$counter", $product->getCategory()->getId());
                 $counter++;
             }
 
@@ -169,6 +179,7 @@ class FakeController extends Controller
 
     public function insertAction($file)
     {
+        set_time_limit(0);
         $data = [];
         $appPath = $this->container->getParameter('kernel.root_dir');
         $file = realpath($appPath . '/../web/excelFiles/'.$file);
@@ -223,16 +234,53 @@ class FakeController extends Controller
             $product->setProductTax($tax);
             $product->setCategory($category);
             //... and so on
+            $qty = $row['E'];
 
 
             $em->persist($product);
             $em->flush();
-            $dataProd[] = $product;
+            $dataProd[] = array("$qty" => $product);
             }
-            $data['product'] = $dataProd;
         }
+        $data['products'] = $dataProd;
+
         $data['obj'] = $phpExcelObject;
-        //return $this->render('excel/read.html.twig', ['data' => $data ] );
+        $new = [];
+        foreach($dataProd as $dt){
+            foreach($dt as $key => $prod){
+                if($key > 0){
+                    $stock = new Stock();
+                    $today = date("d-m-Y h:i:s");
+                    $stock->setOnDate(new \DateTime($today));
+                    $stock->setProduct($prod);
+                    $stock->setQuantity($key);
+                    $stock->setTransaction("sto");
+                  $last_entity = $em->getRepository('AppBundle:Stock')
+                    ->loadLastStockEntry();
+                  $lastSale = $em->getRepository('AppBundle:Sale')
+                    ->loadLastSaleEntry();
+
+                  $stock->setSale($lastSale);
+                  $stock->setUser($user);
+                  if(!$last_entity){
+                      $stock->setOrigId(1);
+                  } else {
+                      $lastInputId = $last_entity->getId();
+                      $thisId = $lastInputId + 1;
+                      $stock->setOrigId($thisId);
+                  }
+                  $totalCost = $prod->getProductRetailPrice()*$key;
+                  $stock->setUnitCost($prod->getProductCost());
+                  $stock->setRetailCost($prod->getProductRetailPrice());
+                  $stock->setTotalCost($totalCost);
+                  $em->persist($stock);
+                    $em->flush();
+                    $new[] = $stock;
+                }
+            }
+        }
+        $data['stock'] = $new;
+        // return $this->render('excel/read.html.twig', ['data' => $data ] );
         return $this->redirectToRoute('product_add');            
     }
 }

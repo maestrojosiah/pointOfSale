@@ -61,6 +61,14 @@ class PDFController extends Controller
 				$dataArray[] = $dataInfo;
 			}
 		}
+        $systSetting = $this->getDoctrine()
+        	->getRepository('AppBundle:systSetting')
+            ->findOneByUser($user);
+            
+        $data['systSetting'] = $systSetting;
+        $data['no_dates'] = true;
+        $data['report'] = "$Entity Report";
+
 
 		$data['entity'] = $dataArray;
 

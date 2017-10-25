@@ -66,9 +66,9 @@
       <li class="nav-item active">
         <a class="nav-link" href="{{ path('stock_movement', {'download':'True', 'from':dates.from, 'to':dates.to, 'specific':dates.specific } ) }}">Download PDF <span class="sr-only"></span></a>
       </li>
-      <li class="nav-item active">
+      {# <li class="nav-item active">
         <a class="nav-link" href="">Download Excel <span class="sr-only"></span></a>
-      </li>
+      </li> #}
     </ul>
   </div>
 </nav>
@@ -117,9 +117,9 @@
             <a href="{{ path('stock_movement_item', { 'id':stock.product.id } ) }}" class="btn btn-info">
           View History
             </a>
-            <a href="" class="btn btn-info">
+           {#  <a href="{{ path('stock_edit', {'stockId': stock.id }) }}" class="btn btn-info">
           Edit
-            </a>
+            </a> #}
         </td>
     </tr>
 {% endfor %}
@@ -144,15 +144,15 @@
  <nav class="navbar navbar-default">
   <div class="container-fluid">
     <div class="navbar-header">
-      <a class="navbar-brand" href="#">Items Returned on {{ dates.specific }}</a>
+      <a class="navbar-brand" href="#">Items Received from {{ dates.from }} to {{ dates.to }}</a>
     </div>
     <ul class="nav navbar-nav">
       <li class="nav-item active">
         <a class="nav-link" href="{{ path('stock_movement', {'download':'True', 'from':dates.from, 'to':dates.to, 'specific':dates.specific } ) }}">Download PDF <span class="sr-only"></span></a>
       </li>
-      <li class="nav-item active">
+      {# <li class="nav-item active">
         <a class="nav-link" href="">Download Excel <span class="sr-only"></span></a>
-      </li>
+      </li> #}
     </ul>
   </div>
 </nav>
@@ -201,9 +201,9 @@
               <a href="{{ path('stock_movement_item', { 'id':stock.product.id } ) }}" class="btn btn-info">
             View History
               </a>
-              <a href="" class="btn btn-info">
+              {# <a href="{{ path('stock_edit', {'stockId': stock.id }) }}" class="btn btn-info">
             Edit
-              </a>
+              </a> #}
             </td>
         </tr>
 {% endfor %}
@@ -219,7 +219,6 @@
     </tr>
   </tbody>
 </table>
-<a href="">Restore deleted Stocks</a>
 </div>
 </div>
 </div>
@@ -230,15 +229,15 @@
  <nav class="navbar navbar-default">
   <div class="container-fluid">
     <div class="navbar-header">
-      <a class="navbar-brand" href="#">Items Returned on {{ dates.specific }}</a>
+      <a class="navbar-brand" href="#">Items Received from {{ dates.from }} to {{ dates.to }}</a>
     </div>
     <ul class="nav navbar-nav">
       <li class="nav-item active">
         <a class="nav-link" href="{{ path('stock_movement', {'download':'True', 'from':dates.from, 'to':dates.to, 'specific':dates.specific } ) }}">Download PDF <span class="sr-only"></span></a>
       </li>
-      <li class="nav-item active">
+      {# <li class="nav-item active">
         <a class="nav-link" href="">Download Excel <span class="sr-only"></span></a>
-      </li>
+      </li> #}
     </ul>
   </div>
 </nav>
@@ -285,9 +284,9 @@
               <a href="{{ path('stock_movement_item', { 'id':stock.product.id } ) }}" class="btn btn-info">
             View History
               </a>
-              <a href="" class="btn btn-info">
+              {# <a href="{{ path('stock_edit', {'stockId': stock.id }) }}" class="btn btn-info">
             Edit
-              </a>
+              </a> #}
             </td>
         </tr>
 {% endfor %}

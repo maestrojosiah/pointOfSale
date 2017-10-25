@@ -1,27 +1,20 @@
 <div class="row collapse" id="category" style="color:black; text-shadow:none;">
   {% for category in data.categories %}
     {% if category is not null %}
-        <button type="button" class="btn btn-info col-xs-6 col-sm-4" data-toggle="modal" data-target="#deleteModal{{ category.id }}" data-clientId="{{ category.id }}" style="margin-top:5px;">
-          <strong>{{category.categoryName}}</strong>
-        </button>
+      <div id="categoryBox">
+      </div>
     <!-- Modal -->
-    <div class="modal fade" id="deleteModal{{ category.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="color:black; text-shadow:none;">
+    <div class="modal fade" id="showProdsModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="color:black; text-shadow:none;">
       <div class="modal-dialog" style="width:100%; height:auto; padding: 0;" role="document">
         <div class="modal-content" style="height:100%; border-radius: 0;">
           <div class="modal-header">
-            <h3 class="modal-title" id="exampleModalLabel">{{ category.categoryName|capitalize }}</h3>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
+            <h3 class="modal-title" id="categoryTitle">{{ category.categoryName|capitalize }}</h3>
+            <button type="button" class="pull-right btn btn-info" data-dismiss="modal" aria-label="Close">
+              Close
             </button>
           </div>
-          <div class="modal-body-fullscreen">
-            {% for product in data.products %}
-            {% if product.category is not null %}
-                {% if category.id == product.category.id %}
-                    <div class="btn btn-default col-xs-6 col-sm-4" id="ajax_{{product.id}}" style="margin-top:5px; margin-bottom:5px;" data-dismiss="modal">{{ product.productName }}</div>
-                {% endif %}
-            {% endif %}
-            {% endfor %}
+          <div class="modal-body-fullscreen" id="productBox">
+            
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

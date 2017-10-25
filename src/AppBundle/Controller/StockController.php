@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Stock;
+use AppBundle\Form\StockType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -74,6 +75,13 @@ class StockController extends Controller
                     $dataInfo['cost'] = $entry->getRetailCost();
                     $dataArray[] = $dataInfo;
                 }
+
+                $systSetting = $em->getRepository('AppBundle:systSetting')
+                    ->findOneByUser($user);
+                    
+                $data['systSetting'] = $systSetting;
+                $data['report'] = "Stock Received Report";
+
 
                 $data['entity'] = $dataArray;
                 $data['property'] = $download;
@@ -162,6 +170,13 @@ class StockController extends Controller
                     $dataInfo['cost'] = $entry->getRetailCost();
                     $dataArray[] = $dataInfo;
                 }
+
+                $systSetting = $em->getRepository('AppBundle:systSetting')
+                    ->findOneByUser($user);
+                    
+                $data['systSetting'] = $systSetting;
+                $data['report'] = "Returns Report";
+
 
                 $data['entity'] = $dataArray;
                 $data['property'] = $download;
@@ -263,6 +278,12 @@ class StockController extends Controller
 
             if($download == "True" ){
 
+                $systSetting = $em->getRepository('AppBundle:systSetting')
+                    ->findOneByUser($user);
+                    
+                $data['systSetting'] = $systSetting;
+
+
                 if( $request->query->get('specific') ){
                     $data['allStock'] = null;
                     $from = new \DateTime($request->query->get('specific'));
@@ -320,7 +341,7 @@ class StockController extends Controller
     }
 
     /**
-     * @Route("/stock/item/{id}{download}", name="stock_movement_item")
+     * @Route("/stock/item/{id}/{download}", name="stock_movement_item")
      */
     public function stockItemAction(Request $request, $id, $download = "False")
     {
@@ -384,6 +405,10 @@ class StockController extends Controller
         $data['stockIn'] = $stockInSoFar[0]['total'];
 
         if($download == "True" ){
+            $systSetting = $em->getRepository('AppBundle:systSetting')
+                ->findOneByUser($user);
+                
+            $data['systSetting'] = $systSetting;
 
             if( $request->query->get('specific') ){
                 $data['allStock'] = null;
@@ -502,6 +527,12 @@ class StockController extends Controller
                     $dataArray[] = $dataInfo;
                 }
 
+                $systSetting = $em->getRepository('AppBundle:systSetting')
+                    ->findOneByUser($user);
+                    
+                $data['systSetting'] = $systSetting;
+                $data['report'] = "Individual Sale Report";
+
                 $data['entity'] = $dataArray;
                 $data['property'] = $download;
 
@@ -590,6 +621,13 @@ class StockController extends Controller
                     $dataInfo['tax'] = $entry->getRetailCost() * 16/116;
                     $dataArray[] = $dataInfo;
                 }
+
+                $systSetting = $em->getRepository('AppBundle:systSetting')
+                    ->findOneByUser($user);
+                    
+                $data['systSetting'] = $systSetting;
+                $data['report'] = "Tax Report";
+
 
                 $data['entity'] = $dataArray;
                 $data['property'] = $download;
@@ -785,6 +823,13 @@ class StockController extends Controller
 
             if($download == "True" ){
 
+                $systSetting = $em->getRepository('AppBundle:systSetting')
+                    ->findOneByUser($user);
+                    
+                $data['systSetting'] = $systSetting;
+                $data['report'] = "Grouped Sale Report";
+
+
                 $appPath = $this->container->getParameter('kernel.root_dir');
 
                 $html = $this->renderView('PDF/saleGrouped.html.twig', $data);
@@ -816,5 +861,43 @@ class StockController extends Controller
 
     }
 
+    /**
+     * @Route("/stock/edit/{stockId}", name="stock_edit")
+     */
+    public function editAction(Request $request, $stockId)
+    {
+        $data = [];
+        $stock = $this->getDoctrine()
+            ->getRepository('AppBundle:Stock')
+            ->find($stockId);
+
+        $form = $this->createForm(StockType::class, $stock);
+
+        $form->handleRequest($request);
+
+        if($form->isSubmitted() && $form->isValid()) {
+            $form_data = $form->getData();
+            $data['form'] = $form_data;
+            $em = $this->getDoctrine()->getManager();
+            $thisQuantity = $form->get('quantity')->getData();
+            $totalCost = $stock->getRetailCost()*$thisQuantity;
+            $stock->setTotalCost($totalCost);
+
+            $em->persist($form_data);
+            $em->flush();
+
+            $this->addFlash(
+                'success',
+                'Stock edited successfully!'
+            );
+
+            return $this->redirectToRoute('stock_movement');
+            
+
+        } 
+
+        return $this->render('stock/edit.html.twig', ['form' => $form->createView(), 'data' => $data,] );
+
+    }
 
 }

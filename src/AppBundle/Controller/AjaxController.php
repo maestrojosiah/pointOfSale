@@ -17,6 +17,7 @@ class AjaxController extends Controller
     public function tableRowAction(Request $request)
     {
         if($request->request->get('some_var_name')){
+            $quantityValue = $request->request->get('quantity') ? $request->request->get('quantity') : 1 ;
             $fullId = explode('_',$request->request->get('some_var_name'));
             $id = $fullId[1];
 
@@ -31,7 +32,7 @@ class AjaxController extends Controller
               $itemName   =     $product->getProductName();
               $itemCode   =     $product->getProductCode();
               $price      =     $product->getProductRetailPrice();
-              $quantity   =     "1";
+              $quantity   =     $quantityValue;
               $total      =     $price*$quantity;
 
               $row = " 
@@ -177,10 +178,13 @@ class AjaxController extends Controller
                     $stock    =  $stockIn[0]['total'];
 
                     $goodsAvailable = $returns + $stock;
-                    $goodsSold      = $sales - $returns;
-                    $balance        = $goodsAvailable - $goodsSold; 
-                    $remainingStock = $balance / $product->getProductRetailPrice();       
-
+                    if($goodsAvailable > 0) {
+                      $goodsSold      = $sales - $returns;
+                      $balance        = $goodsAvailable - $goodsSold; 
+                      $remainingStock = $balance / $product->getProductRetailPrice();       
+                    } else {
+                      $remainingStock = 0;
+                    }
                     $prodArray[] = array($product->getId(), $product->getProductName(), $product->getProductCode(), $product->getProductRetailPrice(), $remainingStock );
                   }
                   $data['prodArray'] = $prodArray;
@@ -191,6 +195,88 @@ class AjaxController extends Controller
               $data['code'] = $product->getProductCode();
               $data['price'] = $product->getProductRetailPrice();
             }
+
+            $arrData = ['output' => $data ];
+            return new JsonResponse($arrData);
+    }
+
+    /**
+     * @Route("/ajax/get_products", name="get_products_ajax")
+     */
+    public function getProductsAction(Request $request)
+    {
+            $data = [];
+            $category = $request->request->get('category');
+
+            $user = $this->get('security.token_storage')->getToken()->getUser();
+            $data['user'] = $user;
+            $em = $this->getDoctrine()->getManager();
+            $product = $this->getDoctrine()
+              ->getRepository('AppBundle:Product')
+              ->findOneByProductCode($category);
+
+            $products = $this->getDoctrine()
+              ->getRepository('AppBundle:Product')
+              ->loadAllProductsFromThisCategory($category);
+
+            $prodArray = [];
+
+            if(!$products){
+              //do nothing
+            } else {
+              foreach($products as $product){
+                $stockIn = $em->getRepository('AppBundle:Stock')
+                    ->findAllStockForThisProduct($product, "sto");
+                $stockSold = $em->getRepository('AppBundle:Stock')
+                    ->findAllStockForThisProduct($product, "sal");
+                $stockReturned = $em->getRepository('AppBundle:Stock')
+                    ->findAllStockForThisProduct($product, "ret");
+
+                $returns  =  $stockReturned[0]['total'];
+                $sales    =  $stockSold[0]['total'];
+                $stock    =  $stockIn[0]['total'];
+
+                $goodsAvailable = $returns + $stock;
+                if($goodsAvailable > 0) {
+                  $goodsSold      = $sales - $returns;
+                  $balance        = $goodsAvailable - $goodsSold; 
+                  $remainingStock = $balance / $product->getProductRetailPrice();       
+                } else {
+                  $remainingStock = 0;
+                }
+  
+                $prodArray[] = array($product->getId(), $product->getProductName(), $product->getProductCode(), $product->getProductRetailPrice(), $remainingStock );
+              }
+              $data['prodArray'] = $prodArray;
+            }
+
+            $arrData = ['output' => $data ];
+            return new JsonResponse($arrData);
+    }
+
+    /**
+     * @Route("/ajax/get_categories", name="get_categories")
+     */
+    public function getCategoriesAction(Request $request)
+    {
+            $data = [];
+            $value = $request->request->get('categories');
+
+            $user = $this->get('security.token_storage')->getToken()->getUser();
+            $data['user'] = $user;
+            $em = $this->getDoctrine()->getManager();
+            $categories = $this->getDoctrine()
+              ->getRepository('AppBundle:Category')
+              ->loadAllCategoriesFromThisUser($user);
+
+                if(!$categories){
+                  //do nothing
+                } else {
+                  foreach($categories as $category){
+                    $catArray[] = array($category->getId(), $category->getCategoryName() );
+                  }
+                  $data['catArray'] = $catArray;
+                }
 
             $arrData = ['output' => $data ];
             return new JsonResponse($arrData);
@@ -219,6 +305,7 @@ class AjaxController extends Controller
     public function saveSaleAction(Request $request)
     {
         $data = [];
+        $transaction = $request->request->get('transaction');
         $qtyTotal = $request->request->get('qtyTotal');
         $total = $request->request->get('total');
         $mpesa = $request->request->get('mpesa');
@@ -227,6 +314,8 @@ class AjaxController extends Controller
         $tax = $request->request->get('tax');
         if($request->request->get('suspended')) {
           $paymentMode = $request->request->get('suspended');
+        } else if ($request->request->get('transaction') != "Sale"){
+          $paymentMode = $request->request->get('transaction');
         } else {
           $paymentMode = $request->request->get('paymentMode');
         }
@@ -241,8 +330,9 @@ class AjaxController extends Controller
           $append = "";
         }
   
-
-        if($paymentMode != "check" && $paymentMode != "creditCard" && $paymentMode != "mpesa" && $paymentMode != "suspended"){
+        if($transaction != "Sale"){
+          $paymentMode = $transaction;
+        } else if($paymentMode != "check" && $paymentMode != "creditCard" && $paymentMode != "mpesa" && $paymentMode != "suspended"){
           $paymentMode = "cash";
         }
 
@@ -283,7 +373,7 @@ class AjaxController extends Controller
 
         //$newArray = array_push($array, $paidAmt);
 
-        $saleNumber = ['output' => $receiptNumber ];
+        $saleNumber = ['output' => $paymentMode ];
         return new JsonResponse($saleNumber);
     }
 

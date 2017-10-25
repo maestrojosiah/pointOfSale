@@ -1,147 +1,85 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="UTF-8" />
-        <title>{% block title %}ABC - POS{% endblock %}</title>
-			<meta charset="utf-8">
-			<meta http-equiv="X-UA-Compatible" content="IE=edge">
-			<meta name="viewport" content="width=device-width, initial-scale=1">
-			<meta name="description" content="">
-			<meta name="author" content="">
+      <meta charset="UTF-8" />
+      <title>{% block title %}ABC - POS{% endblock %}</title>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="">
+      <meta name="author" content="">
       {% block stylesheets %}   
-		    <!-- Bootstrap Core CSS -->
-			<link href="{{ asset('vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+        <!-- Bootstrap Core CSS -->
+      <link href="{{ asset('vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
 
-			<!-- notiny CSS -->
-			<link href="{{ asset('notiny/notiny.min.css') }}" rel="stylesheet">
+      <!-- notiny CSS -->
+      <link href="{{ asset('notiny/notiny.min.css') }}" rel="stylesheet">
 
-			<!-- Custom CSS -->
-			<link href="{{ asset('dist/css/sb-admin-2.css') }}" rel="stylesheet">
-			<link href="{{ asset('css/pos.css') }}" rel="stylesheet">
+      <!-- Custom CSS -->
+      <link href="{{ asset('dist/css/sb-admin-2.css') }}" rel="stylesheet">
+      <link href="{{ asset('css/pos.css') }}" rel="stylesheet">
 
-	    <!-- DataTables CSS -->
-	    <link href="{{ asset('vendor/datatables-plugins/dataTables.bootstrap.css') }}" rel="stylesheet">
+      <!-- DataTables CSS -->
+      <link href="{{ asset('vendor/datatables-plugins/dataTables.bootstrap.css') }}" rel="stylesheet">
 
-	    <!-- DataTables Responsive CSS -->
-	    <link href="{{ asset('vendor/datatables-responsive/dataTables.responsive.css') }}" rel="stylesheet">
+      <!-- DataTables Responsive CSS -->
+      <link href="{{ asset('vendor/datatables-responsive/dataTables.responsive.css') }}" rel="stylesheet">
 
-			<!-- Custom Fonts -->
-			<link href="{{ asset('vendor/font-awesome/css/font-awesome.min.css') }}" rel="stylesheet" type="text/css">
+      <!-- Custom Fonts -->
+      <link href="{{ asset('vendor/font-awesome/css/font-awesome.min.css') }}" rel="stylesheet" type="text/css">
 
       <!-- datepicker styles -->
       <link rel="stylesheet" href="{{ asset('pickadate/lib/themes/default.css') }}">
       <link rel="stylesheet" href="{{ asset('pickadate/lib/themes/default.date.css') }}">
       {% endblock %}
-			<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-			<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-			<!--[if lt IE 9]>
-				<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-				<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-			<![endif]-->
-        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
+      <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+      <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+      <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+      <![endif]-->
+      <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
     </head>
     <body>
     {% block body %}
-		  <div id="wrapper">
-				{{ include('templates/nav.html.twig') }}			 
-			</div>
-    <footer class="footer">
-      <div class="container">
-        <div class="col-lg-2 col-md-6">
-            <div class="panel panel-primary">
-                <a href="#">
-                    <div class="panel-footer">
-                        <span class="pull-left">Focus Search</span>
-                        <span class="pull-right">F2</span>
-                        <div class="clearfix"></div>
-                    </div>
-                </a>
-            </div>
-        </div>
-        <div class="col-lg-2 col-md-6">
-            <div class="panel panel-primary">
-                <a href="#">
-                    <div class="panel-footer">
-                        <span class="pull-left">Complete Sale</span>
-                        <span class="pull-right">F4</span>
-                        <div class="clearfix"></div>
-                    </div>
-                </a>
-            </div>
-        </div>
-        <div class="col-lg-2 col-md-6">
-            <div class="panel panel-primary">
-                <a href="#">
-                    <div class="panel-footer">
-                        <span class="pull-left">Reset Page</span>
-                        <span class="pull-right">ESC</span>
-                        <div class="clearfix"></div>
-                    </div>
-                </a>
-            </div>
-        </div>
-        <div class="col-lg-2 col-md-6">
-            <div class="panel panel-primary">
-                <a href="#">
-                    <div class="panel-footer">
-                        <span class="pull-left">Focus Paid Amt</span>
-                        <span class="pull-right">F7</span>
-                        <div class="clearfix"></div>
-                    </div>
-                </a>
-            </div>
-        </div>
-        <div class="col-lg-2 col-md-6">
-            <div class="panel panel-primary">
-                <a href="#">
-                    <div class="panel-footer">
-                        <span class="pull-left">Suspend Sale</span>
-                        <span class="pull-right">F3</span>
-                        <div class="clearfix"></div>
-                    </div>
-                </a>
-            </div>
-        </div>
-        <div class="col-lg-2 col-md-6">
-            <div class="panel panel-primary">
-                <a href="#">
-                    <div class="panel-footer">
-                        <span class="pull-left">Last Sale Qty</span>
-                        <span class="pull-right">F6</span>
-                        <div class="clearfix"></div>
-                    </div>
-                </a>
-            </div>
-        </div>
+      <div id="wrapper">
+        {{ include('templates/nav.html.twig') }}       
       </div>
+    <footer class="footer">
+        <div class="panel panel-default" style="margin: 0 0 0 250px;">
+          <div class="panel-body">
+            Focus on the <mark>Search</mark> box : [F2] | Complete <mark>Sale</mark> : [F4] | <mark>Reset</mark> Page : [F8] | Enter <mark>Amount</mark> Paid: [F7] | <mark>Suspend</mark> Sale : [F3] | Change <mark>Qty of Last Sale</mark> : [F6] 
+          </div>
+        </div>        
     </footer>
-		{% endblock %}
+    {% endblock %}
         {% if data.systSetting is defined %}
             {% set limitRows = data.systSetting.rowsPerPage %}
+        {% elseif systSetting is defined %}
+            {% set limitRows = systSetting.rowsPerPage %}
         {% else %}
-            {% set limitRows = '20' %}
+            {% set limitRows = '15' %}
         {% endif %}
 
-        {% block javascripts %}	   
-		    <!-- jQuery -->
-			<script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
+        <!-- jQuery -->
+      <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
 
-			<!-- Bootstrap Core JavaScript -->
-			<script src="{{ asset('vendor/bootstrap/js/bootstrap.min.js') }}"></script>
+      <!-- Bootstrap Core JavaScript -->
+      <script src="{{ asset('vendor/bootstrap/js/bootstrap.min.js') }}"></script>
 
-			<!-- Notification javascript - notiny -->
-			<script src="{{ asset('notiny/notiny.min.js') }}"></script>
+      <!-- Notification javascript - notiny -->
+      <script src="{{ asset('notiny/notiny.min.js') }}"></script>
 
-			<!-- Custom Theme JavaScript -->
-			<script src="{{ asset('dist/js/sb-admin-2.js') }}"></script>
-			
- 	   <!-- DataTables JavaScript -->
-	    <script src="{{ asset('vendor/datatables/js/jquery.dataTables.min.js') }}"></script>
-	    <script src="{{ asset('vendor/datatables-plugins/dataTables.bootstrap.min.js') }}"></script>
-	    <script src="{{ asset('vendor/datatables-responsive/dataTables.responsive.js') }}"></script>
+      <!-- Custom Theme JavaScript -->
+      <script src="{{ asset('dist/js/sb-admin-2.js') }}"></script>
+      
+     <!-- DataTables JavaScript -->
+      <script src="{{ asset('vendor/datatables/js/jquery.dataTables.min.js') }}"></script>
+      <script src="{{ asset('vendor/datatables-plugins/dataTables.bootstrap.min.js') }}"></script>
+      <script src="{{ asset('vendor/datatables-responsive/dataTables.responsive.js') }}"></script>
 
-		<!-- Keyboard Shortcut Javascript -->
-			<script src="{{ asset('js/shortcut.js') }}"></script>
+    <!-- Keyboard Shortcut Javascript -->
+      <script src="{{ asset('js/shortcut.js') }}"></script>
       <script src="{{ asset('js/printThis.js') }}"></script>
       <script src="{{ asset('pickadate/lib/picker.js') }}"></script>
       <script src="{{ asset('pickadate/lib/picker.date.js') }}"></script>
@@ -161,47 +99,48 @@
         });
       });
       </script>
-			<script>
-		    window.onload=loadShortcuts;
+      <script>
+        window.onload=loadShortcuts;
         $('#valueHolder').focus();
-  			$("input[type='text']").focus(function () {
-  			   $(this).select();
-  			});
+        $("input[type='text']").focus(function () {
+           $(this).select();
+        });
         $('#infoModalAuto').on('shown.bs.modal', function () {
           $('.go-ahead').focus();
         })                  
-			</script>
-	    <script>
-	    $(document).ready(function() {
-	        $('#niceTable').DataTable({
-	            responsive: true,
+      </script>
+      <script>
+      $(document).ready(function() {
+          $('#niceTable').DataTable({
+              responsive: true,
               "pageLength": "{{limitRows}}",
-	        });
+          });
       });
       $(document).ready(function() {
           $('table.display').DataTable({
               "order": [[ 1, "asc" ]],
+              "pageLength": "{{limitRows}}",
             });
         });  
 
-	    </script>
+      </script>
 
-			<script>
-			$( "#searchItem" ).keyup(function( event ) {
-			  var value = $(this).val();
-			  console.log(value);
-			  var id = jQuery(this).attr("id");
-			    $.ajax({
-			        url:'{{ (path('get_matches')) }}',
-			        type: "POST",
-			        dataType: "json",
-			        data: {
-			            "thisValue": value,
-			        },
-			        async: true,
-			        success: function (data)
-			        {
-			            // console.log(data.output.prodArray);
+      <script>
+      $( "#searchItem" ).keyup(function( event ) {
+        var value = $(this).val();
+        console.log(value);
+        var id = jQuery(this).attr("id");
+          $.ajax({
+              url:'{{ (path('get_matches')) }}',
+              type: "POST",
+              dataType: "json",
+              data: {
+                  "thisValue": value,
+              },
+              async: true,
+              success: function (data)
+              {
+                  // console.log(data.output.prodArray);
                   $( "#searchResults ul" ).empty();
                   if (typeof data.output.prodArray != 'undefined'){
                     $("#close").show();
@@ -219,35 +158,124 @@
                         var myClass = "success";
                       } 
                       
-                      $("#searchResults ul").append('<li id="ajax_'+value[0]+'" class="list-group-item" onclick="dismiss(this);"><span class="tab btn btn-'+myClass+'"><strong>'+value[2]+'</strong> | '+value[1]+'</span><span class="badge">'+value[3]+'</span></li>');
+                      $("#searchResults ul").append('<li id="ajax_'+value[0]+'" class="list-group-item" onclick="dismiss(this);"><span class="tab btn btn-'+myClass+'"><strong>'+value[2]+'</strong> | '+value[1]+'</span><span class="badge">$'+value[3]+', inStock:'+value[4]+'</span></li>');
                       codeArray.push(value[2]);
                     });
                     $("#codeStore").text(codeArray[0]);                    
                   } else {
                     $(".result").show();
                     $("#close").hide();
-  			            $('.result').text(data.output.product);
-  			            $('.result').attr('id', 'ajax_'+data.output.id);
+                    $('.result').text(data.output.product);
+                    $('.result').attr('id', 'ajax_'+data.output.id);
                     $("#codeStore").text(data.output.code);                    
-  			            if ( event.which == 13 ) {
-    						    //$('#ajax_'+data.output.id).click();
-    						    console.log('from#ajax_'+data.output.id);
-    						    $('#searchItem').val('');
-                    $("#close").hide();
-                    $("#searchResults").hide();
-                  }
-						    }
+                      if ( event.which == 13 ) {
+                        $("#searchResults").hide();
+                        //$('#ajax_'+data.output.id).click();
+                        console.log('after hiding: '+data.output.id);
+                        $('#searchItem').val('');
+                        $("#close").hide();
+                      }
+                }
                 if($("#searchItem").val() == ""){
                   $("#searchResults").hide();
                   $("#close").hide();
                   $("#codeStore").text("");
                   $(".result").hide();
-                }                                
-			        }
-			    });
+                } 
+                  $("#warning").text("")                                               
+              },
+             error: function () {
+                if ( event.which == 13 ) {
+                  $("#searchResults").hide();
+                  //$('#ajax_'+data.output.id).click();
+                  console.log('after hiding: '+data.output.id);
+                  $('#searchItem').val('');
+                  $("#close").hide();
+                }
+                  $("#warning").html("<ol><li>No results: No such product</li><li>Red Result: No stock Remaining</li><li>Amber Result: Low stock</li></ol>");
+            }
+          });
 
-			});
-			</script>
+      });
+      </script>
+      <script>
+      $( "#getCategories" ).click(function() {
+          $.ajax({
+              url:'{{ (path('get_categories')) }}',
+              type: "POST",
+              dataType: "json",
+              data: {
+                  "categories": "categories",
+              },
+              async: true,
+              success: function (data)
+              {
+                  // console.log(data.output.catArray);
+                  $( "#categoryBox" ).empty();
+                  if (typeof data.output.catArray != 'undefined'){
+                    $("#close").show();
+                    $("#categoryBox").show();
+                    $.each( data.output.catArray, function( key, value) {
+                      //console.log("this is why "+value[1]);
+
+                      $("#categoryBox").append('<button type="button" class="btn btn-info col-xs-6 col-sm-4" id="fromCagetory_'+value[0]+'" style="margin-top:5px;"><strong>'+value[1]+'</strong></button>');
+                    });
+
+                  }                                             
+              },
+             error: function () {
+                  $("#warning").html("<b>something's wrong</b>");
+            }
+          });
+
+      });
+      </script>
+
+      <script>
+        $(document).on('click', '[id^="fromCagetory_"]', function(){
+          var category = jQuery(this).attr("id");
+          var splitted = category.split('_'); //changeRow_Qt_1504
+          var id = splitted[1] //1504
+
+          $.ajax({
+              url:'{{ (path('get_products_ajax')) }}',
+              type: "POST",
+              dataType: "json",
+              data: {
+                  "category": id,
+              },
+              async: true,
+              success: function (data)
+              {
+                //console.log("prod_array: "+data.output);
+                $( "#productBox" ).empty();
+                if (typeof data.output.prodArray != 'undefined'){
+                  $("#close").show();
+                  $("#showProdsModal").modal('show');
+                  $.each( data.output.prodArray, function( key, value) {
+                    //console.log("this is why "+value[4]);
+                    if(value[4] <= 30 ){
+                      var myClass = "warning";
+                    } 
+                    if (value[4] <= 0){
+                      var myClass = "danger";
+                    } 
+                    if (value[4] > 30){
+                      var myClass = "success";
+                    } 
+                      $("#productBox").append('<div style="cursor:pointer;" id="ajax_'+value[0]+'" class="well text-center col-xs-6 col-sm-4well text-center col-xs-6 col-sm-4 text-'+myClass+'" data-dismiss="modal"><strong>'+value[2]+'</strong> | '+value[1]+'<br /><span class="badge">$'+value[3]+', inStock:'+value[4]+'</span></div>');
+                    
+                  });
+                }                                               
+              },
+             error: function () {
+                $("#warning").html("somethings wrong");
+            }
+          });
+
+        });
+      </script>
+
       <script type="text/javascript">
         $(document).on('click', '#close', function () {
             $(this).parent('div').fadeOut();
@@ -258,13 +286,13 @@
           $('#searchItem').focus();                
         };
       </script>
-			{% for message in app.flashes('success') %}
-				<script type="text/javascript">
-					$.notiny({ text: '{{ message }}' });
-				</script>
-			{% endfor %}
-
-    <script>
+      {% for message in app.flashes('success') %}
+        <script type="text/javascript">
+          $.notiny({ text: '{{ message }}' });
+        </script>
+      {% endfor %}
+      
+      <script>
         $(document).on('click', '[id^="ajax_"]', function(){
             that = $(this);
             var id = jQuery(this).attr("id");
@@ -283,13 +311,20 @@
                     $('#tableToArray').click();
                 }
             });
+            $('#searchItem').val(''); 
             $('#searchItem').focus(); 
             return false;
 
         });
     </script>
 
-	  <script>
+    <script>
+        $(document).on('click', '[id^="someAjax2_"]', function(){
+          console.log("someAjax2_ is clicked");
+        });
+    </script>
+
+    <script>
         $(document).on('click', '[id^="Cl_"]', function(){
             that = $(this);
             var id = jQuery(this).attr("id");
@@ -471,8 +506,10 @@
             {
               console.log("row:");
               console.log(data.output.chunks);
+              $("#due").show();
               $("#amountDue").text(data.output.totalSum);
-              $("#show_tax").text(data.output.tax);
+              $(".amountDue").text(data.output.totalSum);
+              $("#show_tax").text(data.output.tax.toFixed(2));
               $("#show_qty").text(data.output.qtySum);
               var arrayLength = data.output.chunks.length;
 
@@ -495,8 +532,14 @@
         var value = $(this).val();
         var amountDue = $("#amountDue").text();
         var difference = parseInt(value)-parseInt(amountDue);
-        if(difference >= 0){
+        if(difference >= 0 && $("amountDue").text() != "0"){
+          $("#bal").show();
+          $(".show_bal").text(difference);
           $("#show_bal").text(difference);
+        } else {
+          $("#bal").hide();
+          $(".show_bal").text(difference);
+          $("#show_bal").text("");
         }
         console.log("diff:"+difference);
       });
@@ -504,114 +547,9 @@
   </script>
   <script type="text/javascript">
   shortcut.add("F4", function() {
-      var paidAmt =    $("#paidAmt").val();
-      if($("#transaction").text() == "Sale"){
-      if($("#paidAmt").val()==""){
-        $("#infoParagraphAuto").html("<span class='text-danger'>Please indicate how much has been paid</span><br />Hit F7 to focus");
-        $("#infoModalAuto").modal('show');
-        }
-      } else {
-            var qtyTotal = $("#show_qty").text();
-            var total = $("#amountDue").text();
-            var tax = $("#show_tax").text();
-            if($("#creditCardInput").val() != ""){
-              var creditCard = $("#creditCardInput").val();
-              var paymentMode = "creditCard";
-            } else {
-              var creditCard = 0;
-            } 
-            if($("#mpesaInput").val() != "") {
-              var mpesa = $("#mpesaInput").val();
-              var paymentMode = "mpesa";
-            } else {
-              var mpesa = 0;
-            }
-            if($("#checkInput").val() != "") {
-              var check = $("#checkInput").val();
-              var paymentMode = "check";
-            } else {
-              var check = 0;
-            }
-
-              $.ajax({
-              type: "POST",
-              url: '{{ (path('save_sale')) }}',
-              data: {
-                'qtyTotal': qtyTotal,
-                'total': total,
-                'tax': tax,
-                'mpesa': mpesa,
-                'check': check,
-                'creditCard': creditCard,
-                'paymentMode': paymentMode,
-              },
-              async: true,
-              success: function (data) 
-              {
-                console.log("fromAjax"+data.output);
-                $("#receiptTotal").html('<strong>' + $("#amountDue").text() +'</strong>');              
-                $("#receiptPaid").html('<strong>' + $("#paidAmt").val() +'</strong>');              
-                $("#receiptChange").html('<strong>' + $("#show_bal").text() +'</strong>');              
-                $("#receiptTax").html('<strong>' + $("#show_tax").text() +'</strong>');   
-                $("#receiptNumber").text(data.output);           
-                $("#transactionTitle").text($("#transaction").text());           
-                $("#receiptModal").modal('show'); 
-
-                var $table = $("#sales");
-                $rowCells = $table.find("tbody tr td");
-                $rowFull = $table.find("tbody tr");
-                
-                var rows = [];
-                var raws = [];
-
-                $rowCells.each(function(k,v) {
-                   rows[rows.length] = $(this).text();
-                });
-                
-                $rowFull.each(function(k,v) {
-                   raws[raws.length] = $(this).attr('id');
-                });
-                
-                $.ajax({
-                      url:'{{ (path('get_additions')) }}',
-                      type: "POST",
-                      dataType: "json",
-                      data: {
-                          "rows": rows,
-                          "raws": raws,
-                      },
-                      async: true,
-                      success: function (data)
-                      {
-                        var transaction = $("#transaction").text();
-                        var arrayLength = data.output.chunks.length;
-                        var stock = new Array();
-                        for (var i = 0; i < arrayLength; i++) {                          
-                            data.output.chunks[i].splice(0, 1, data.output.products[i]);
-                            stock.push(data.output.chunks[i]);
-                        }
-                        var stockString = JSON.stringify(stock);
-                          $.ajax({
-                          url:'{{ (path('save_stock')) }}',
-                          type: "POST",
-                          dataType: "json",
-                          data: {
-                              "stock": stock,
-                              "transaction": transaction,
-                          },
-                          async: true,
-                          success: function (data)
-                          {
-                            //console.log("fromAjax: "+data.output);
-                          }
-                        });
-
-                      }
-                  });
-
-            }
-        });
-      }
+      var e = jQuery.Event("keypress");
+      e.which = 13; 
+      $("#paidAmt").trigger(e);
   });
 
   </script>
@@ -624,122 +562,125 @@
     });
   </script>
 
-  <script type="text/javascript">
-  $( "#paidAmt" ).keypress(function(e) {
-      var key = e.which;
-      if(key == 13) {
-      var paidAmt =    $("#paidAmt").val();
-      if($("#transaction").text() == "Sale"){
-        console.log("paidAmt keypress called");
-        if($("#paidAmt").val()==""){
-          $("#infoParagraphAuto").html("<span class='text-danger'>Please indicate how much has been paid</span><br />Hit F7 to focus");
-          $("#infoModalAuto").modal('show');
+<script type="text/javascript">
+$( "#paidAmt" ).keypress(function(e) {
+    var key = e.which;
+    if(key == 13) {
+    var paidAmt =    $("#paidAmt").val();
 
-          }
-      }
+    if(($("#transaction").text() == "Sale") && ($("#paidAmt").val()=="") || ($("#amountDue").text() == "0") || ($("#show_bal").text() == "") ){
+      $("#infoParagraphAuto").html("<span class='text-danger'>Something is wrong with this sale. If you have made any sale entries, Hit F7 to input amount paid. Also make sure the amount paid is enough for the goods sold");
+      $("#infoModalAuto").modal('show');
+        $('#autoModal').addClass("disabled");
 
-            var qtyTotal = $("#show_qty").text();
-            var total = $("#amountDue").text();
-            var tax = $("#show_tax").text();
-            if($("#creditCardInput").val() != ""){
-              var creditCard = $("#creditCardInput").val();
-              var paymentMode = "creditCard";
-            } else {
-              var creditCard = 0;
-            } 
-            if($("#mpesaInput").val() != "") {
-              var mpesa = $("#mpesaInput").val();
-              var paymentMode = "mpesa";
-            } else {
-              var mpesa = 0;
-            }
-            if($("#checkInput").val() != "") {
-              var check = $("#checkInput").val();
-              var paymentMode = "check";
-            } else {
-              var check = 0;
-            }
+      } else {
 
-              $.ajax({
-              type: "POST",
-              url: '{{ (path('save_sale')) }}',
-              data: {
-                'qtyTotal': qtyTotal,
-                'total': total,
-                'tax': tax,
-                'mpesa': mpesa,
-                'check': check,
-                'creditCard': creditCard,
-                'paymentMode': paymentMode,
-              },
-              async: true,
-              success: function (data) 
-              {
-                console.log("fromAjax"+data.output);
-                $("#receiptTotal").html('<strong>' + $("#amountDue").text() +'</strong>');              
-                $("#receiptPaid").html('<strong>' + $("#paidAmt").val() +'</strong>');              
-                $("#receiptChange").html('<strong>' + $("#show_bal").text() +'</strong>');              
-                $("#receiptTax").html('<strong>' + $("#show_tax").text() +'</strong>');              
-                $("#transactionTitle").text($("#transaction").text());           
-                $("#receiptNumber").text(data.output);           
-                $("#receiptModal").modal('show'); 
+        var qtyTotal = $("#show_qty").text();
+        var total = $("#amountDue").text();
+        var tax = $("#show_tax").text();
+        var transaction = $("#transaction").text();
 
-                var $table = $("#sales");
-                $rowCells = $table.find("tbody tr td");
-                $rowFull = $table.find("tbody tr");
-                
-                var rows = [];
-                var raws = [];
+        if($("#creditCardInput").val() != ""){
+          var creditCard = $("#creditCardInput").val();
+          var paymentMode = "creditCard";
+        } else {
+          var creditCard = 0;
+        } 
+        if($("#mpesaInput").val() != "") {
+          var mpesa = $("#mpesaInput").val();
+          var paymentMode = "mpesa";
+        } else {
+          var mpesa = 0;
+        }
+        if($("#checkInput").val() != "") {
+          var check = $("#checkInput").val();
+          var paymentMode = "check";
+        } else {
+          var check = 0;
+        }
 
-                $rowCells.each(function(k,v) {
-                   rows[rows.length] = $(this).text();
-                });
-                
-                $rowFull.each(function(k,v) {
-                   raws[raws.length] = $(this).attr('id');
-                });
-                
-                $.ajax({
-                      url:'{{ (path('get_additions')) }}',
+          $.ajax({
+          type: "POST",
+          url: '{{ (path('save_sale')) }}',
+          data: {
+            'qtyTotal': qtyTotal,
+            'total': total,
+            'tax': tax,
+            'mpesa': mpesa,
+            'check': check,
+            'creditCard': creditCard,
+            'paymentMode': paymentMode,
+            'transaction': transaction,
+          },
+          async: true,
+          success: function (data) 
+          {
+            console.log("fromAjaxSaveSale: "+data.output);
+            $("#receiptTotal").html('<strong>' + $("#amountDue").text() +'</strong>');              
+            $("#receiptPaid").html('<strong>' + $("#paidAmt").val() +'</strong>');              
+            $("#receiptChange").html('<strong>' + $("#show_bal").text() +'</strong>');              
+            $("#receiptTax").html('<strong>' + $("#show_tax").text() +'</strong>');              
+            $("#transactionTitle").text($("#transaction").text());           
+            $("#receiptNumber").text(data.output);           
+            $("#receiptModal").modal('show'); 
+
+            var $table = $("#sales");
+            $rowCells = $table.find("tbody tr td");
+            $rowFull = $table.find("tbody tr");
+            
+            var rows = [];
+            var raws = [];
+
+            $rowCells.each(function(k,v) {
+               rows[rows.length] = $(this).text();
+            });
+            
+            $rowFull.each(function(k,v) {
+               raws[raws.length] = $(this).attr('id');
+            });
+            
+            $.ajax({
+                  url:'{{ (path('get_additions')) }}',
+                  type: "POST",
+                  dataType: "json",
+                  data: {
+                      "rows": rows,
+                      "raws": raws,
+                  },
+                  async: true,
+                  success: function (data)
+                  {
+                    var transaction = $("#transaction").text();
+                    var arrayLength = data.output.chunks.length;
+                    var stock = new Array();
+                    for (var i = 0; i < arrayLength; i++) {                          
+                        data.output.chunks[i].splice(0, 1, data.output.products[i]);
+                        stock.push(data.output.chunks[i]);
+                    }
+                    var stockString = JSON.stringify(stock);
+                      $.ajax({
+                      url:'{{ (path('save_stock')) }}',
                       type: "POST",
                       dataType: "json",
                       data: {
-                          "rows": rows,
-                          "raws": raws,
+                          "stock": stock,
+                          "transaction": transaction,
                       },
                       async: true,
                       success: function (data)
                       {
-                        var transaction = $("#transaction").text();
-                        var arrayLength = data.output.chunks.length;
-                        var stock = new Array();
-                        for (var i = 0; i < arrayLength; i++) {                          
-                            data.output.chunks[i].splice(0, 1, data.output.products[i]);
-                            stock.push(data.output.chunks[i]);
-                        }
-                        var stockString = JSON.stringify(stock);
-                          $.ajax({
-                          url:'{{ (path('save_stock')) }}',
-                          type: "POST",
-                          dataType: "json",
-                          data: {
-                              "stock": stock,
-                              "transaction": transaction,
-                          },
-                          async: true,
-                          success: function (data)
-                          {
-                            //console.log("fromAjax: "+data.output);
-                          }
-                        });
-
+                        console.log("fromAjaxSaveStock: "+data.output);
                       }
-                  });
+                    });
+
+                  }
+              });
 
             }
         });
-    $("#searchItem").focus();      
+
     }
+  }
   });
 
   </script>
@@ -757,6 +698,7 @@
             var qtyTotal = $("#show_qty").text();
             var total = $("#amountDue").text();
             var tax = $("#show_tax").text();
+            var transaction = $("#transaction").text();
             if($("#creditCardInput").val() != ""){
               var creditCard = $("#creditCardInput").val();
               var paymentMode = "creditCard";
@@ -788,11 +730,12 @@
                 'creditCard': creditCard,
                 'suspended': "suspended",
                 'paymentMode': paymentMode,
+                'transaction': transaction,
               },
               async: true,
               success: function (data) 
               {
-                //console.log("fromAjax"+data.output);
+                console.log("fromAjaxSaveSale: "+data.output);
                 $("#receiptTotal").html('<strong>' + $("#amountDue").text() +'</strong>');              
                 $("#receiptPaid").html('<strong>' + $("#paidAmt").val() +'</strong>');              
                 $("#receiptChange").html('<strong>' + $("#show_bal").text() +'</strong>');              
@@ -824,6 +767,7 @@
                       async: true,
                       success: function (data)
                       {
+                        console.log("fromAjaxSaveAdditions: "+data.output);                        
                         var transaction = $("#transaction").text();
                         var arrayLength = data.output.chunks.length;
                         var stock = new Array();
@@ -843,7 +787,7 @@
                           async: true,
                           success: function (data)
                           {
-                            //console.log("fromAjax: "+data.output);
+                            console.log("fromAjaxSaveStock: "+data.output);
                             location.href = "{{ path('homepage') }}";
                           }
                         });
@@ -859,21 +803,17 @@
 
   </script>
 <script type="text/javascript">
-  shortcut.add("ESC", function() {
+  shortcut.add("F8", function() {
         location.href = "{{ path('homepage') }}";
   });
 </script>
-  {# if the page is for completing suspended sales:...#}
-{% if data.stocks is defined %}
-  {% for stock in data.stocks %}
-  <script type="text/javascript">
-    $( document ).ready(function() {
-      $("#ajax_{{stock.product.id}}").click();
-      $('#tableToArray').click();
-    });
-  </script>
-  {% endfor %}
-{% endif %}
-{% endblock %}
+<script type="text/javascript">
+  shortcut.add("ESC", function() {
+        $("#searchResults").hide();
+  });
+</script>
+
+
+{% block javascripts %}{% endblock %}
 </body>
 </html>

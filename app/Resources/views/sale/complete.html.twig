@@ -2,8 +2,65 @@
 
 {% block body %}
 {{ parent() }}
-{{ include('templates/wrapper.html.twig') }} 
+{{ include('templates/wrapper.html.twig') }}
+<button id="someAjax2_">click me</button>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
 {% endblock %}
 {% block stylesheets %}
 {{ parent() }}
+{% endblock %}
+{% block javascripts %}
+  <script type="text/javascript">
+    $( document ).ready(function() {
+    	$("#showSuspendModal").hide();
+    });
+  </script>
+  <script type="text/javascript">
+$( ".paidAmt" ).keypress(function(e) {
+    var key = e.which;
+	    if(key == 13) {
+	    var paidAmt = $(".paidAmt").val();
+          $.ajax({
+          type: "POST",
+          url: '{{ path('delete_sale_ajax') }}',
+          data: {
+            'id': {{data.sale.id}},
+          },
+          async: true,
+          success: function (data) 
+          {
+          	console.log("complete_sale"+data);
+		  }
+		});
+      }
+	});
+  </script>
+  {# if the page is for completing suspended sales:...#}
+{% if data.stocks is defined %}
+  {% for stock in data.stocks %}
+  <script type="text/javascript">
+    $( document ).ready(function() {
+      var id = "sth_{{stock.product.id}}";
+      var qty = "{{stock.quantity}}"
+      $.ajax({
+          url:'{{ (path('ajax_request')) }}',
+          type: "POST",
+          dataType: "json",
+          data: {
+              "some_var_name": id,
+              "quantity": qty,
+          },
+          async: true,
+          success: function (data)
+          {
+              console.log(data.output)
+              $('#sales > tbody:last-child').append(data.output);
+              $('#tableToArray').click();
+          }
+      });
+      $('#tableToArray').click();
+    });
+  </script>
+  {% endfor %}
+{% endif %}
+
 {% endblock %}
