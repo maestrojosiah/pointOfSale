@@ -254,7 +254,7 @@ class FakeController extends Controller
                     $stock->setOnDate(new \DateTime($today));
                     $stock->setProduct($prod);
                     $stock->setQuantity($key);
-                    $stock->setTransaction("sto");
+                    $stock->setTransaction("sto_ini");
                   $last_entity = $em->getRepository('AppBundle:Stock')
                     ->loadLastStockEntry();
                   $lastSale = $em->getRepository('AppBundle:Sale')

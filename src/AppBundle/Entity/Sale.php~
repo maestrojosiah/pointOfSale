@@ -56,6 +56,13 @@ class Sale
     private $paymentMode;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="details", type="string", length=3000, nullable=false)
+     */
+    private $details;
+
+    /**
      * @var integer
      *
      * @ORM\Column(name="qty", type="integer", nullable=false)

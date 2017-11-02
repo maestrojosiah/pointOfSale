@@ -9,7 +9,7 @@
                 </button>
                 <a class="navbar-brand" href="{{ path('homepage') }}" style="color:white;">
                     {% if data.systSetting is defined %}
-                    {{ data.systSetting.siteName }}
+                    {{ data.systSetting.siteName }} - {{ app.user }}
                     {% endif %}
 
                 </a>
@@ -138,7 +138,7 @@
                         <li><a href="{{ path('items_returned') }}"><i class="fa fa-gear fa-fw"></i> Returns </a></li>
                         <li><a href="{{ path('stock_movement') }}"><i class="fa fa-gear fa-fw"></i> Stock Movement </a></li>
                         <li class="divider"></li>
-                        <li><a href="{{ path('logout') }}"><i class="fa fa-sign-out fa-fw"></i> Logout</a></li>
+                        <li><a href="{{ path('logout') }}"><i class="fa fa-sign-out fa-fw"></i> Logout [{{ app.user }}]</a></li>
                     </ul>
                     <!-- /.dropdown-user -->
                 </li>

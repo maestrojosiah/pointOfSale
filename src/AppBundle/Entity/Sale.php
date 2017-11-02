@@ -56,6 +56,13 @@ class Sale
     private $paymentMode;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="details", type="string", length=3000, nullable=false)
+     */
+    private $details;
+
+    /**
      * @var integer
      *
      * @ORM\Column(name="qty", type="integer", nullable=false)
@@ -385,5 +392,29 @@ class Sale
     public function getStocks()
     {
         return $this->stocks;
+    }
+
+    /**
+     * Set details
+     *
+     * @param string $details
+     *
+     * @return Sale
+     */
+    public function setDetails($details)
+    {
+        $this->details = $details;
+
+        return $this;
+    }
+
+    /**
+     * Get details
+     *
+     * @return string
+     */
+    public function getDetails()
+    {
+        return $this->details;
     }
 }

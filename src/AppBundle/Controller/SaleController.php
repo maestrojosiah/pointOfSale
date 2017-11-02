@@ -33,6 +33,79 @@ class SaleController extends Controller
 
 	}
 
+	/**
+	 * @Route("sale/purchase_view/{saleId}", name="purchase_view")
+	 */
+	public function viewPurchaseAction(Request $request, $saleId)
+	{
+		$data = [];
+		$sale = $this->getDoctrine()
+			->getRepository('AppBundle:Sale')
+			->find($saleId);
+		$em = $this->getDoctrine()->getManager();
+
+		$stocks = $em->getRepository('AppBundle:Stock')
+			->findAllForThisSale($sale);
+		$data['sale'] = $sale;
+		$data['stocks'] = $stocks;
+
+        $refNoArray = explode("|", $sale->getPaymentMode());
+        $refNo = isset($refNoArray[1]) ? $refNoArray[1] : 'Not Set' ;
+        
+        $details = explode('|', $sale->getDetails());
+        $company = $details[0] != "" ? $details[0] : 'No Company Set' ;
+        $address = isset($details[1]) ? $details[1] : 'No Address Set' ;
+
+        $lastSaleId = $em->getRepository('AppBundle:Sale')
+        	->loadLastSaleEntry();
+        $nextSaleId = $lastSaleId->getId() + 1;
+
+        $data['refNo'] = $refNo;
+        $data['address'] = $address;
+        $data['company'] = $company;
+        $data['nextSaleId'] = $nextSaleId;
+		return $this->render('sale/purchases.html.twig', ['data' => $data,] );
+
+	}
+
+	/**
+	 * @Route("sale/return_view/{saleId}", name="return_view")
+	 */
+	public function viewReturnAction(Request $request, $saleId)
+	{
+		$data = [];
+		$sale = $this->getDoctrine()
+			->getRepository('AppBundle:Sale')
+			->find($saleId);
+
+		$em = $this->getDoctrine()->getManager();
+
+		$stocks = $em->getRepository('AppBundle:Stock')
+			->findAllForThisSale($sale);
+
+		$data['sale'] = $sale;
+		$data['stocks'] = $stocks;
+
+        $refNoArray = explode("|", $sale->getPaymentMode());
+        $refNo = isset($refNoArray[1]) ? $refNoArray[1] : 'Not Set' ;
+        
+        $details = explode('|', $sale->getDetails());
+        $company = $details[0] != "" ? $details[0] : 'No Company Set' ;
+        $address = isset($details[1]) ? $details[1] : 'No Address Set' ;
+
+        $lastSaleId = $em->getRepository('AppBundle:Sale')
+        	->loadLastSaleEntry();
+        $nextSaleId = $lastSaleId->getId() + 1;
+
+        $data['refNo'] = $refNo;
+        $data['address'] = $address;
+        $data['company'] = $company;
+        $data['nextSaleId'] = $nextSaleId;
+
+		return $this->render('sale/returns.html.twig', ['data' => $data,] );
+
+	}
+
 
 	/**
 	 * @Route("sale/complete/{saleId}", name="sale_view_complete")

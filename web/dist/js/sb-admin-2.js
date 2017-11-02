@@ -21,34 +21,47 @@ $('.toggleButton').click(function(){
     }
 });
 
+
 $(document).on("click", '.toggleSale', function(){
     var $this = $(this);
     if($this.text() == 'Sale'){
         $this.text('Return');   
+        $this.removeClass('showReturns');
+        $this.addClass('showPurchases');
         console.log($this.text());
         $("#action").html(
             '<button type="button" id="salesReturn" class="btn btn-primary"><strong>Submit Return</strong></button>'
         );
         $("#rightSide").hide();
-        $("#totalsRecord").hide()
-        $("#changeRecord").hide()
+        $("#totalsRecord").hide();
+        $("#changeRecord").hide();
+        $("#returnsDetails").show();
+        $("#purchaseDetails").hide();
 
     } else if($this.text() == 'Return') {
-        $this.text('Stock In');
+        $this.text('Purchase');
         console.log($this.text());      
         $("#action").html(
-            '<button type="button" id="stockIn" class="btn btn-primary"><strong>Submit Stock Received</strong></button>'
+            '<button type="button" id="stockIn" class="btn btn-primary"><strong>Submit Purchase</strong></button>'
         );
         $("#rightSide").hide();
-        $("#totalsRecord").hide()
-        $("#changeRecord").hide()
-    } else if($this.text() == 'Stock In') {
+        $("#newProduct").show();
+        $("#getCategories").hide();
+        $("#totalsRecord").hide();
+        $("#changeRecord").hide();
+        $("#purchaseDetails").show();
+        $("#returnsDetails").hide();
+    } else if($this.text() == 'Purchase') {
+        $this.removeClass('showPurchases');
         $this.text('Sale');
         console.log($this.text());   
         $("#action").html("");   
+        $("#newProduct").hide();
+        $("#getCategories").show();
         $("#rightSide").show();
-        $("#totalsRecord").show()
-        $("#changeRecord").show()
+        $("#totalsRecord").show();
+        $("#changeRecord").show();
+        $("#purchaseDetails").hide();
     }
 });
 

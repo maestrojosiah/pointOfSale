@@ -121,6 +121,11 @@ class User implements AdvancedUserInterface, \Serializable
         // $this->salt = md5(uniqid(null, true));    
     }
 
+    public function __toString()
+    {
+        return $this->fName;
+    }
+
 
     /**
      * Set fName

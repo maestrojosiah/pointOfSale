@@ -255,6 +255,157 @@ class AjaxController extends Controller
     }
 
     /**
+     * @Route("/ajax/get_purchases", name="get_purchases_ajax")
+     */
+    public function getPurchasesAction(Request $request)
+    {
+            $data = [];
+            $what_to_do = $request->request->get('what_to_do') ? $request->request->get('what_to_do') : null ;
+
+            $user = $this->get('security.token_storage')->getToken()->getUser();
+            $data['user'] = $user;
+            $em = $this->getDoctrine()->getManager();
+            if($what_to_do == "get_purchases"){
+
+              $purchases = $em->getRepository('AppBundle:Sale')
+                  ->loadPurchases('Purchase');
+
+              if(!$purchases){
+                $data['purchases'] = null;
+              } else {
+                $data['purchases'] = $purchases;
+              }
+              $list = "<option selected >Select existing Purchase</option>";
+              foreach($purchases as $purchase){
+                $detailsArray = explode("|", $purchase->getPaymentMode());
+                $refNo = isset($detailsArray[1]) ? $detailsArray[1] : 'Not Set' ;
+                $list .= '<option value="'.$purchase->getId().'">'.'Number: '.$purchase->getId().' Ref.No ['.$refNo .']</option>';
+              }
+              $to_send = $list;
+
+            } else if ($what_to_do == "show_details"){
+
+              $valueInSelect = $request->request->get('valueInSelect');
+              $purchase = $em->getRepository('AppBundle:Sale')
+                ->find($valueInSelect);
+              $saleId = $purchase->getId();
+              $to_send = $this->generateUrl('purchase_view', ['saleId'=>$saleId]);
+            }
+
+             
+
+            $arrData = ['output' => $to_send ];
+            return new JsonResponse($arrData);
+    }
+
+    /**
+     * @Route("/ajax/get_returns", name="get_returns_ajax")
+     */
+    public function getReturnsAction(Request $request)
+    {
+            $data = [];
+            $what_to_do = $request->request->get('what_to_do') ? $request->request->get('what_to_do') : null ;
+
+            $user = $this->get('security.token_storage')->getToken()->getUser();
+            $data['user'] = $user;
+            $em = $this->getDoctrine()->getManager();
+            if($what_to_do == "get_returns"){
+
+              $returns = $em->getRepository('AppBundle:Sale')
+                  ->loadPurchases('Return');
+
+              if(!$returns){
+                $data['returns'] = null;
+              } else {
+                $data['returns'] = $returns;
+              }
+              $list = "<option selected >Select existing Purchase</option>";
+              foreach($returns as $return){
+                $detailsArray = explode("|", $return->getPaymentMode());
+                $refNo = isset($detailsArray[1]) ? $detailsArray[1] : 'Not Set' ;
+                $list .= '<option value="'.$return->getId().'">'.'Number: '.$return->getId().' Ref.No ['.$refNo .']</option>';
+              }
+              $to_send = $list;
+
+            } else if ($what_to_do == "show_details"){
+
+              $valueInSelect = $request->request->get('valueInSelect');
+              $return = $em->getRepository('AppBundle:Sale')
+                ->find($valueInSelect);
+              $saleId = $return->getId();
+              $to_send = $this->generateUrl('return_view', ['saleId'=>$saleId]);
+            }
+
+             
+
+            $arrData = ['output' => $to_send ];
+            return new JsonResponse($arrData);
+    }
+
+    /**
+     * @Route("/ajax/ref_no/{trans}", name="set_ref_no")
+     */
+    public function purchaseReferenceAction(Request $request, $trans)
+    {
+            $data = [];
+            $value = $request->request->get('value') ? $request->request->get('value') : null ;
+            $id = $request->request->get('id');
+
+            $user = $this->get('security.token_storage')->getToken()->getUser();
+            $data['user'] = $user;
+            $em = $this->getDoctrine()->getManager();
+
+            $sale = $em->getRepository('AppBundle:Sale')
+              ->find($id); 
+
+            if($trans == 'purchase'){
+              $sale->setPaymentMode("Purchase|".$value);
+              $em->persist($sale);
+              $em->flush();
+              $url = $this->generateUrl('purchase_view', ['saleId'=>$id]);
+            } else if ($trans == 'returns'){
+              $sale->setPaymentMode("Return|".$value);
+              $em->persist($sale);
+              $em->flush();
+              $url = $this->generateUrl('return_view', ['saleId'=>$id]);
+            }
+            
+            $arrData = ['output' => $url ];
+            return new JsonResponse($arrData);
+    }
+
+    /**
+     * @Route("/ajax/company_address/{trans}", name="set_company_address")
+     */
+    public function companyAddressAction(Request $request, $trans)
+    {
+            $data = [];
+            $company = $request->request->get('company');
+            $address = $request->request->get('address');
+            $id = $request->request->get('id');
+
+            $user = $this->get('security.token_storage')->getToken()->getUser();
+            $data['user'] = $user;
+            $em = $this->getDoctrine()->getManager();
+
+            $sale = $em->getRepository('AppBundle:Sale')
+              ->find($id); 
+
+            $sale->setDetails($company.'|'.$address);
+            $em->persist($sale);
+            $em->flush();
+            if($trans == 'purchase'){
+              $url = $this->generateUrl('purchase_view', ['saleId'=>$id]);
+            } else if ($trans == 'returns'){
+              $url = $this->generateUrl('return_view', ['saleId'=>$id]);
+            }
+
+            
+            $arrData = ['output' => $url ];
+            return new JsonResponse($arrData);
+    }
+
+    /**
      * @Route("/ajax/get_categories", name="get_categories")
      */
     public function getCategoriesAction(Request $request)
@@ -267,7 +418,7 @@ class AjaxController extends Controller
             $em = $this->getDoctrine()->getManager();
             $categories = $this->getDoctrine()
               ->getRepository('AppBundle:Category')
-              ->loadAllCategoriesFromThisUser($user);
+              ->findAll();
 
                 if(!$categories){
                   //do nothing
@@ -310,6 +461,10 @@ class AjaxController extends Controller
         $total = $request->request->get('total');
         $mpesa = $request->request->get('mpesa');
         $creditCard = $request->request->get('creditCard');
+        $purchaseDetails = $request->request->get('purchaseDetails');
+        $returnsDetails = $request->request->get('returnsDetails');
+        $referenceNumber = $request->request->get('referenceNumber');
+        $referenceNumberR = $request->request->get('referenceNumberR');
         $check = $request->request->get('check');
         $tax = $request->request->get('tax');
         if($request->request->get('suspended')) {
@@ -318,6 +473,14 @@ class AjaxController extends Controller
           $paymentMode = $request->request->get('transaction');
         } else {
           $paymentMode = $request->request->get('paymentMode');
+        }
+
+        if($transaction == "Purchase"){
+          $detailsRecord = $purchaseDetails;
+        } else if ($transaction == "Return"){
+          $detailsRecord = $returnsDetails;
+        } else {
+          $detailsRecord = "customer";
         }
         
         if($paymentMode == "check"){
@@ -328,6 +491,12 @@ class AjaxController extends Controller
           $append = "|".$mpesa;
         } else {
           $append = "";
+        }
+
+        if($transaction == "Purchase"){
+          $append = "|".$referenceNumber;
+        } else if ($transaction == "Return"){
+          $append = "|".$referenceNumberR;
         }
   
         if($transaction != "Sale"){
@@ -362,6 +531,7 @@ class AjaxController extends Controller
         $sale->setDiscount("0");
         $sale->setPaymentMode($paymentMode.$append);
         $sale->setQty($qtyTotal);
+        $sale->setDetails($detailsRecord);
         $sale->setTotalSale($total);
 
         $em->persist($sale);
@@ -424,7 +594,7 @@ class AjaxController extends Controller
             $stock->setTransaction("sal");
           } elseif ($thisSaleTransaction == "Return") {
             $stock->setTransaction("ret");
-          } elseif ($thisSaleTransaction == "Stock In") {
+          } elseif ($thisSaleTransaction == "Purchase") {
             $stock->setTransaction("sto");
           } else {
             $stock->setTransaction("err");

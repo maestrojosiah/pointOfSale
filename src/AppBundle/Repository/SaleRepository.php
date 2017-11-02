@@ -49,5 +49,14 @@ class SaleRepository extends \Doctrine\ORM\EntityRepository
 		    ->getResult();
     }
 
+    public function loadPurchases($searchText)
+    {
+    	return $this->createQueryBuilder('s')
+           ->where('s.paymentMode LIKE :input')
+           ->setParameter('input', '%'.$searchText.'%')
+	       ->orderBy('s.id', 'DESC')
+           ->getQuery()
+           ->getResult();
+    }
 
 }

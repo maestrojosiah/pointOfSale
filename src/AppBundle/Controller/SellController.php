@@ -21,19 +21,15 @@ class SellController extends Controller
         $user = $this->get('security.token_storage')->getToken()->getUser();
         
         $products = $em->getRepository('AppBundle:Product')
-            ->findBy(
-                array('user' => $user),
-                array('id' => 'ASC'),
-                1
-            );
+            ->findAll();
         $data['products'] = $products;
 
         $categories = $em->getRepository('AppBundle:Category')
-            ->findBy(
-                array('user' => $user),
-                array('id' => 'ASC'),
-                1
-            );
+            ->findAll();
+
+        $lastSaleId = $em->getRepository('AppBundle:Sale')
+            ->loadLastSaleEntry();
+        $nextSaleId = $lastSaleId->getId() + 1;
 
         $systSetting = $em->getRepository('AppBundle:SystSetting')
             ->settingsForThisUser($user);
@@ -51,6 +47,7 @@ class SellController extends Controller
 
         $data['categories'] = $categories;
         $data['systSetting'] = $systSetting;
+        $data['nextSaleId'] = $nextSaleId;
 
         $chunks = array_chunk($products, 4);
         $data['chunks'] = $chunks;

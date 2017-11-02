@@ -40,7 +40,7 @@
                         			<td>{{stock.product}}</td>
                         			<td>{{stock.quantity}}</td>
                         			<td class="text-center">{{stock.retailCost}}</td>
-                        			<td class="text-center">{{stock.retailCost}}</td>
+                        			<td class="text-center">{{ stock.retailCost * stock.quantity }}</td>
                         		</tr>
                         	{% endfor %}
                         </tbody>
