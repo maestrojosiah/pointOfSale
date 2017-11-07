@@ -126,7 +126,10 @@ class ProductController extends Controller
         $user = $this->get('security.token_storage')->getToken()->getUser();
 		$products = $this->getDoctrine()
 			->getRepository('AppBundle:Product')
-			->loadAllProductsFromThisUser($user);
+			->findBy(
+				array('deleted' => 0),
+				array('productName' => 'DESC')
+			);
 
 		$systSetting = $this->getDoctrine()
 			->getRepository('AppBundle:systSetting')
@@ -212,6 +215,118 @@ class ProductController extends Controller
     	);
 
 		return $this->redirectToRoute('product_restore_list');
+	}
+
+	/**
+	 * @Route("/product/stock_take/{order_by}/{include_zero}/{download}", name="stock_take_report")
+	 */
+	public function stockTakeAction($order_by = 'productName', $include_zero = false, $download = "False")
+	{
+		$data = [];
+ 		$em = $this->getDoctrine()->getManager();
+       	$user = $this->get('security.token_storage')->getToken()->getUser();
+        if($order_by == 'productCode'){
+			$products = $this->getDoctrine()
+	            ->getRepository('AppBundle:Product')
+		            ->findBy(
+		              array('deleted' => 0),
+		              array('productCode' => 'ASC')
+		            );
+        } else if ($order_by == 'productName'){
+			$products = $this->getDoctrine()
+	            ->getRepository('AppBundle:Product')
+	            ->findBy(
+	              array('deleted' => 0),
+	              array('productName' => 'ASC')
+	            );            	
+        }
+
+		$systSetting = $this->getDoctrine()
+			->getRepository('AppBundle:systSetting')
+			->settingsForThisUser($user);
+
+		$stockReport = [];
+	    if(!$products){
+	      //do nothing
+	    } else {
+	      foreach($products as $product){
+	        $stockIn = $em->getRepository('AppBundle:Stock')
+	            ->findAllStockForThisProduct($product, "sto");
+	        $stockSold = $em->getRepository('AppBundle:Stock')
+	            ->findAllStockForThisProduct($product, "sal");
+	        $stockReturned = $em->getRepository('AppBundle:Stock')
+	            ->findAllStockForThisProduct($product, "ret");
+
+	        $returns  =  $stockReturned[0]['total'];
+	        $sales    =  $stockSold[0]['total'];
+	        $stock    =  $stockIn[0]['total'];
+
+	        $goodsAvailable = $stock - $returns;
+	        if($goodsAvailable > 0) {
+	          $goodsSold      = $sales;
+	          $balance        = $goodsAvailable - $goodsSold; 
+	          $remainingStock = $balance / $product->getProductRetailPrice();       
+	        } else {
+	          $remainingStock = 0;
+	        }
+		      if($include_zero == false){
+		      	if($remainingStock > 1){
+		      		$stockReport[$product->getId()."|".$product->getProductCode()."|".$product->getProductName()] = $remainingStock;
+		      	}
+		      } else {
+		      	$stockReport[$product->getId()."|".$product->getProductCode()."|".$product->getProductName()] = $remainingStock;
+		      }
+	          
+
+	      }
+	      $data['stockReport'] = $stockReport;
+	    }
+
+        if($download == "True" ){
+            $entity = $stockReport;
+
+            foreach($entity as $product=>$entry){
+                $dataInfo['Product Code'] = explode("|", $product)[1];
+                $dataInfo['Product Name'] = explode("|", $product)[2];
+                $dataInfo['Quantity On Hand'] = $entry;
+                $dataInfo['Actual Count'] = "";
+                $dataArray[] = $dataInfo;
+            }
+
+            $systSetting = $em->getRepository('AppBundle:systSetting')
+                ->findOneByUser($user);
+                
+            $data['systSetting'] = $systSetting;
+            $data['report'] = "Stock Take Report";
+
+
+            $data['entity'] = $dataArray;
+            $data['property'] = $download;
+
+            $appPath = $this->container->getParameter('kernel.root_dir');
+
+            $html = $this->renderView('PDF/pdf.html.twig', $data);
+
+            $filename = sprintf("received-%s.pdf", date('Ymd~his'));
+
+            return new Response(
+                $this->get('knp_snappy.pdf')->getOutputFromHtml($html),
+                200,
+                [
+                    'Content-Type'        => 'application/pdf',
+                    'Content-Disposition' => sprintf('attachment; filename="%s"', $filename),
+                ]
+            );
+        }
+
+
+		$data['order_by'] = $order_by;
+		$data['include_zero'] = $include_zero;
+		$data['products'] = $products;
+		$data['systSetting'] = $systSetting;
+
+		return $this->render('product/stock_report.html.twig', ['data' => $data ] );
+
 	}
 
 

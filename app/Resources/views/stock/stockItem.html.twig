@@ -2,8 +2,8 @@
 {% block body %}
 {{ include('templates/nav.html.twig') }}
 
-{% set goodsAvailable = returns + stockIn %}       
-{% set goodsSold = sales - returns %}
+{% set goodsAvailable =  stockIn - returns %}       
+{% set goodsSold = sales %}
 {% set balance = goodsAvailable - goodsSold %}			 
 <div id="page-wrapper">
 <div class="panel-body">
@@ -96,9 +96,12 @@
   {% if stock.transaction == "sto" %}
     {% set transaction = "Re-stock" %}
     {% set changingStock = changingStock + stock.retailCost * stock.quantity %}
+  {% elseif stock.transaction == "sto_ini" %}
+    {% set transaction = "Initial Stock" %}
+    {% set changingStock = changingStock + stock.retailCost * stock.quantity %}
   {% elseif stock.transaction == "ret" %}
     {% set transaction = "Returns" %}
-    {% set changingStock = changingStock + stock.retailCost * stock.quantity %}
+    {% set changingStock = changingStock - stock.retailCost * stock.quantity %}
   {% elseif stock.transaction == "sus" %}
     {% set transaction = "Suspended" %}
   {% elseif stock.transaction == "sal" %}
@@ -168,9 +171,12 @@
   {% if stock.transaction == "sto" %}
     {% set transaction = "Re-stock" %}
     {% set changingStock = changingStock + stock.retailCost * stock.quantity %}
+  {% elseif stock.transaction == "sto_ini" %}
+    {% set transaction = "Initial Stock" %}
+    {% set changingStock = changingStock + stock.retailCost * stock.quantity %}
   {% elseif stock.transaction == "ret" %}
     {% set transaction = "Returns" %}
-    {% set changingStock = changingStock + stock.retailCost * stock.quantity %}
+    {% set changingStock = changingStock - stock.retailCost * stock.quantity %}
   {% elseif stock.transaction == "sus" %}
     {% set transaction = "Suspended" %}
   {% elseif stock.transaction == "sal" %}
@@ -240,9 +246,12 @@
   {% if stock.transaction == "sto" %}
     {% set transaction = "Re-stock" %}
     {% set changingStock = changingStock + stock.retailCost * stock.quantity %}
+  {% elseif stock.transaction == "sto_ini" %}
+    {% set transaction = "Initial Stock" %}
+    {% set changingStock = changingStock + stock.retailCost * stock.quantity %}
   {% elseif stock.transaction == "ret" %}
     {% set transaction = "Returns" %}
-    {% set changingStock = changingStock + stock.retailCost * stock.quantity %}
+    {% set changingStock = changingStock - stock.retailCost * stock.quantity %}
   {% elseif stock.transaction == "sus" %}
     {% set transaction = "Suspended" %}
   {% elseif stock.transaction == "sal" %}

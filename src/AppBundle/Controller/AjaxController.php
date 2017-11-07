@@ -75,37 +75,47 @@ class AjaxController extends Controller
      */
     public function tableSearchRowAction(Request $request)
     {
-            $code = $request->request->get('code');
+        $data = [];
+        $code = $request->request->get('code');
+        $qtyRemaining = $request->request->get('qtyRemaining');
 
 
-            $product = $this->getDoctrine()
-                ->getRepository('AppBundle:Product')
-                ->findOneByProductCode($code);
-            if(!$product){
-              $arrData = [];
-            } else {
-              $itemName   =     $product->getProductName();
-              $itemCode   =     $product->getProductCode();
-              $price      =     $product->getProductRetailPrice();
-              $quantity   =     "1";
-              $total      =     $price*$quantity;
-              $id         =     $product->getId();
+        $product = $this->getDoctrine()
+            ->getRepository('AppBundle:Product')
+            ->findOneBy(
+              array('productCode' => $code, 'deleted' => 0),
+              array('id' => 'ASC')
+            );
+        if(!$product){
+          $arrData = [];
+        } else {
+          $itemName   =     $product->getProductName();
+          $itemCode   =     $product->getProductCode();
+          $price      =     $product->getProductRetailPrice();
+          $quantity   =     "1";
+          $total      =     $price*$quantity;
+          $id         =     $product->getId();
 
-              $row = " 
-              <tr id='Rw_$id'> 
-                <td><span id='Cl_$id' class='btn btn-secondary glyphicon glyphicon-remove' aria-hidden='true'></span></td>
-                <td><span id='IN_$id' class='btn btn-secondary'><b>".$itemCode."</b> | ".$itemName."</span></td>
-                <td><span id='Pr_$id' class='btn btn-secondary'>".$price."</span></td>
-                <td><span id='Qt_$id' class='btn btn-secondary'>".$quantity."</span></td>
-                <td><span id='Tl_$id' class='btn btn-secondary'>".$total."</span></td>
-              </tr>";
+          if($qtyRemaining > 1){
+            $data['message'] = 'OK';
+          } else {
+            $data['message'] = "warningLowStock";
+          }
 
-              $arrData = ['output' => $row ];
+            $data['row'] = " 
+            <tr id='Rw_$id'> 
+              <td><span id='Cl_$id' class='btn btn-secondary glyphicon glyphicon-remove' aria-hidden='true'></span></td>
+              <td><span id='IN_$id' class='btn btn-secondary'><b>".$itemCode."</b> | ".$itemName."</span></td>
+              <td><span id='Pr_$id' class='btn btn-secondary'>".$price."</span></td>
+              <td><span id='Qt_$id' class='btn btn-secondary'>".$quantity."</span></td>
+              <td><span id='Tl_$id' class='btn btn-secondary'>".$total."</span></td>
+            </tr>";
+          $arrData = ['output' => $data ];
 
-            }
+        }
 
-            return new JsonResponse($arrData);
-        
+        return new JsonResponse($arrData);
+    
 
     }
 
@@ -153,11 +163,13 @@ class AjaxController extends Controller
             $em = $this->getDoctrine()->getManager();
             $product = $this->getDoctrine()
               ->getRepository('AppBundle:Product')
-              ->findOneByProductCode($value);
+              ->findOneBy(
+                array('productCode' => $value, 'deleted' => 0),
+                array('id' => 'ASC')
+              );
 
             if(!$product){
-                $products = $this->getDoctrine()
-                  ->getRepository('AppBundle:Product')
+                $products = $em->getRepository('AppBundle:Product')
                   ->searchMatchingProducts($value);
 
                 $prodArray = [];
@@ -177,19 +189,41 @@ class AjaxController extends Controller
                     $sales    =  $stockSold[0]['total'];
                     $stock    =  $stockIn[0]['total'];
 
-                    $goodsAvailable = $returns + $stock;
+                    $goodsAvailable = $stock - $returns;
                     if($goodsAvailable > 0) {
-                      $goodsSold      = $sales - $returns;
+                      $goodsSold      = $sales;
                       $balance        = $goodsAvailable - $goodsSold; 
                       $remainingStock = $balance / $product->getProductRetailPrice();       
                     } else {
                       $remainingStock = 0;
                     }
-                    $prodArray[] = array($product->getId(), $product->getProductName(), $product->getProductCode(), $product->getProductRetailPrice(), $remainingStock );
+                      $prodArray[] = array($product->getId(), $product->getProductName(), $product->getProductCode(), $product->getProductRetailPrice(), $remainingStock );
+                      $data['remainingStock'] = $remainingStock;
+
                   }
                   $data['prodArray'] = $prodArray;
                 }
             } else {
+              $stockIn = $em->getRepository('AppBundle:Stock')
+                  ->findAllStockForThisProduct($product, "sto");
+              $stockSold = $em->getRepository('AppBundle:Stock')
+                  ->findAllStockForThisProduct($product, "sal");
+              $stockReturned = $em->getRepository('AppBundle:Stock')
+                  ->findAllStockForThisProduct($product, "ret");
+
+              $returns  =  $stockReturned[0]['total'];
+              $sales    =  $stockSold[0]['total'];
+              $stock    =  $stockIn[0]['total'];
+
+              $goodsAvailable = $stock - $returns;
+              if($goodsAvailable > 0) {
+                $goodsSold      = $sales;
+                $balance        = $goodsAvailable - $goodsSold; 
+                $remainingStock = $balance / $product->getProductRetailPrice();       
+              } else {
+                $remainingStock = 0;
+              }
+              $data['remainingStock'] = $remainingStock;
               $data['product'] = $product->getProductName();
               $data['id'] = $product->getId();
               $data['code'] = $product->getProductCode();
@@ -213,7 +247,10 @@ class AjaxController extends Controller
             $em = $this->getDoctrine()->getManager();
             $product = $this->getDoctrine()
               ->getRepository('AppBundle:Product')
-              ->findOneByProductCode($category);
+              ->findOneBy(
+                array('productCode' => $category, 'deleted' => 0),
+                array('id' => 'ASC')
+              );
 
             $products = $this->getDoctrine()
               ->getRepository('AppBundle:Product')
@@ -236,7 +273,7 @@ class AjaxController extends Controller
                 $sales    =  $stockSold[0]['total'];
                 $stock    =  $stockIn[0]['total'];
 
-                $goodsAvailable = $returns + $stock;
+                $goodsAvailable = $stock - $returns;
                 if($goodsAvailable > 0) {
                   $goodsSold      = $sales - $returns;
                   $balance        = $goodsAvailable - $goodsSold; 
@@ -279,7 +316,8 @@ class AjaxController extends Controller
               foreach($purchases as $purchase){
                 $detailsArray = explode("|", $purchase->getPaymentMode());
                 $refNo = isset($detailsArray[1]) ? $detailsArray[1] : 'Not Set' ;
-                $list .= '<option value="'.$purchase->getId().'">'.'Number: '.$purchase->getId().' Ref.No ['.$refNo .']</option>';
+                $number = isset($detailsArray[2]) ? $detailsArray[2] : 'Not Set' ;
+                $list .= '<option value="'.$purchase->getId().'">'.'Number: '.$number.' Ref.No ['.$refNo .']</option>';
               }
               $to_send = $list;
 
@@ -319,11 +357,12 @@ class AjaxController extends Controller
               } else {
                 $data['returns'] = $returns;
               }
-              $list = "<option selected >Select existing Purchase</option>";
+              $list = "<option selected >Select existing Returns</option>";
               foreach($returns as $return){
                 $detailsArray = explode("|", $return->getPaymentMode());
                 $refNo = isset($detailsArray[1]) ? $detailsArray[1] : 'Not Set' ;
-                $list .= '<option value="'.$return->getId().'">'.'Number: '.$return->getId().' Ref.No ['.$refNo .']</option>';
+                $number = isset($detailsArray[2]) ? $detailsArray[2] : 'Not Set' ;
+                $list .= '<option value="'.$return->getId().'">'.'Number: '.$number.' Ref.No ['.$refNo .']</option>';
               }
               $to_send = $list;
 
@@ -359,12 +398,18 @@ class AjaxController extends Controller
               ->find($id); 
 
             if($trans == 'purchase'){
-              $sale->setPaymentMode("Purchase|".$value);
+              $totalNumberOfPurchases = $em->getRepository('AppBundle:Sale')
+                  ->countEntries('Purchase', $sale->getId());
+              $increment = $totalNumberOfPurchases;            
+              $sale->setPaymentMode("Purchase|".$value."|".$increment);
               $em->persist($sale);
               $em->flush();
               $url = $this->generateUrl('purchase_view', ['saleId'=>$id]);
             } else if ($trans == 'returns'){
-              $sale->setPaymentMode("Return|".$value);
+              $totalNumberOfReturns = $em->getRepository('AppBundle:Sale')
+                  ->countEntries('Return', $sale->getId());
+              $increment = $totalNumberOfReturns;            
+              $sale->setPaymentMode("Return|".$value."|".$increment);
               $em->persist($sale);
               $em->flush();
               $url = $this->generateUrl('return_view', ['saleId'=>$id]);
@@ -418,7 +463,10 @@ class AjaxController extends Controller
             $em = $this->getDoctrine()->getManager();
             $categories = $this->getDoctrine()
               ->getRepository('AppBundle:Category')
-              ->findAll();
+              ->findBy(
+                array('deleted' => 0),
+                array('id' => 'ASC')
+              );
 
                 if(!$categories){
                   //do nothing
@@ -493,10 +541,21 @@ class AjaxController extends Controller
           $append = "";
         }
 
+        $em = $this->getDoctrine()->getManager();
+        $last_entity = $em->getRepository('AppBundle:Sale')
+          ->loadLastSaleEntry();
+
+
         if($transaction == "Purchase"){
-          $append = "|".$referenceNumber;
+          $totalNumberOfPurchases = $em->getRepository('AppBundle:Sale')
+              ->countEntries('Purchase', $last_entity);
+          $increment = $totalNumberOfPurchases + 1;
+          $append = "|".$referenceNumber."|".$increment;
         } else if ($transaction == "Return"){
-          $append = "|".$referenceNumberR;
+          $totalNumberOfReturns = $em->getRepository('AppBundle:Sale')
+              ->countEntries('Return', $last_entity);
+          $increment = $totalNumberOfReturns + 1;
+          $append = "|".$referenceNumberR."|".$increment;
         }
   
         if($transaction != "Sale"){
@@ -504,16 +563,14 @@ class AjaxController extends Controller
         } else if($paymentMode != "check" && $paymentMode != "creditCard" && $paymentMode != "mpesa" && $paymentMode != "suspended"){
           $paymentMode = "cash";
         }
-
+        if($request->request->get('suspended')) {
+            $paymentMode = 'suspended|'.$request->request->get('suspended');
+        }
         $user = $this->get('security.token_storage')->getToken()->getUser();
         $userFName = $user->getFName();
         $userLName = $user->getLName();
         $userNameAbbrev = $userFName[0].$userLName[0];
         $sale = new Sale();
-        $em = $this->getDoctrine()->getManager();
-
-        $last_entity = $em->getRepository('AppBundle:Sale')
-          ->loadLastSaleEntry();
 
         $sale->setUser($user);
         if(!$last_entity){

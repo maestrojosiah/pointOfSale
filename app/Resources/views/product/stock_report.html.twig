@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+{{ include('templates/nav.html.twig') }}			 
+<div id="page-wrapper">
+<div class="panel-body">
+ <nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">Product List Documents</a>
+    </div>
+    <ul class="nav navbar-nav">
+      <li class="nav-item active">
+      	{% if data.order_by == 'productName' %}
+      		<a class="nav-link" href="{{ path('stock_take_report', { 'order_by': 'productCode', 'include_zero': data.include_zero }) }}">Order By Product Code <span class="sr-only"></span></a>
+      	{% else %}
+      		<a class="nav-link" href="{{ path('stock_take_report', { 'order_by': 'productName', 'include_zero': data.include_zero }) }}">Order By Product Name <span class="sr-only"></span></a>
+      	{% endif %}
+      </li>
+      <li class="nav-item">
+      	{% if data.include_zero == false %}
+      		<a class="nav-link" href="{{ path('stock_take_report', { 'order_by': data.order_by, 'include_zero': true }) }}">Include Zero Results <span class="sr-only"></span></a>
+      	{% else %}
+      		<a class="nav-link" href="{{ path('stock_take_report', { 'order_by': data.order_by, 'include_zero': false }) }}">Exclude Zero Results <span class="sr-only"></span></a>
+      	{% endif %}
+      </li>
+      <li class="nav-item">
+        {# <a class="nav-link" href="{{ path('stock_take_report', { 'order_by': data.order_by, 'include_zero': data.include_zero, 'download': "True" }) }}">Download PDF <span class="sr-only"></span></a> #}
+      </li>
+    </ul>
+  </div>
+</nav>
+<table width="100%" class="table table-striped table-bordered table-hover printTable" id="">
+    <thead>
+        <tr>
+            <td colspan="4">Stock Take Report on {{ "now"|date('Y-m-d') }} </td>
+        </tr>
+        <tr>
+            <th>Product Code</th>
+            <th>Product Name</th>
+            <th>Qty On Hand</th>
+            <th>Actual Count</th>
+        </tr>
+    </thead>
+    <tbody>
+
+	{% for product,remainingInStock in data.stockReport %}
+        <tr class="odd gradeX">
+            <td>{{ product|split('|')[1] }}</td>
+            <td>{{ product|split('|')[2] }}</td>
+            <td>{{ remainingInStock }}</td>
+            <td class="center"></td>
+        </tr>
+	{% endfor %}
+  </tbody>
+</table>
+</div>
+</div>
+
+<!-- /.panel-body -->
+{# {{ dump(form) }} #}
+{% endblock %}

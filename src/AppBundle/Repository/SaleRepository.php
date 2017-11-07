@@ -31,8 +31,8 @@ class SaleRepository extends \Doctrine\ORM\EntityRepository
     {
         return $this->createQueryBuilder('s')
 		    ->select('s')
-		    ->where('s.paymentMode = :suspended AND s.deleted = 0')
-		    ->setParameter('suspended', "suspended")
+		    ->where('s.paymentMode LIKE :suspended AND s.deleted = 0')
+		    ->setParameter('suspended', "suspended%")
 		    ->orderBy('s.id', 'ASC')
 		    ->getQuery()
 		    ->getResult();
@@ -59,4 +59,42 @@ class SaleRepository extends \Doctrine\ORM\EntityRepository
            ->getResult();
     }
 
+    public function findAllForThisRange($from, $to, $transaction)
+    {
+        return $this->createQueryBuilder('s')
+		    ->select('s')
+		    ->where('s.onDate >= :from AND s.paymentMode LIKE :trans AND s.deleted = 0')
+		    ->andWhere('s.onDate < :to')
+		    ->setParameter('from', $from)
+		    ->setParameter('to', $to)
+		    ->setParameter('trans', $transaction.'%')
+		    ->getQuery()
+		    ->getResult();
+    }
+
+    public function findAllForThisDate($startDay, $endDay, $transaction)
+    {
+        return $this->createQueryBuilder('s')
+		    ->select('s')
+		    ->where('s.onDate >= :startDay AND s.paymentMode LIKE :trans AND s.deleted = 0')
+		    ->andWhere('s.onDate < :endDay')
+		    ->setParameter('startDay', $startDay)
+		    ->setParameter('endDay', $endDay)
+		    ->setParameter('trans', $transaction.'%')
+		    ->orderBy('s.onDate', 'ASC')
+		    ->getQuery()
+		    ->getResult();
+    }
+
+    public function countEntries($what, $id = null){
+        return $this->createQueryBuilder('s')
+            ->select('count(s.id)')
+            ->where('s.paymentMode LIKE :what')
+            ->andWhere('s.id <= :id')
+            ->setParameter('what', $what.'%')
+            ->setParameter('id', $id )
+            ->getQuery()
+            ->getSingleScalarResult();
+
+    }
 }

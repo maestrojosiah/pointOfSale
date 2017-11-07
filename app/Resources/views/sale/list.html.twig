@@ -19,14 +19,14 @@
   </div>
 </nav>
 
-<table width="100%" class="table table-striped table-bordered table-hover" id="niceTable">
+<table width="100%" class="table table-striped table-bordered table-hover printTable" id="niceTable">
     <thead>
         <tr>
             <th>Receipt#</th>
             <th>Date</th>
             <th>Sale Total</th>
             <th>Payment Mode</th>
-            <th>Manage</th>
+            <th class="hidableColumn">Manage</th>
         </tr>
     </thead>
     <tbody>
@@ -37,7 +37,7 @@
                 <td>{{ sale.onDate|date('Y-m-d') }}</td>
                 <td>{{ sale.totalSale }}</td>
                 <td>{{ sale.paymentMode }}</td>
-                <td class="center">
+                <td class="center hidableColumn">
                     <a type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal{{ sale.id }}" data-saleId="{{ sale.id }}">
                   Delete
                     </a>

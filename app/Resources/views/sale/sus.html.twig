@@ -19,7 +19,7 @@
             <tr class="odd gradeX">
                 <td>{{ sale.onDate|date('Y-m-d') }}</td>
                 <td>{{ sale.totalSale }}</td>
-                <td>{{ sale.paymentMode }}</td>
+                <td>{{ sale.paymentMode|split('|')[1] }}</td>
                 <td class="center">
                     <a type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal{{ sale.id }}" data-saleId="{{ sale.id }}">
                   Delete

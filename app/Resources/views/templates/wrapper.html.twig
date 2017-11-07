@@ -120,7 +120,7 @@
                     <!-- Dropdown button -->
                     <section role="form">
                         <div class="form-group">
-                            <label>Purchase Number: {{ data.nextSaleId }}</label>
+                            {% if nextSaleId is defined %}<label>Purchase Number: {{ data.nextSaleId }}</label>{% endif %}
                             <select value="null" id="listPurchases" class="form-control">
                                 
                             </select>
@@ -147,7 +147,7 @@
 					<!-- Dropdown button -->
                     <section role="form">
                         <div class="form-group">
-                            <label>Return Number</label>
+                            {% if nextSaleId is defined %}<label>Return Number: {{ data.nextSaleId }}</label>{% endif %}
                             <select value="null" id="listReturns" class="form-control">
                                 <option selected >Select existing Returns</option>
                             </select>
@@ -186,7 +186,8 @@
         </button>
       </div>
       <div class="modal-body">
-        <p id="infoParagraph">Are you sure you want to suspend the sale? You can come back to it later by clicking on "Actions" then "Suspended Sales".</p>
+        <input type="text" class="form-group input-lg" id="suspendMessage" placeholder="Comment" style="width:100%;"/>
+        {# <p id="infoParagraph">Are you sure you want to suspend the sale? You can come back to it later by clicking on "Actions" then "Suspended Sales".</p> #}
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

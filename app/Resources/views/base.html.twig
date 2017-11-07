@@ -48,15 +48,17 @@
     <footer class="footer">
         <div class="panel panel-default" style="margin: 0 0 0 250px;">
           <div class="panel-body">
-            Focus on the <mark>Search</mark> box : [F2] | Complete <mark>Sale</mark> : [F4] | <mark>Reset</mark> Page : [F8] | Enter <mark>Amount</mark> Paid: [F7] | <mark>Suspend</mark> Sale : [F3] | Change <mark>Qty of Last Sale</mark> : [F6] 
+            <span class="bg-warning">Focus on the Search box : [F2] </span> | <span class="bg-info">Complete Sale : [F4] </span> | <span class="bg-success">Reset Page : [F8] </span> | <span class="bg-warning">Enter Amount Paid: [F7] </span> | <span class="bg-info">Suspend Sale : [F3] </span> | <span class="bg-success">Change Qty of Last Sale : [F6] </span>
           </div>
         </div>        
     </footer>
     {% endblock %}
         {% if app.user and app.user.systSettings is defined and app.user.systSettings is not empty %}
             {% set limitRows = app.user.systSettings|first.rowsPerPage %}
+            {% set minStock = app.user.systSettings|first.minStock %}
         {% else %}
-            {% set limitRows = 15 %}
+            {% set limitRows = 10 %}
+            {% set minStock = 30 %}
         {% endif %}
 
         <!-- jQuery -->
@@ -97,6 +99,26 @@
         });
       });
       </script>
+    <script>
+    $(document).ready(function() {
+      if ( $( ".printTable" ).length ) {
+       
+          $( "#sendToPrint" ).show();
+       
+      } else {
+
+          $( "#sendToPrint" ).hide();
+
+      }
+      $( "#sendToPrint" ).click(function(e) {
+
+        console.log('success');
+        $('.hidableColumn').hide()
+        $('.printTable').printThis();        
+      });
+    });
+    </script>
+
       <script>
         window.onload=loadShortcuts;
         $('#valueHolder').focus();
@@ -125,6 +147,7 @@
 
       <script>
       $( "#searchItem" ).keyup(function( event ) {
+        var minStock = {{minStock}};
         var value = $(this).val();
         console.log(value);
         var id = jQuery(this).attr("id");
@@ -142,30 +165,42 @@
                   $( "#searchResults ul" ).empty();
                   if (typeof data.output.prodArray != 'undefined'){
                     $("#close").show();
+                    $(".result").hide();
                     $("#searchResults").show();
                     var codeArray = Array();
                     $.each( data.output.prodArray, function( key, value) {
                       console.log("this is why "+value[4]);
-                      if(value[4] <= 30 ){
+                      if(value[4] <= minStock ){
                         var myClass = "warning";
                       } 
                       if (value[4] <= 0){
                         var myClass = "danger";
                       } 
-                      if (value[4] > 30){
+                      if (value[4] > minStock ){
                         var myClass = "success";
                       } 
                       
                       $("#searchResults ul").append('<li id="ajax_'+value[0]+'" class="list-group-item" onclick="dismiss(this);"><span class="tab btn btn-'+myClass+'"><strong>'+value[2]+'</strong> | '+value[1]+'</span><span class="badge">$'+value[3]+', inStock:'+value[4]+'</span></li>');
-                      codeArray.push(value[2]);
+                      codeArray.push(value[2]+'|'+value[4]);
                     });
                     $("#codeStore").text(codeArray[0]);                    
                   } else {
+                      if(data.output.remainingStock <= minStock ){
+                        var myClass = "warning";
+                      } 
+                      if (data.output.remainingStock <= 0){
+                        var myClass = "danger";
+                        // alert("Not enough in stock to sell this item.");
+                      } 
+                      if (data.output.remainingStock > minStock ){
+                        var myClass = "success";
+                      } 
                     $(".result").show();
                     $("#close").hide();
                     $('.result').text(data.output.product);
                     $('.result').attr('id', 'ajax_'+data.output.id);
-                    $("#codeStore").text(data.output.code);                    
+                    $('.result').addClass('class', 'bg-'+myClass);
+                    $("#codeStore").text(data.output.code+'|'+data.output.remainingStock);                    
                       if ( event.which == 13 ) {
                         $("#searchResults").hide();
                         //$('#ajax_'+data.output.id).click();
@@ -234,6 +269,7 @@
           var category = jQuery(this).attr("id");
           var splitted = category.split('_'); //changeRow_Qt_1504
           var id = splitted[1] //1504
+          var title = $(this).text();
 
           $.ajax({
               url:'{{ (path('get_products_ajax')) }}',
@@ -250,6 +286,7 @@
                 if (typeof data.output.prodArray != 'undefined'){
                   $("#close").show();
                   $("#showProdsModal").modal('show');
+                  $("#categoryTitle").text(title);
                   $.each( data.output.prodArray, function( key, value) {
                     //console.log("this is why "+value[4]);
                     if(value[4] <= 30 ){
@@ -261,7 +298,8 @@
                     if (value[4] > 30){
                       var myClass = "success";
                     } 
-                      $("#productBox").append('<div style="cursor:pointer;" id="ajax_'+value[0]+'" class="well text-center col-xs-6 col-sm-4well text-center col-xs-6 col-sm-4 text-'+myClass+'" data-dismiss="modal"><strong>'+value[2]+'</strong> | '+value[1]+'<br /><span class="badge">$'+value[3]+', inStock:'+value[4]+'</span></div>');
+
+                    $("#productBox").append('<div style="cursor:pointer;" id="ajax_'+value[0]+'" class="well text-center col-xs-6 col-sm-4well text-center col-xs-6 col-sm-4 text-'+myClass+'" data-dismiss="modal"><strong>'+value[2]+'</strong> | '+value[1]+'<br /><span class="badge">$'+value[3]+', inStock:'+value[4]+'</span></div>');
                     
                   });
                 }                                               
@@ -448,22 +486,32 @@
         $(document).on('keypress', '#searchItem', function(e){
            var key = e.which;
            if(key == 13){ 
-            var code = $("#codeStore").text();
+            var itemsFromCodeStore = $('#codeStore').text().split('|');
+            var code = itemsFromCodeStore[0];
+            var qtyRemaining = itemsFromCodeStore[1];
+            console.log('this is the quantity of stock remaining after hitting ENTER:'+qtyRemaining);
             $.ajax({
                 url:'{{ (path('ajax_request_search')) }}',
                 type: "POST",
                 dataType: "json",
                 data: {
                     "code": code,
+                    "qtyRemaining": qtyRemaining,
                 },
                 async: true,
                 success: function (data)
                 {
-                    console.log("ajaxSearch"+data.output)
-                    $('#sales > tbody:last-child').append(data.output);
-                    $('#searchItem').val('');                    
-                    $("#searchResults").click();                    
-                    $('#tableToArray').click();
+                    console.log("ajaxSearch"+data.output.row)
+                    if($('#transaction').text() == 'Sale' && data.output.message == 'warningLowStock'){
+                      alert("Not enough in stock to sell this item")
+                    } else {
+                      $('#codeStore').text("");
+                      $('#sales > tbody:last-child').append(data.output.row);
+                      $('#searchItem').val('');                    
+                      $("#searchResults").click();                    
+                      $('#tableToArray').click();
+                    }
+                    
                 }
             });
             return false;
@@ -664,13 +712,13 @@ $( "#paidAmt" ).keypress(function(e) {
     if(key == 13) {
     var paidAmt =    $("#paidAmt").val();
 
-    if(($("#transaction").text() == "Sale") && ($("#paidAmt").val() < $("#amountDue").text() ) ){
+    if(($("#transaction").text() == "Sale") && (parseInt($("#paidAmt").val()) < parseInt($("#amountDue").text()) ) ){
       $("#infoParagraphAuto").html("<span class='text-danger'>Something is wrong with this sale. If you have made any sale entries, Hit F7 to input amount paid. Also make sure the amount paid is enough for the goods sold");
       $("#infoModalAuto").modal('show');
         $('#autoModal').addClass("disabled");
 
       } else {
-
+        $("#paidAmt").blur();
         var qtyTotal = $("#show_qty").text();
         var total = $("#amountDue").text();
         var tax = $("#show_tax").text();
@@ -774,6 +822,7 @@ $( "#paidAmt" ).keypress(function(e) {
                       success: function (data)
                       {
                         console.log("fromAjaxSaveStock: "+data.output);
+                        $("#sendPrint").click();
                       }
                     });
 
@@ -792,7 +841,7 @@ $( "#paidAmt" ).keypress(function(e) {
   $(document).on('click', '#suspendSale', function(e){ 
 
       var paidAmt =    $("#paidAmt").val();
-      if($("#amountDue").text()==""){
+      if($("#amountDue").text() == "0"){
         $("#infoParagraphAuto").html("<span class='text-danger'>No sale exists to suspend!</span><br />Hit F7 to focus");
         $("#infoModalAuto").modal('show');
         $('#infoModalAuto').on('shown.bs.modal', function () {
@@ -803,6 +852,7 @@ $( "#paidAmt" ).keypress(function(e) {
             var total = $("#amountDue").text();
             var tax = $("#show_tax").text();
             var transaction = $("#transaction").text();
+            var suspendMessage = $("#suspendMessage").val();
             if($("#creditCardInput").val() != ""){
               var creditCard = $("#creditCardInput").val();
               var paymentMode = "creditCard";
@@ -832,7 +882,7 @@ $( "#paidAmt" ).keypress(function(e) {
                 'mpesa': mpesa,
                 'check': check,
                 'creditCard': creditCard,
-                'suspended': "suspended",
+                'suspended': suspendMessage,
                 'paymentMode': paymentMode,
                 'transaction': transaction,
               },

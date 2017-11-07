@@ -26,10 +26,10 @@ class SellController extends Controller
 
         $categories = $em->getRepository('AppBundle:Category')
             ->findAll();
+            
+        $sale = $em->getRepository('AppBundle:Sale')
+            ->findAll();
 
-        $lastSaleId = $em->getRepository('AppBundle:Sale')
-            ->loadLastSaleEntry();
-        $nextSaleId = $lastSaleId->getId() + 1;
 
         $systSetting = $em->getRepository('AppBundle:SystSetting')
             ->settingsForThisUser($user);
@@ -44,10 +44,15 @@ class SellController extends Controller
             return $this->redirectToRoute('product_add');
         }
 
+        if($sale){
+            $lastSaleId = $em->getRepository('AppBundle:Sale')
+                ->loadLastSaleEntry();
+            $nextSaleId = $lastSaleId->getId() + 1;
+            $data['nextSaleId'] = $nextSaleId;
+        }
 
         $data['categories'] = $categories;
         $data['systSetting'] = $systSetting;
-        $data['nextSaleId'] = $nextSaleId;
 
         $chunks = array_chunk($products, 4);
         $data['chunks'] = $chunks;

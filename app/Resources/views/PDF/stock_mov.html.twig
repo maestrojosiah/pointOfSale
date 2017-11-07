@@ -31,8 +31,8 @@
 </style>
 {% endblock %}
 {% block content %}
-{% set goodsAvailable = returns + stockIn %}       
-{% set goodsSold = sales - returns %}
+{% set goodsAvailable =  stockIn - returns %}       
+{% set goodsSold = sales %}
 {% set balance = goodsAvailable - goodsSold %}       
 <div id="page-wrapper">
 <h3>{{ systSetting.receiptHeader|raw }}</h3>
@@ -64,11 +64,14 @@
 {% for stock in specificStock %}
   <!--calculations-->
   {% if stock.transaction == "sto" %}
-    {% set transaction = "Re-stock" %}
+    {% set transaction = "Purchase" %}
+    {% set changingStock = changingStock + stock.retailCost * stock.quantity %}
+  {% elseif stock.transaction == "sto_ini" %}
+    {% set transaction = "Initial Stock" %}
     {% set changingStock = changingStock + stock.retailCost * stock.quantity %}
   {% elseif stock.transaction == "ret" %}
     {% set transaction = "Returns" %}
-    {% set changingStock = changingStock + stock.retailCost * stock.quantity %}
+    {% set changingStock = changingStock - stock.retailCost * stock.quantity %}
   {% elseif stock.transaction == "sus" %}
     {% set transaction = "Suspended" %}
   {% elseif stock.transaction == "sal" %}
@@ -122,11 +125,14 @@
 {% set total = 0 %}
 {% for stock in rangeStock %}
   {% if stock.transaction == "sto" %}
-    {% set transaction = "Re-stock" %}
+    {% set transaction = "Purchase" %}
+    {% set changingStock = changingStock + stock.retailCost * stock.quantity %}
+  {% elseif stock.transaction == "sto_ini" %}
+    {% set transaction = "Initial Stock" %}
     {% set changingStock = changingStock + stock.retailCost * stock.quantity %}
   {% elseif stock.transaction == "ret" %}
     {% set transaction = "Returns" %}
-    {% set changingStock = changingStock + stock.retailCost * stock.quantity %}
+    {% set changingStock = changingStock - stock.retailCost * stock.quantity %}
   {% elseif stock.transaction == "sus" %}
     {% set transaction = "Suspended" %}
   {% elseif stock.transaction == "sal" %}
@@ -181,11 +187,14 @@
         </tr>
 {% for stock in allStock %}
   {% if stock.transaction == "sto" %}
-    {% set transaction = "Re-stock" %}
+    {% set transaction = "Purchase" %}
+    {% set changingStock = changingStock + stock.retailCost * stock.quantity %}
+  {% elseif stock.transaction == "sto_ini" %}
+    {% set transaction = "Initial Stock" %}
     {% set changingStock = changingStock + stock.retailCost * stock.quantity %}
   {% elseif stock.transaction == "ret" %}
     {% set transaction = "Returns" %}
-    {% set changingStock = changingStock + stock.retailCost * stock.quantity %}
+    {% set changingStock = changingStock - stock.retailCost * stock.quantity %}
   {% elseif stock.transaction == "sus" %}
     {% set transaction = "Suspended" %}
   {% elseif stock.transaction == "sal" %}

@@ -28,10 +28,9 @@ class SystSettingType extends AbstractType
             ->add('rows_per_page', ChoiceType::class, array(
 				    'choices' => array(
 				        '10 Rows' => 10,
-				        '20 Rows' => 20,
-				        '30 Rows' => 30,
-				        '40 Rows' => 40,
+				        '25 Rows' => 25,
 				        '50 Rows' => 50,
+				        '100 Rows' => 100,
 				    ),
 				    'preferred_choices' => array('20', 'arr')
 				))

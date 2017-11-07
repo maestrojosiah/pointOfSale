@@ -17,8 +17,9 @@
             <!-- /.navbar-header -->
 
             <ul class="nav navbar-top-links navbar-right">
+                <li><button type="button" id="sendToPrint" class="btn btn-primary btn-lg" style="display:none;">Print</button></li>
                 <li class="dropdown">
-                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" style="color:#171717;">
                         <i class="fa fa-product-hunt fa-fw"></i> <i class="fa fa-caret-down"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-messages">
@@ -69,7 +70,7 @@
                 </li>
                 <!-- /.dropdown -->
                 <li class="dropdown">
-                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" style="color:#171717;">
                         <i class="fa fa-tasks fa-fw"></i> <i class="fa fa-caret-down"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-messages">
@@ -120,23 +121,30 @@
                 </li>
                 <!-- /.dropdown -->
                 <li class="dropdown">
-                    <a href="{{ path('systSetting_add') }}">
+                    <a href="{{ path('systSetting_add') }}" style="color:#171717;">
                         <i class="fa fa-gear fa-fw"></i> <i class="fa fa-caret-down"></i>
                     </a>
                 </li>
                 <!-- /.dropdown -->
                 <li class="dropdown">
-                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                        <i class="fa fa-money fa-fw"></i> <i class="fa fa-caret-down"></i>
+                    <a class="dropdown-toggle bg-white" data-toggle="dropdown" href="#" style="color:#171717;">
+                        <i class="fa fa-file-text fa-fw"></i> <i class="fa fa-caret-down"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-user">
                         <li><a href="{{ path('sale_list') }}"><i class="fa fa-user fa-fw"></i> History </a></li>
-                        <li><a href="{{ path('items_received') }}"><i class="fa fa-gear fa-fw"></i> Received Items</a></li>
+                        <li><a href="{{ path('purchases_view') }}"><i class="fa fa-gear fa-fw"></i> Purchases </a></li>
+                        <li><a href="{{ path('items_received') }}"><i class="fa fa-gear fa-fw"></i> Purchases (Individual)</a></li>
+                        <li><a href="{{ path('returns_view') }}"><i class="fa fa-gear fa-fw"></i> Purchases Return </a></li>
+                        <li><a href="{{ path('items_returned') }}"><i class="fa fa-gear fa-fw"></i> Returns (Individual) </a></li>
                         <li><a href="{{ path('items_sold') }}"><i class="fa fa-gear fa-fw"></i> Sales Report (Individual)</a></li>
                         <li><a href="{{ path('items_sold_grouped') }}"><i class="fa fa-gear fa-fw"></i> Sales Report (Grouped)</a></li>
                         <li><a href="{{ path('tax_report') }}"><i class="fa fa-gear fa-fw"></i> Tax Report (Individual)</a></li>
-                        <li><a href="{{ path('items_returned') }}"><i class="fa fa-gear fa-fw"></i> Returns </a></li>
                         <li><a href="{{ path('stock_movement') }}"><i class="fa fa-gear fa-fw"></i> Stock Movement </a></li>
+                        <li><a href="{{ path('mpesa_view') }}"><i class="fa fa-gear fa-fw"></i> M-Pesa Report </a></li>
+                        <li><a href="{{ path('creditCard_view') }}"><i class="fa fa-gear fa-fw"></i> Credit Card Report </a></li>
+                        <li><a href="{{ path('cheque_view') }}"><i class="fa fa-gear fa-fw"></i> Cheque Report </a></li>
+                        <li><a href="{{ path('stock_take_report') }}"><i class="fa fa-gear fa-fw"></i> Stock Take Report </a></li>
+
                         <li class="divider"></li>
                         <li><a href="{{ path('logout') }}"><i class="fa fa-sign-out fa-fw"></i> Logout [{{ app.user }}]</a></li>
                     </ul>
@@ -156,13 +164,13 @@
                             <a href="{{ path('homepage') }}"><i class="fa fa-table fa-fw"></i> Sell</a>
                         </li>
                         <li>
-                            <a href="{{ path('sale_list') }}"><i class="fa fa-edit fa-fw"></i> History</a>
+                            <a href="{{ path('sale_list') }}"><i class="fa fa-clock-o fa-fw"></i> History</a>
                         </li>
                         <li>
-                            <a href="{{ path('documentation') }}"><i class="fa fa-edit fa-fw"></i> Docs</a>
+                            <a href="{{ path('documentation') }}"><i class="fa fa-book fa-fw"></i> Docs</a>
                         </li>
                         <li>
-                            <a href="{{ path('logout') }}"><i class="fa fa-edit fa-fw"></i> Logout</a>
+                            <a href="{{ path('logout') }}"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
                         </li>
                     </ul>
                 </div>

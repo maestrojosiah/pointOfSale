@@ -51,7 +51,7 @@ class ProductRepository extends \Doctrine\ORM\EntityRepository
     public function searchMatchingProducts($searchText)
     {
     	return $this->createQueryBuilder('p')
-               ->where('p.productName LIKE :input OR p.productCode LIKE :input')
+               ->where('p.productName LIKE :input OR p.productCode LIKE :input AND p.deleted = 0' )
                ->setParameter('input', '%'.$searchText.'%')
                ->setMaxResults(10)
                ->getQuery()
