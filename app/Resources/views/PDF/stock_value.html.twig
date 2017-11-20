@@ -1,0 +1,74 @@
+{% extends 'layout-pdf.html.twig' %}
+{% block stylesheets %}
+<style type="text/css">
+    body {
+        font-size: 8px;
+    }
+    table {
+        font-size: 12px;
+        border-collapse: collapse;
+    }
+
+    table, th, td {
+        border: 1px solid black;
+    } 
+
+    th {
+        text-align: left;
+    } 
+    th, td {
+        padding: 1px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    } 
+    tr:nth-child(even) {background-color: #f2f2f2} 
+    
+    table thead tr {
+        page-break-inside: avoid;
+    }
+    table tbody tr {
+        page-break-inside: avoid;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<h3>{{ app.user.systSettings|first.receiptHeader|raw }}</h3>
+<table width="100%" class="table table-striped table-bordered table-hover printTable" id="">
+    <thead>
+        <tr>
+            <td colspan="5">Stock Take Report on {{ "now"|date('Y-m-d') }} </td>
+        </tr>
+        <tr>
+            <th>Product Code</th>
+            <th>Product Name</th>
+            <th>Qty On Hand</th>
+            <th>Cost</th>
+            <th>Price</th>
+        </tr>
+    </thead>
+    <tbody>
+      {% set totalItems = 0 %}
+      {% set totalCost = 0 %}
+      {% set totalPrice = 0 %}
+    {% for product,remainingInStock in data.stockReport %}
+    {% set totalItems = totalItems + remainingInStock %}
+    {% set totalCost = totalCost + (product|split('|')[3] * remainingInStock) %}
+    {% set totalPrice = totalPrice + (product|split('|')[4] * remainingInStock) %}
+        <tr class="odd gradeX">
+            <td>{{ product|split('|')[1] }}</td>
+            <td>{{ product|split('|')[2] }}</td>
+            <td>{{ remainingInStock }}</td>
+            <td class="center">{{ product|split('|')[3] * remainingInStock }}</td>
+            <td class="center">{{ product|split('|')[4] * remainingInStock }}</td>
+        </tr>
+    {% endfor %}
+
+  <tr>
+    <td colspan="2">TOTALS</td>
+    <td class="center">{{ totalItems }}</td>
+    <td class="center">{{ totalCost }}</td>
+    <td class="center">{{ totalPrice }}</td>
+  </tr>
+  </tbody>
+</table>
+{% endblock %}

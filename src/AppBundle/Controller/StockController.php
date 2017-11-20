@@ -90,7 +90,7 @@ class StockController extends Controller
 
                 $html = $this->renderView('PDF/pdf.html.twig', $data);
 
-                $filename = sprintf("received-%s.pdf", date('Ymd~his'));
+                $filename = sprintf("stock_received-%s.pdf", date('Ymd~his'));
 
                 return new Response(
                     $this->get('knp_snappy.pdf')->getOutputFromHtml($html),
@@ -185,7 +185,7 @@ class StockController extends Controller
 
                 $html = $this->renderView('PDF/pdf.html.twig', $data);
 
-                $filename = sprintf("returns-%s.pdf", date('Ymd~his'));
+                $filename = sprintf("stock_returns-%s.pdf", date('Ymd~his'));
 
                 return new Response(
                     $this->get('knp_snappy.pdf')->getOutputFromHtml($html),
@@ -559,16 +559,115 @@ class StockController extends Controller
 
     }
 
+    /**
+     * @Route("/stock/tax/{download}", name="tax_report")
+     */
+    public function taxAction(Request $request, $download = "False")
+    {
+        $data = [];
+        $em = $this->getDoctrine()->getManager();
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+
+        $data['specificStock'] = [];
+        $data['rangeStock'] = [];
+        $data['dates']['specific'] = '';
+        $data['dates']['from'] = '';
+        $data['dates']['to'] = '';
+        $form = $this   ->createFormBuilder()
+                        ->add('dateSpecific')
+                        ->add('dateFrom')
+                        ->add('dateTo')
+                        ->getForm();
+     
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted()) {
+            $form_data = $form->getData();
+
+            $data['dates']['specific'] = $form_data['dateSpecific'];
+            $data['dates']['from'] = $form_data['dateFrom'];
+            $data['dates']['to'] = $form_data['dateTo'];
+
+            $em = $this->getDoctrine()->getManager();
+            if($data['dates']['specific']){
+                $startDay = new \DateTime($data['dates']['specific']);
+                $startDay ->setTime(0, 0, 0);
+
+                $endDay = clone $startDay;
+                $endDay->modify('+1 day'); 
+                $stocks = $em->getRepository('AppBundle:Stock')
+                    ->findAllForThisDate($startDay, $endDay, "sal");
+                $data['specificStock'] = $stocks;
+            } 
+
+            if ($data['dates']['from']) {
+                $from = new \DateTime($data['dates']['from']);
+                $to = new \DateTime($data['dates']['to']);
+                $from ->setTime(0, 0, 0);
+                $to ->setTime(0, 0, 0);
+                $to -> modify('+1 day');
+                $stocks = $em->getRepository('AppBundle:Stock')
+                    ->findAllForThisRange($from, $to, "sal");
+                $data['rangeStock'] = $stocks;
+            }
+            
+            if($download == "True" ){
+                $entity = $stocks;
+
+                foreach($entity as $entry){
+                    $dataInfo['name'] = $entry->getProduct();
+                    $dataInfo['date'] = $entry->getOnDate();
+                    $dataInfo['quantity'] = $entry->getQuantity();
+                    $dataInfo['tax'] = $entry->getRetailCost() * 16/116;
+                    $dataArray[] = $dataInfo;
+                }
+
+                $systSetting = $em->getRepository('AppBundle:systSetting')
+                    ->findOneByUser($user);
+                    
+                $data['systSetting'] = $systSetting;
+                $data['report'] = "Tax Report";
+
+
+                $data['entity'] = $dataArray;
+                $data['property'] = $download;
+
+                $appPath = $this->container->getParameter('kernel.root_dir');
+
+                $html = $this->renderView('PDF/pdf.html.twig', $data);
+
+                $filename = sprintf("tax-%s.pdf", date('Ymd~his'));
+
+                return new Response(
+                    $this->get('knp_snappy.pdf')->getOutputFromHtml($html),
+                    200,
+                    [
+                        'Content-Type'        => 'application/pdf',
+                        'Content-Disposition' => sprintf('attachment; filename="%s"', $filename),
+                    ]
+                );
+            }
+            
+
+        }
+
+        return $this->render('stock/tax.html.twig', $data );
+
+    }
+
 	/**
-	 * @Route("/stock/tax/{download}", name="tax_report")
+	 * @Route("/stock/tax_accum/{download}", name="tax_accum_report")
 	 */
-	public function taxAction(Request $request, $download = "False")
+	public function taxAccumAction(Request $request, $download = "False")
 	{
 		$data = [];
 		$em = $this->getDoctrine()->getManager();
         $user = $this->get('security.token_storage')->getToken()->getUser();
 
         $data['specificStock'] = [];
+        $data['taxed'] = 0;
+        $data['taxedSales'] = 0;
+        $data['nonTaxedSales'] = 0;
         $data['rangeStock'] = [];
     	$data['dates']['specific'] = '';
     	$data['dates']['from'] = '';
@@ -597,6 +696,23 @@ class StockController extends Controller
 				$endDay->modify('+1 day'); 
         		$stocks = $em->getRepository('AppBundle:Stock')
         			->findAllForThisDate($startDay, $endDay, "sal");
+
+                $taxedSales = 0;
+                $nonTaxedSales = 0;
+                $taxed = 0;
+
+                foreach($stocks as $stock){
+                    $product = $stock->getProduct();
+                    if($product->getProductTax() == '0'){
+                        $nonTaxedSales += $stock->getTotalCost();
+                    } else if ($product->getProductTax() == '1.16'){
+                        $taxedSales +=  $stock->getTotalCost();
+                        $taxed += $stock->getRetailCost() * (16/116) * $stock->getQuantity();
+                    }
+                }
+                $data['taxed'] = $taxed;
+                $data['taxedSales'] = $taxedSales;
+                $data['nonTaxedSales'] = $nonTaxedSales;
         		$data['specificStock'] = $stocks;
         	} 
 
@@ -608,6 +724,24 @@ class StockController extends Controller
         		$to -> modify('+1 day');
         		$stocks = $em->getRepository('AppBundle:Stock')
         			->findAllForThisRange($from, $to, "sal");
+
+                $taxedSales = 0;
+                $nonTaxedSales = 0;
+                $taxed = 0;
+
+                foreach($stocks as $stock){
+                    $product = $stock->getProduct();
+                    if($product->getProductTax() == '0'){
+                        $nonTaxedSales += $stock->getTotalCost();
+                    } else if ($product->getProductTax() == '1.16'){
+                        $taxedSales +=  $stock->getTotalCost();
+                        $taxed += $stock->getRetailCost() * (16/116) * $stock->getQuantity();
+                    }
+                }
+
+                $data['taxed'] = $taxed;
+                $data['taxedSales'] = $taxedSales;
+                $data['nonTaxedSales'] = $nonTaxedSales;
         		$data['rangeStock'] = $stocks;
         	}
         	
@@ -634,9 +768,9 @@ class StockController extends Controller
 
                 $appPath = $this->container->getParameter('kernel.root_dir');
 
-                $html = $this->renderView('PDF/pdf.html.twig', $data);
+                $html = $this->renderView('PDF/tax_accum.html.twig', $data);
 
-                $filename = sprintf("sold-%s.pdf", date('Ymd~his'));
+                $filename = sprintf("tax_accum-%s.pdf", date('Ymd~his'));
 
                 return new Response(
                     $this->get('knp_snappy.pdf')->getOutputFromHtml($html),
@@ -651,7 +785,7 @@ class StockController extends Controller
 
     	}
 
-		return $this->render('stock/tax.html.twig', $data );
+		return $this->render('stock/tax_accum.html.twig', $data );
 
 	}
 
@@ -834,7 +968,7 @@ class StockController extends Controller
 
                 $html = $this->renderView('PDF/saleGrouped.html.twig', $data);
 
-                $filename = sprintf("sold-%s.pdf", date('Ymd~his'));
+                $filename = sprintf("sale_grouped-%s.pdf", date('Ymd~his'));
 
                 return new Response(
                     $this->get('knp_snappy.pdf')->getOutputFromHtml($html),

@@ -47,7 +47,7 @@
   </div>
   <!-- /.col-lg-4 -->
 </div>
-<input class="btn btn-outline btn-primary btn-lg btn-block" type="submit" {% if app.request.query.get("from") is not empty or app.request.query.get("specific") is not empty %} value = "CLICK HERE TO DOWNLOAD" {% else %} value="SHOW PURCHASES RECORDS" {% endif %} />
+<input class="btn btn-outline btn-primary btn-lg btn-block" type="submit" {% if app.request.query.get("from") is not empty or app.request.query.get("specific") is not empty %} value = "CLICK HERE TO DOWNLOAD" {% else %} value="SHOW PURCHASE RETURNS RECORDS" {% endif %} />
 </form>
 {% if specificSale is defined and specificSale is not empty%}
 <div class="panel-body">

@@ -48,6 +48,30 @@
                         </li>
                         <li class="divider"></li>
                         <li>
+                            <a href="{{ path('product_cost_list') }}">
+                                <div>
+                                    <strong>Product Cost List</strong>
+                                    <span class="pull-right text-muted">
+                                        <em>e</em>
+                                    </span>
+                                </div>
+                                <div>List of products by cost</div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="{{ path('product_price_list') }}">
+                                <div>
+                                    <strong>Product Price List</strong>
+                                    <span class="pull-right text-muted">
+                                        <em>e</em>
+                                    </span>
+                                </div>
+                                <div>List of products by price</div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
                             <a href="{{ path('product_restore_list') }}">
                                 <div>
                                     <strong>Product Restore</strong>
@@ -139,11 +163,13 @@
                         <li><a href="{{ path('items_sold') }}"><i class="fa fa-gear fa-fw"></i> Sales Report (Individual)</a></li>
                         <li><a href="{{ path('items_sold_grouped') }}"><i class="fa fa-gear fa-fw"></i> Sales Report (Grouped)</a></li>
                         <li><a href="{{ path('tax_report') }}"><i class="fa fa-gear fa-fw"></i> Tax Report (Individual)</a></li>
+                        <li><a href="{{ path('tax_accum_report') }}"><i class="fa fa-gear fa-fw"></i> Tax Report (Grouped)</a></li>
                         <li><a href="{{ path('stock_movement') }}"><i class="fa fa-gear fa-fw"></i> Stock Movement </a></li>
                         <li><a href="{{ path('mpesa_view') }}"><i class="fa fa-gear fa-fw"></i> M-Pesa Report </a></li>
                         <li><a href="{{ path('creditCard_view') }}"><i class="fa fa-gear fa-fw"></i> Credit Card Report </a></li>
                         <li><a href="{{ path('cheque_view') }}"><i class="fa fa-gear fa-fw"></i> Cheque Report </a></li>
                         <li><a href="{{ path('stock_take_report') }}"><i class="fa fa-gear fa-fw"></i> Stock Take Report </a></li>
+                        <li><a href="{{ path('stock_value_report') }}"><i class="fa fa-gear fa-fw"></i> Stock Valuation Report </a></li>
 
                         <li class="divider"></li>
                         <li><a href="{{ path('logout') }}"><i class="fa fa-sign-out fa-fw"></i> Logout [{{ app.user }}]</a></li>

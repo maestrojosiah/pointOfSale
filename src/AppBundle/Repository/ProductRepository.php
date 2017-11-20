@@ -26,6 +26,15 @@ class ProductRepository extends \Doctrine\ORM\EntityRepository
 		    ->getResult();
     }
 
+    public function loadAllProductsFromThisSystem(){
+        return $this->createQueryBuilder('p')
+            ->select('p')
+            ->where('p.deleted = 0')
+            ->orderBy('p.productName', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     public function loadAllDeletedProductsFromThisUser($user)
     {
         return $this->createQueryBuilder('p')

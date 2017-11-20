@@ -47,7 +47,7 @@
   </div>
   <!-- /.col-lg-4 -->
 </div>
-<input class="btn btn-outline btn-primary btn-lg btn-block" type="submit" {% if app.request.query.get("from") is not empty or app.request.query.get("specific") is not empty %} value = "CLICK HERE TO DOWNLOAD" {% else %} value="SHOW TAX RECORDS" {% endif %} />
+<input class="btn btn-outline btn-primary btn-lg btn-block" type="submit" {% if app.request.query.get("from") is not empty or app.request.query.get("specific") is not empty %} value = "CLICK HERE TO DOWNLOAD" {% else %} value="SHOW TAX SUMMARY RECORDS" {% endif %} />
 </form>
 {% if specificStock is defined and specificStock is not empty%}
 <div class="panel-body">
@@ -58,7 +58,7 @@
     </div>
     <ul class="nav navbar-nav">
       <li class="nav-item active">
-        <a class="nav-link" href="{{ path('tax_report', {'download':'True', 'from':dates.from, 'to':dates.to, 'specific':dates.specific } ) }}">Download PDF <span class="sr-only"></span></a>
+        <a class="nav-link" href="{{ path('tax_accum_report', {'download':'True', 'from':dates.from, 'to':dates.to, 'specific':dates.specific } ) }}">Download PDF <span class="sr-only"></span></a>
       </li>
       <li class="nav-item active">
         <a class="nav-link" href="">Download Excel <span class="sr-only"></span></a>
@@ -66,45 +66,27 @@
     </ul>
   </div>
 </nav>
-<table width="100%" class="table table-striped table-bordered table-hover display printTable" id="">
+<table width="100%" class="table table-striped table-bordered table-hover printTable" id="">
     <thead>
         <tr>
-            <th>Name</th>
-            <th>Date</th>
-            <th>Quantity</th>
+            <th>Details</th>
+            <th>VAT%</th>
             <th>Sales</th>
-            <th>Tax</th>
+            <th>Tax Collected</th>
         </tr>
     </thead>
     <tbody>
-{% set total = 0 %}
-{% set taxTotal = 0 %}
-{% for stock in specificStock %}
-	<!--calculations-->        
-  {% if stock.product.productTax == 1.16 %}
-	   {% set thisTax = stock.retailCost * (16 / 116) * stock.quantity %}
-  {% else %}
-     {% set thisTax = 0 %}
-  {% endif %}
-	{% set total = total + stock.retailCost * stock.quantity %}
-	{% set taxTotal = taxTotal + thisTax %}
     <tr class="odd gradeX">
-        <td><b>{{ stock.product.productCode }}</b> {{ stock.product }}</td>
-        <td>{{ stock.onDate | date('Y-m-d') }}</td>
-        <td>{{ stock.quantity }}</td>
-        <td class="center">{{ stock.retailCost * stock.quantity }}</td>
-        <td class="center">{{ thisTax|round(2) }}</td>
-        <td class="center">
+        <td>-TAX</td>
+        <td>16.00%</td>
+        <td class="center">{{ taxedSales|round(3) }}</td>
+        <td class="center">{{ taxed|round(3) }}</td>
     </tr>
-{% endfor %}
-  </tbody>
-  <tbody>
     <tr class="odd gradeX">
-        <td></td>
-        <td></td>
-        <td>Total</td>
-        <td class="center">{{ total|round(2) }}</td>
-        <td class="center">{{ taxTotal|round(2) }}</td>
+        <td>-ZERO RATED</td>
+        <td>0.00%</td>
+        <td class="center">{{ nonTaxedSales|round(3) }}</td>
+        <td class="center">0.00</td>
     </tr>
   </tbody>
 </table>
@@ -119,7 +101,7 @@
     </div>
     <ul class="nav navbar-nav">
       <li class="nav-item active">
-        <a class="nav-link" href="{{ path('tax_report', {'download':'True', 'from':dates.from, 'to':dates.to, 'specific':dates.specific } ) }}">Download PDF <span class="sr-only"></span></a>
+        <a class="nav-link" href="{{ path('tax_accum_report', {'download':'True', 'from':dates.from, 'to':dates.to, 'specific':dates.specific } ) }}">Download PDF <span class="sr-only"></span></a>
       </li>
       <li class="nav-item active">
         <a class="nav-link" href="">Download Excel <span class="sr-only"></span></a>
@@ -127,44 +109,27 @@
     </ul>
   </div>
 </nav>
-<table width="100%" class="table table-striped table-bordered table-hover display printTable" id="">
+<table width="100%" class="table table-striped table-bordered table-hover printTable" id="">
     <thead>
         <tr>
-            <th>Name</th>
-            <th>Date</th>
-            <th>Quantity</th>
+            <th>Details</th>
+            <th>VAT%</th>
             <th>Sales</th>
-            <th>Tax</th>
+            <th>Tax Collected</th>
         </tr>
     </thead>
     <tbody>
-
-{% set total = 0 %}
-{% set taxTotal = 0 %}
-{% for stock in rangeStock %}
-  {% if stock.product.productTax == 1.16 %}
-     {% set thisTax = stock.retailCost * (16 / 116) * stock.quantity %}
-  {% else %}
-     {% set thisTax = 0 %}
-  {% endif %}
-	{% set total = total + stock.retailCost * stock.quantity %}
-	{% set taxTotal = taxTotal + thisTax %}
     <tr class="odd gradeX">
-    	<td><b>{{ stock.product.productCode }}</b> {{ stock.product }}</td>
-        <td>{{ stock.onDate | date('Y-m-d') }}</td>
-        <td>{{ stock.quantity }}</td>
-        <td class="center">{{ stock.retailCost * stock.quantity }}</td>
-        <td class="center">{{ thisTax|round(2) }}</td>
+        <td>-TAX</td>
+        <td>16.00%</td>
+        <td class="center">{{ taxedSales|round(3) }}</td>
+        <td class="center">{{ taxed|round(3) }}</td>
     </tr>
-{% endfor %}
-  </tbody>
-  <tbody>
     <tr class="odd gradeX">
-        <td></td>
-        <td></td>
-        <td>Total</td>
-        <td class="center">{{ total|round(2) }}</td>
-        <td class="center">{{ taxTotal|round(2) }}</td>
+        <td>-ZERO RATED</td>
+        <td>0.00%</td>
+        <td class="center">{{ nonTaxedSales|round(3) }}</td>
+        <td class="center">0.00</td>
     </tr>
   </tbody>
 </table>

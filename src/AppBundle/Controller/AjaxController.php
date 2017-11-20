@@ -600,7 +600,7 @@ class AjaxController extends Controller
 
         //$newArray = array_push($array, $paidAmt);
 
-        $saleNumber = ['output' => $paymentMode ];
+        $saleNumber = ['output' => $receiptNumber ];
         return new JsonResponse($saleNumber);
     }
 

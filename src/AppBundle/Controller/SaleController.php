@@ -129,7 +129,6 @@ class SaleController extends Controller
                     $dataInfo['refId'] = explode("|", ($entry->getPaymentMode()))[1];
                     $dataInfo['details'] = 'Purchase Invoice';
                     $dataInfo['amount'] = $entry->getTotalSale();
-                    $dataInfo['no_dates'] = true;
                     $dataArray[] = $dataInfo;
                 }
 
@@ -264,7 +263,6 @@ class SaleController extends Controller
                     $dataInfo['refId'] = explode("|", ($entry->getPaymentMode()))[1];
                     $dataInfo['details'] = 'Debit Note';
                     $dataInfo['amount'] = $entry->getTotalSale();
-                    $dataInfo['no_dates'] = true;
                     $dataArray[] = $dataInfo;
                 }
 
@@ -282,7 +280,7 @@ class SaleController extends Controller
 
                 $html = $this->renderView('PDF/pdf.html.twig', $data);
 
-                $filename = sprintf("received-%s.pdf", date('Ymd~his'));
+                $filename = sprintf("purchase_return-%s.pdf", date('Ymd~his'));
 
                 return new Response(
                     $this->get('knp_snappy.pdf')->getOutputFromHtml($html),
@@ -376,7 +374,7 @@ class SaleController extends Controller
 
                 $html = $this->renderView('PDF/pdf.html.twig', $data);
 
-                $filename = sprintf("purchases-%s.pdf", date('Ymd~his'));
+                $filename = sprintf("mpesa-%s.pdf", date('Ymd~his'));
 
                 return new Response(
                     $this->get('knp_snappy.pdf')->getOutputFromHtml($html),
@@ -470,7 +468,7 @@ class SaleController extends Controller
 
                 $html = $this->renderView('PDF/pdf.html.twig', $data);
 
-                $filename = sprintf("purchases-%s.pdf", date('Ymd~his'));
+                $filename = sprintf("c_card-%s.pdf", date('Ymd~his'));
 
                 return new Response(
                     $this->get('knp_snappy.pdf')->getOutputFromHtml($html),
@@ -564,7 +562,7 @@ class SaleController extends Controller
 
                 $html = $this->renderView('PDF/pdf.html.twig', $data);
 
-                $filename = sprintf("purchases-%s.pdf", date('Ymd~his'));
+                $filename = sprintf("cheque-%s.pdf", date('Ymd~his'));
 
                 return new Response(
                     $this->get('knp_snappy.pdf')->getOutputFromHtml($html),
@@ -600,7 +598,7 @@ class SaleController extends Controller
 
         $categories = $this->getDoctrine()
             ->getRepository('AppBundle:Category')
-            ->loadAllCategoriesFromThisUser($user);
+            ->findAll();
 
         $systSetting = $this->getDoctrine()
             ->getRepository('AppBundle:SystSetting')

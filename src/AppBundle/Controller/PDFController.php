@@ -39,13 +39,39 @@ class PDFController extends Controller
 		if($Entity == "Product"){
 			$entity = $this->getDoctrine()
 				->getRepository('AppBundle:Product')
-				->loadAllProductsFromThisUser($user);
+				->loadAllProductsFromThisSystem($user);
 
 			foreach($entity as $entry){
+				$dataInfo['code'] = $entry->getProductCode();
 				$dataInfo['name'] = $entry->getProductName();
 				$dataInfo['cost'] = $entry->getProductCost();
 				$dataInfo['retail'] = $entry->getProductRetailPrice();
+				$dataArray[] = $dataInfo;
+			}
+		}
+
+		if($Entity == "ProductPrice"){
+			$entity = $this->getDoctrine()
+				->getRepository('AppBundle:Product')
+				->loadAllProductsFromThisSystem($user);
+
+			foreach($entity as $entry){
 				$dataInfo['code'] = $entry->getProductCode();
+				$dataInfo['name'] = $entry->getProductName();
+				$dataInfo['retail'] = $entry->getProductRetailPrice();
+				$dataArray[] = $dataInfo;
+			}
+		}
+
+		if($Entity == "ProductCost"){
+			$entity = $this->getDoctrine()
+				->getRepository('AppBundle:Product')
+				->loadAllProductsFromThisSystem($user);
+
+			foreach($entity as $entry){
+				$dataInfo['code'] = $entry->getProductCode();
+				$dataInfo['name'] = $entry->getProductName();
+				$dataInfo['cost'] = $entry->getProductCost();
 				$dataArray[] = $dataInfo;
 			}
 		}
@@ -53,7 +79,7 @@ class PDFController extends Controller
 		if($Entity == "Category"){
 			$entity = $this->getDoctrine()
 				->getRepository('AppBundle:Category')
-				->loadAllCategoriesFromThisUser($user);
+				->findAll();
 
 			foreach($entity as $entry){
 				$dataInfo['name'] = $entry->getCategoryName();

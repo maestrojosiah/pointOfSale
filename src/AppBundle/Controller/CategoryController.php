@@ -124,7 +124,7 @@ class CategoryController extends Controller
         $user = $this->get('security.token_storage')->getToken()->getUser();
 		$categories = $this->getDoctrine()
 			->getRepository('AppBundle:Category')
-			->loadAllCategoriesFromThisUser($user);
+			->findAll();
 
 		$data['categories'] = $categories;
 
