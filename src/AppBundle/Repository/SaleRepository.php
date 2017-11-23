@@ -75,12 +75,26 @@ class SaleRepository extends \Doctrine\ORM\EntityRepository
     public function findAllForThisDate($startDay, $endDay, $transaction)
     {
         return $this->createQueryBuilder('s')
+            ->select('s')
+            ->where('s.onDate >= :startDay AND s.paymentMode LIKE :trans AND s.deleted = 0')
+            ->andWhere('s.onDate < :endDay')
+            ->setParameter('startDay', $startDay)
+            ->setParameter('endDay', $endDay)
+            ->setParameter('trans', $transaction.'%')
+            ->orderBy('s.onDate', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findAllTransForThisDate($startDay, $endDay, $details)
+    {
+        return $this->createQueryBuilder('s')
 		    ->select('s')
-		    ->where('s.onDate >= :startDay AND s.paymentMode LIKE :trans AND s.deleted = 0')
+		    ->where('s.onDate >= :startDay AND s.details LIKE :trans AND s.deleted = 0')
 		    ->andWhere('s.onDate < :endDay')
 		    ->setParameter('startDay', $startDay)
 		    ->setParameter('endDay', $endDay)
-		    ->setParameter('trans', $transaction.'%')
+		    ->setParameter('trans', $details.'%')
 		    ->orderBy('s.onDate', 'ASC')
 		    ->getQuery()
 		    ->getResult();

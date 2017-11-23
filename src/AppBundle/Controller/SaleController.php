@@ -679,7 +679,6 @@ class SaleController extends Controller
 			->getRepository('AppBundle:Sale')
 			->loadAllSalesFromThisUser($user);
 
-
 		$data['sales'] = $sales;
 
 		return $this->render('sale/list.html.twig', ['data' => $data ] );

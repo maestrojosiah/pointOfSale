@@ -32,20 +32,20 @@
     <tbody>
 
 {% for sale in data.sales %}
-            <tr class="odd gradeX">
-                <td>{{ sale.onDate|date('ymd') }}{{sale.id}}</td>
-                <td>{{ sale.onDate|date('Y-m-d') }}</td>
-                <td>{{ sale.totalSale }}</td>
-                <td>{{ sale.paymentMode }}</td>
-                <td class="center hidableColumn">
-                    <a type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal{{ sale.id }}" data-saleId="{{ sale.id }}">
-                  Delete
-                    </a>
-                    <a href="{{ path('sale_view', { 'saleId': sale.id } ) }}" class="btn btn-primary">
-                  View
-                    </a>
-                </td>
-            </tr>
+    <tr class="odd gradeX">
+        <td>{{ sale.onDate|date('ymd') }}{{sale.id}}</td>
+        <td>{{ sale.onDate|date('Y-m-d') }}</td>
+        <td>{{ sale.totalSale }}</td>
+        <td>{{ sale.paymentMode }}</td>
+        <td class="center hidableColumn">
+            <a type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal{{ sale.id }}" data-saleId="{{ sale.id }}">
+          Delete
+            </a>
+            <a href="{{ path('sale_view', { 'saleId': sale.id } ) }}" class="btn btn-primary">
+          View
+            </a>
+        </td>
+    </tr>
 
     <!-- Modal -->
     <div class="modal fade" id="deleteModal{{ sale.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="color:black; text-shadow:none;">

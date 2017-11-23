@@ -1034,4 +1034,155 @@ class StockController extends Controller
 
     }
 
+    /**
+     * @Route("/stock/pos/summary/{download}", name="pos_summary")
+     */
+    public function posSummaryAction(Request $request, $download = "False"){
+        $data = [];
+        $em = $this->getDoctrine()->getManager();
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+
+        $data['rangeStock'] = [];
+        $data['dates']['from'] = '';
+        $data['dates']['to'] = '';
+        $form = $this   ->createFormBuilder()
+                        ->add('dateFrom')
+                        ->add('dateTo')
+                        ->getForm();
+     
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted()) {
+            $form_data = $form->getData();
+
+            $data['dates']['from'] = $form_data['dateFrom'];
+            $data['dates']['to'] = $form_data['dateTo'];
+
+            $em = $this->getDoctrine()->getManager();
+
+            if ($data['dates']['from']) {
+                $from = new \DateTime($data['dates']['from']);
+                $to = new \DateTime($data['dates']['to']);
+                $from ->setTime(0, 0, 0);
+                $to ->setTime(0, 0, 0);
+                $to -> modify('+1 day');
+                $stocks = $em->getRepository('AppBundle:Stock')
+                    ->findAllForThisRange($from, $to, "sal");
+                $data['rangeStock'] = $stocks;
+            }
+        }
+
+        if(isset($stocks)){
+
+        $uniqueDates = [];
+        foreach($stocks as $stock){
+            $uniqueDates[$stock->getOnDate()->format('Y-m-d')] = $stock->getOnDate();
+        }
+        $data['uniqueDates'] = $uniqueDates;
+
+        $forThisDate = [];
+        foreach($uniqueDates as $key => $uniqueDate){
+                $startDay = $uniqueDate;
+                $startDay ->setTime(0, 0, 0);
+
+                $endDay = clone $startDay;
+                $endDay->modify('+1 day'); 
+                $individualSales = $em->getRepository('AppBundle:Sale')
+                    ->findAllTransForThisDate($startDay, $endDay, "customer");
+                $forThisDate[$key] = $individualSales;
+
+        }
+        $data['forThisDate'] = $forThisDate;
+
+        $entry = [];
+        $cash = 0;
+        $mpesa = 0;
+        $cCard = 0;
+        $cheque = 0;
+        $day = 0;
+        $count = 0;
+
+        foreach($forThisDate as $date=>$sales){
+
+            $paymentModes = [];
+            $totalForDate = 0;
+            $totalForCash = 0;
+            $totalForMpesa = 0;
+            $totalForCreditCard = 0;
+            $totalForCheque = 0;
+            $totalCount = 0;
+
+            foreach($sales as $sale){
+                if(strpos($sale->getPaymentMode(), 'mpesa') === 0 ) {
+                    $totalForMpesa += $sale->getTotalSale();
+                }
+                if(strpos($sale->getPaymentMode(), 'creditCard') === 0 ) {
+                    $totalForCreditCard += $sale->getTotalSale();
+                }
+                if(strpos($sale->getPaymentMode(), 'check') === 0 ) {
+                    $totalForCheque += $sale->getTotalSale();
+                }
+                if(strpos($sale->getPaymentMode(), 'cash') === 0 ) {
+                    $totalForCash += $sale->getTotalSale();
+                }
+
+            $totalForDate += $sale->getTotalSale();
+            $totalCount += $sale->getQty();
+
+            }
+
+            $cash += $totalForCash;
+            $mpesa += $totalForMpesa;
+            $cCard += $totalForCreditCard;
+            $cheque += $totalForCheque;
+            $day += $totalForDate;
+            $count += $totalCount;
+
+            $paymentModes['totalForMpesa'] = $totalForMpesa;
+            $paymentModes['totalForCreditCard'] = $totalForCreditCard;
+            $paymentModes['totalForCheque'] = $totalForCheque;
+            $paymentModes['totalForCash'] = $totalForCash;
+            $paymentModes['totalForDate'] = $totalForDate;
+            $paymentModes['totalCount'] = $totalCount;
+            $entry[$date] = $paymentModes;
+
+        }
+
+        $data['entry'] = $entry;
+        $data['cash'] = $cash;
+        $data['cCard'] = $cCard;
+        $data['cheque'] = $cheque;
+        $data['day'] = $day;
+        $data['mpesa'] = $mpesa;
+        $data['count'] = $count;
+        
+        if($download == "True" ){
+
+
+            $data['report'] = "POS Summary Report";
+
+
+            $appPath = $this->container->getParameter('kernel.root_dir');
+
+            $html = $this->renderView('PDF/pos_sum.html.twig', $data);
+
+            $filename = sprintf("pos_summary-%s.pdf", date('Ymd~his'));
+
+            return new Response(
+                $this->get('knp_snappy.pdf')->getOutputFromHtml($html),
+                200,
+                [
+                    'Content-Type'        => 'application/pdf',
+                    'Content-Disposition' => sprintf('attachment; filename="%s"', $filename),
+                ]
+            );
+        }
+
+        }   //if stocks
+
+
+        return $this->render('stock/pos_summary.html.twig', $data );
+            
+    }
+
 }
