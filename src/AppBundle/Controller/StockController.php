@@ -1204,8 +1204,7 @@ class StockController extends Controller
             ->getRepository('AppBundle:Sale')
             ->findBy(
                 array('paymentMode' => 'Adjustment'),
-                array('id' => 'DESC'),
-                5
+                array('id' => 'DESC')
             );
 
         $categories = $this->getDoctrine()

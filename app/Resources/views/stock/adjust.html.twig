@@ -378,7 +378,6 @@ $("#completeAdj").click(function() {
             $("#receiptTax").html('<strong>' + $("#show_tax").text() +'</strong>');              
             $("#transactionTitle").text($("#transaction").text());           
             $("#receiptNumber").text(data.output);           
-            $("#receiptModal").modal('show'); 
 
             var $table = $("#sales");
             $rowCells = $table.find("tbody tr td");
@@ -426,7 +425,7 @@ $("#completeAdj").click(function() {
                       success: function (data)
                       {
                         console.log("fromAjaxSaveStock: "+data.output);
-                        $("#sendPrint").click();
+                        location.reload();
                       }
                     });
 
