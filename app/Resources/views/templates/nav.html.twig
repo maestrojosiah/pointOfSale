@@ -9,7 +9,7 @@
                     <span class="icon-bar"></span>
                 </button>
                 <a class="navbar-brand" href="{{ path('homepage') }}" style="color:white;">
-                    {% if data.systSetting is defined %}
+                    {% if data.systSetting is defined and data.systSetting is not empty %}
                     {{ data.systSetting.siteName }} - {{ app.user }}
                     {% endif %}
 
@@ -154,25 +154,55 @@
                     <a class="dropdown-toggle bg-white" data-toggle="dropdown" href="#" style="color:#171717;">
                         <i class="fa fa-file-text fa-fw"></i> <i class="fa fa-caret-down"></i>
                     </a>
+                    {% set permission_vals = app.user.permissions.getValues %}
+                    {% set links_array = {} %}
+                    {% set counter = 0 %}
+                        {% for link in permission_vals %}
+                            {% set counter = counter + 1 %}
+                            {% set key = link.feature ~ '|' ~ link.rights ~ '|' ~ counter %}
+                            {% set links_array = links_array|merge({(key): link.feature}) %}
+                        {% endfor %}
                     <ul class="dropdown-menu dropdown-user">
-                        <li><a href="{{ path('sale_list') }}"><i class="fa fa-user fa-fw"></i> History </a></li>
-                        <li><a href="{{ path('purchases_view') }}"><i class="fa fa-gear fa-fw"></i> Purchases </a></li>
-                        <li><a href="{{ path('items_received') }}"><i class="fa fa-gear fa-fw"></i> Purchases (Individual)</a></li>
-                        <li><a href="{{ path('returns_view') }}"><i class="fa fa-gear fa-fw"></i> Purchases Return </a></li>
-                        <li><a href="{{ path('items_returned') }}"><i class="fa fa-gear fa-fw"></i> Returns (Individual) </a></li>
-                        <li><a href="{{ path('items_sold') }}"><i class="fa fa-gear fa-fw"></i> Sales Report (Individual)</a></li>
-                        <li><a href="{{ path('items_sold_grouped') }}"><i class="fa fa-gear fa-fw"></i> Sales Report (Grouped)</a></li>
-                        <li><a href="{{ path('tax_report') }}"><i class="fa fa-gear fa-fw"></i> Tax Report (Individual)</a></li>
-                        <li><a href="{{ path('tax_accum_report') }}"><i class="fa fa-gear fa-fw"></i> Tax Report (Grouped)</a></li>
-                        <li><a href="{{ path('stock_movement') }}"><i class="fa fa-gear fa-fw"></i> Stock Movement </a></li>
-                        <li><a href="{{ path('mpesa_view') }}"><i class="fa fa-gear fa-fw"></i> M-Pesa Report </a></li>
-                        <li><a href="{{ path('creditCard_view') }}"><i class="fa fa-gear fa-fw"></i> Credit Card Report </a></li>
-                        <li><a href="{{ path('cheque_view') }}"><i class="fa fa-gear fa-fw"></i> Cheque Report </a></li>
-                        <li><a href="{{ path('stock_take_report') }}"><i class="fa fa-gear fa-fw"></i> Stock Take Report </a></li>
-                        <li><a href="{{ path('stock_value_report') }}"><i class="fa fa-gear fa-fw"></i> Stock Valuation Report </a></li>
-                        <li><a href="{{ path('pos_summary') }}"><i class="fa fa-gear fa-fw"></i> POS Summary Report </a></li>
-
+                        <li><a href="{{ path('sale_list') }}"><i class="fa fa-user fa-fw history"></i> History </a></li>
+                        {% if 'purchases|1|1' in links_array|keys or 'purchases|2|1' in links_array|keys or 'purchases|3|1' in links_array|keys  %}
+                        <li><a href="{{ path('purchases_view') }}"><i class="fa fa-gear fa-fw purchases"></i> Purchases </a></li>
+                        <li><a href="{{ path('items_received') }}"><i class="fa fa-gear fa-fw purchases"></i> Purchases (Individual)</a></li>
+                        {% endif %}
+                        {% if 'returns|1|2' in links_array|keys or 'returns|2|2' in links_array|keys or 'returns|3|2' in links_array|keys  %}
+                        <li><a href="{{ path('returns_view') }}"><i class="fa fa-gear fa-fw returns"></i> Purchases Return </a></li>
+                        <li><a href="{{ path('items_returned') }}"><i class="fa fa-gear fa-fw returns"></i> Returns (Individual) </a></li>
+                        {% endif %}
+                        {% if 'sales|1|4' in links_array|keys or 'sales|2|4' in links_array|keys or 'sales|3|4' in links_array|keys  %}                        
+                        <li><a href="{{ path('items_sold') }}"><i class="fa fa-gear fa-fw sales"></i> Sales Report (Individual)</a></li>
+                        <li><a href="{{ path('items_sold_grouped') }}"><i class="fa fa-gear fa-fw sales_report"></i> Sales Report (Grouped)</a></li>
+                        {% endif %}
+                        {% if 'tax|1|3' in links_array|keys or 'tax|2|3' in links_array|keys or 'tax|3|3' in links_array|keys  %}
+                        <li><a href="{{ path('tax_report') }}"><i class="fa fa-gear fa-fw tax"></i> Tax Report (Individual)</a></li>
+                        <li><a href="{{ path('tax_accum_report') }}"><i class="fa fa-gear fa-fw tax"></i> Tax Report (Grouped)</a></li>
+                        {% endif %}
+                        {% if 'stock_mov|1|5' in links_array|keys or 'stock_mov|2|5' in links_array|keys or 'stock_mov|3|5' in links_array|keys  %}                        
+                        <li><a href="{{ path('stock_movement') }}"><i class="fa fa-gear fa-fw stock_mov"></i> Stock Movement </a></li>
+                        {% endif %}
+                        {% if 'sales_reports|1|9' in links_array|keys or 'sales_reports|2|9' in links_array|keys or 'sales_reports|3|9' in links_array|keys  %}                        
+                        <li><a href="{{ path('mpesa_view') }}"><i class="fa fa-gear fa-fw sales_reports"></i> M-Pesa Report </a></li>
+                        <li><a href="{{ path('creditCard_view') }}"><i class="fa fa-gear fa-fw sales_reports"></i> Credit Card Report </a></li>
+                        <li><a href="{{ path('cheque_view') }}"><i class="fa fa-gear fa-fw sales_reports"></i> Cheque Report </a></li>
+                        {% endif %}
+                        {% if 'stock_take|1|7' in links_array|keys or 'stock_take|2|7' in links_array|keys or 'stock_take|3|7' in links_array|keys  %}                        
+                        <li><a href="{{ path('stock_take_report') }}"><i class="fa fa-gear fa-fw stock_take"></i> Stock Take Report </a></li>
+                        <li><a href="{{ path('stock_value_report') }}"><i class="fa fa-gear fa-fw stock_take"></i> Stock Valuation Report </a></li>
+                        {% endif %}
+                        {% if 'stock_adj|1|6' in links_array|keys or 'stock_adj|2|6' in links_array|keys or 'stock_adj|3|6' in links_array|keys  %}
+                        <li><a href="{{ path('stock_adjustment') }}"><i class="fa fa-gear fa-fw stock_adj"></i> Stock Adjustment </a></li>
+                        {% endif %}
+                        {% if 'pos_summary|1|8' in links_array|keys or 'pos_summary|2|8' in links_array|keys or 'pos_summary|3|8' in links_array|keys  %}                        
+                        <li><a href="{{ path('pos_summary') }}"><i class="fa fa-gear fa-fw pos_summary"></i> POS Summary Report </a></li>
+                        {% endif %}
                         <li class="divider"></li>
+                        {% if app.user and app.user.admin == 1 %}
+                        <li><a href="{{ path('user_registration') }}"><i class="fa fa-sign-out fa-fw"></i> Add User</a></li>
+                        <li><a href="{{ path('change_permissions') }}"><i class="fa fa-sign-out fa-fw"></i> Change User Permissions</a></li>
+                        {% endif %}
                         <li><a href="{{ path('logout') }}"><i class="fa fa-sign-out fa-fw"></i> Logout [{{ app.user }}]</a></li>
                     </ul>
                     <!-- /.dropdown-user -->
@@ -196,9 +226,11 @@
                         <li>
                             <a href="{{ path('documentation') }}"><i class="fa fa-book fa-fw"></i> Docs</a>
                         </li>
-                        <li>
-                            <a href="{{ path('logout') }}"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
-                        </li>
+                        {% if app.user and app.user.admin == 1 %}
+                            <li>
+                                <a href="{{ path('user_registration') }}"><i class="fa fa-sign-out fa-fw"></i> Add User</a>
+                            </li>
+                        {% endif %}
                     </ul>
                 </div>
                 <!-- /.sidebar-collapse -->

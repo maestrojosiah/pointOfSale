@@ -184,12 +184,15 @@ class AjaxController extends Controller
                         ->findAllStockForThisProduct($product, "sal");
                     $stockReturned = $em->getRepository('AppBundle:Stock')
                         ->findAllStockForThisProduct($product, "ret");
+                    $stockAdjusted = $em->getRepository('AppBundle:Stock')
+                        ->findAllStockForThisProduct($product, "adj");
 
-                    $returns  =  $stockReturned[0]['total'];
-                    $sales    =  $stockSold[0]['total'];
-                    $stock    =  $stockIn[0]['total'];
+                    $returns        =  $stockReturned[0]['total'];
+                    $sales          =  $stockSold[0]['total'];
+                    $stock          =  $stockIn[0]['total'];
+                    $adjustments    =  $stockAdjusted[0]['total'];
 
-                    $goodsAvailable = $stock - $returns;
+                    $goodsAvailable = $stock + $adjustments - $returns;
                     if($goodsAvailable > 0) {
                       $goodsSold      = $sales;
                       $balance        = $goodsAvailable - $goodsSold; 
@@ -729,6 +732,7 @@ class AjaxController extends Controller
         $arrData = ['output' => $stuff ];
         return new JsonResponse($arrData);
     }
+
 
     public function getProfit($bp, $sp, $qty = 1, $rate = 16){
         $vat = round($sp * ($rate / 116), 2);

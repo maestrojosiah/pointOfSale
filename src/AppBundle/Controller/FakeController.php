@@ -245,41 +245,41 @@ class FakeController extends Controller
         $data['products'] = $dataProd;
 
         $data['obj'] = $phpExcelObject;
-        $new = [];
-        foreach($dataProd as $dt){
-            foreach($dt as $key => $prod){
-                if($key > 0){
-                    $stock = new Stock();
-                    $today = date("d-m-Y h:i:s");
-                    $stock->setOnDate(new \DateTime($today));
-                    $stock->setProduct($prod);
-                    $stock->setQuantity($key);
-                    $stock->setTransaction("sto_ini");
-                  $last_entity = $em->getRepository('AppBundle:Stock')
-                    ->loadLastStockEntry();
-                  $lastSale = $em->getRepository('AppBundle:Sale')
-                    ->loadLastSaleEntry();
+        // $new = [];
+        // foreach($dataProd as $dt){
+        //     foreach($dt as $key => $prod){
+        //         if($key > 0){
+        //             $stock = new Stock();
+        //             $today = date("d-m-Y h:i:s");
+        //             $stock->setOnDate(new \DateTime($today));
+        //             $stock->setProduct($prod);
+        //             $stock->setQuantity($key);
+        //             $stock->setTransaction("sto_ini");
+        //           $last_entity = $em->getRepository('AppBundle:Stock')
+        //             ->loadLastStockEntry();
+        //           $lastSale = $em->getRepository('AppBundle:Sale')
+        //             ->loadLastSaleEntry();
 
-                  $stock->setSale($lastSale);
-                  $stock->setUser($user);
-                  if(!$last_entity){
-                      $stock->setOrigId(1);
-                  } else {
-                      $lastInputId = $last_entity->getId();
-                      $thisId = $lastInputId + 1;
-                      $stock->setOrigId($thisId);
-                  }
-                  $totalCost = $prod->getProductRetailPrice()*$key;
-                  $stock->setUnitCost($prod->getProductCost());
-                  $stock->setRetailCost($prod->getProductRetailPrice());
-                  $stock->setTotalCost($totalCost);
-                  $em->persist($stock);
-                    $em->flush();
-                    $new[] = $stock;
-                }
-            }
-        }
-        $data['stock'] = $new;
+        //           $stock->setSale($lastSale);
+        //           $stock->setUser($user);
+        //           if(!$last_entity){
+        //               $stock->setOrigId(1);
+        //           } else {
+        //               $lastInputId = $last_entity->getId();
+        //               $thisId = $lastInputId + 1;
+        //               $stock->setOrigId($thisId);
+        //           }
+        //           $totalCost = $prod->getProductRetailPrice()*$key;
+        //           $stock->setUnitCost($prod->getProductCost());
+        //           $stock->setRetailCost($prod->getProductRetailPrice());
+        //           $stock->setTotalCost($totalCost);
+        //           $em->persist($stock);
+        //             $em->flush();
+        //             $new[] = $stock;
+        //         }
+        //     }
+        // }
+        // $data['stock'] = $new;
         // return $this->render('excel/read.html.twig', ['data' => $data ] );
         return $this->redirectToRoute('product_add');            
     }

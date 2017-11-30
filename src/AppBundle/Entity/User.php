@@ -66,6 +66,13 @@ class User implements AdvancedUserInterface, \Serializable
     /**
      * @var integer
      *
+     * @ORM\Column(name="admin", type="integer", nullable=false)
+     */
+    private $admin;
+
+    /**
+     * @var integer
+     *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -107,6 +114,11 @@ class User implements AdvancedUserInterface, \Serializable
      */
     private $bankings;
     
+    /**
+     * @ORM\OneToMany(targetEntity="Permission", mappedBy="user")
+     */
+    private $permissions;
+    
     public function __construct()
     {
         $this->products = new ArrayCollection();
@@ -116,7 +128,9 @@ class User implements AdvancedUserInterface, \Serializable
         $this->duplicates = new ArrayCollection();
         $this->categories = new ArrayCollection();
         $this->bankings = new ArrayCollection();
+        $this->permissions = new ArrayCollection();
         $this->active = true;
+        $this->admin = false;
         // may not be needed, see section on salt below
         // $this->salt = md5(uniqid(null, true));    
     }
@@ -588,5 +602,63 @@ class User implements AdvancedUserInterface, \Serializable
     public function isEnabled()
     {
         return $this->active;
+    }
+
+    /**
+     * Add permission
+     *
+     * @param \AppBundle\Entity\Permission $permission
+     *
+     * @return User
+     */
+    public function addPermission(\AppBundle\Entity\Permission $permission)
+    {
+        $this->permissions[] = $permission;
+
+        return $this;
+    }
+
+    /**
+     * Remove permission
+     *
+     * @param \AppBundle\Entity\Permission $permission
+     */
+    public function removePermission(\AppBundle\Entity\Permission $permission)
+    {
+        $this->permissions->removeElement($permission);
+    }
+
+    /**
+     * Get permissions
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getPermissions()
+    {
+        return $this->permissions;
+    }
+
+    /**
+     * Set admin
+     *
+     * @param integer $admin
+     *
+     * @return User
+     */
+    public function setAdmin($admin)
+    {
+        $this->admin = $admin;
+
+        return $this;
+    }
+
+    /**
+     * Get admin
+     *
+     * @return integer
+     */
+    public function getAdmin()
+    {
+        return $this->admin;
     }
 }

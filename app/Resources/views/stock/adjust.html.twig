@@ -1,0 +1,445 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+{{ parent() }}
+{{ include('templates/wrapper2.html.twig') }}
+<button id="someAjax2_"></button>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+{% endblock %}
+{% block stylesheets %}
+{{ parent() }}
+{% endblock %}
+{% block javascripts %}
+  <script>
+    $( "#tableToArrayAdj" ).click(function() {
+      var $table = $("#sales");
+      $rowCells = $table.find("tbody tr td");
+      $rowFull = $table.find("tbody tr");
+      
+      var rows = [];
+      var raws = [];
+
+      $rowCells.each(function(k,v) {
+         rows[rows.length] = $(this).text();
+      });
+      
+      $rowFull.each(function(k,v) {
+         raws[raws.length] = $(this).attr('id');
+      });
+      
+      $.ajax({
+            url:'{{ (path('get_additions_adj')) }}',
+            type: "POST",
+            dataType: "json",
+            data: {
+                "rows": rows,
+                "raws": raws,
+            },
+            async: true,
+            success: function (data)
+            {
+              console.log("row:");
+              console.log('totalSum:'+data.output.totalSum);
+              $("#due").show();
+              $("#amountDue").text(data.output.totalSum);
+              $(".amountDue").text(data.output.totalSum);
+              $("#show_tax").text(data.output.tax.toFixed(2));
+              $("#show_qty").text(data.output.qtySum);
+              var arrayLength = data.output.chunks.length;
+
+              var stock = new Array();
+              $("#salesRow").closest("tbody").html("");
+              for (var i = 0; i < arrayLength; i++) {
+                  stock.push(data.output.chunks[i]);
+                  var oneRow = data.output.chunks[i];
+                  var row = '<tr id="salesRow"><td class="col-md-9"><em>'+oneRow[1]+'</em></td><td class="col-md-1" style="text-align: center">'+oneRow[3]+'</td><td class="col-md-1 text-center">'+oneRow[2]+'</td><td class="col-md-1 text-center">'+oneRow[4]+'</td></tr>';
+                  $('#receiptTable > tbody:first').append(row);
+
+              }
+            }
+        });
+
+      });
+  </script>
+      <script>
+      $( "#searchItemAdj" ).keyup(function( event ) {
+        var minStock = {{minStock}};
+        var value = $(this).val();
+        console.log(value);
+        var id = jQuery(this).attr("id");
+          $.ajax({
+              url:'{{ (path('get_matches')) }}',
+              type: "POST",
+              dataType: "json",
+              data: {
+                  "thisValue": value,
+              },
+              async: true,
+              success: function (data)
+              {
+                  // console.log(data.output.prodArray);
+                  $( "#searchResults ul" ).empty();
+                  if (typeof data.output.prodArray != 'undefined'){
+                    $("#close").show();
+                    $(".result").hide();
+                    $("#searchResults").show();
+                    var codeArray = Array();
+                    $.each( data.output.prodArray, function( key, value) {
+                      console.log("this is why "+value[4]);
+                      if(value[4] <= minStock ){
+                        var myClass = "warning";
+                      } 
+                      if (value[4] <= 0){
+                        var myClass = "danger";
+                      } 
+                      if (value[4] > minStock ){
+                        var myClass = "success";
+                      } 
+                      
+                      $("#searchResults ul").append('<li id="adjAjax_'+value[0]+'" class="list-group-item" onclick="dismiss(this);"><span class="tab btn btn-'+myClass+'"><strong>'+value[2]+'</strong> | '+value[1]+'</span><span class="badge">$'+value[3]+', inStock:'+value[4]+'</span></li>');
+                      codeArray.push(value[2]+'|'+value[4]);
+                    });
+                    $("#codeStore").text(codeArray[0]);                    
+                  } else {
+                      if(data.output.remainingStock <= minStock ){
+                        var myClass = "warning";
+                      } 
+                      if (data.output.remainingStock <= 0){
+                        var myClass = "danger";
+                        // alert("Not enough in stock to sell this item.");
+                      } 
+                      if (data.output.remainingStock > minStock ){
+                        var myClass = "success";
+                      } 
+                    $(".result").show();
+                    $("#close").hide();
+                    $('.result').text(data.output.product);
+                    $('.result').attr('id', 'ajax_'+data.output.id);
+                    $('.result').addClass('class', 'bg-'+myClass);
+                    $("#codeStore").text(data.output.code+'|'+data.output.remainingStock);                    
+                      if ( event.which == 13 ) {
+                        $("#searchResults").hide();
+                        //$('#ajax_'+data.output.id).click();
+                        console.log('after hiding: '+data.output.id);
+                        $('#searchItemAdj').val('');
+                        $("#close").hide();
+                      }
+                }
+                if($("#searchItemAdj").val() == ""){
+                  $("#searchResults").hide();
+                  $("#close").hide();
+                  $("#codeStore").text("");
+                  $(".result").hide();
+                } 
+                  $("#warning").text("")                                               
+              },
+             error: function () {
+                if ( event.which == 13 ) {
+                  $("#searchResults").hide();
+                  //$('#ajax_'+data.output.id).click();
+                  console.log('after hiding: '+data.output.id);
+                  $('#searchItemAdj').val('');
+                  $("#close").hide();
+                }
+                  $("#warning").html("<ol><li>No results: No such product</li><li>Red Result: No stock Remaining</li><li>Amber Result: Low stock</li></ol>");
+            }
+          });
+
+      });
+      </script>
+      <script>
+        $(document).on('click', '[id^="adjAjax_"]', function(){
+            that = $(this);
+            var id = jQuery(this).attr("id");
+            $.ajax({
+                url:'{{ (path('ajax_request_adj')) }}',
+                type: "POST",
+                dataType: "json",
+                data: {
+                    "some_var_name": id,
+                },
+                async: true,
+                success: function (data)
+                {
+                    console.log(data.output)
+                    $('#sales > tbody:last-child').append(data.output);
+                    $('#tableToArrayAdj').click();
+                }
+            });
+            $('#searchItem').val(''); 
+            $('#searchItem').focus(); 
+            return false;
+
+        });
+    </script>
+
+  <script>
+    $(document).on("change", '#valueHolderAdj', function(){
+      var classNames = $("#valueHolderAdj").attr("class").toString().split(' ');
+      var thirdClass = classNames[2];
+      var newValue = $("#valueHolderAdj").val();
+
+      var thirdClassArray = thirdClass.split('_'); //changeRow_QtAdj_1504
+      var id = thirdClassArray[2] //1504
+
+      var price = $("#Pr_"+id).text();
+      var total = $("#Tl_"+id);
+      var qty = $("#QtAdj_"+id);
+      qty.text(newValue);
+      total.text(price*newValue)
+
+      $("#changeValueModalAdj").modal('hide');
+      $('#searchItem').focus(); 
+      $('#tableToArrayAdj').click();     
+    });
+  </script>
+  <script>
+    $(document).on('keypress', '#valueHolderAdj', function(e){
+      var key = e.which;
+      if(key == 13){ 
+      var classNames = $("#valueHolderAdj").attr("class").toString().split(' ');
+      var thirdClass = classNames[2];
+      var newValue = $("#valueHolderAdj").val();
+
+      var thirdClassArray = thirdClass.split('_'); //changeRow_QtAdj_1504
+      var id = thirdClassArray[2] //1504
+
+      var price = $("#Pr_"+id).text();
+      var total = $("#Tl_"+id);
+      var fixed = $("#RS_"+id);
+      var adjustable = $("#RSE_"+id);
+      var qty = $("#QtAdj_"+id);
+
+      qty.text(newValue);
+      total.text(price*newValue)
+      adjustable.text(parseInt(fixed.text()) + parseInt(qty.text()));
+      console.log(adjustable.text());
+
+      $("#changeValueModalAdj").modal('hide');
+      $('#searchItem').focus(); 
+      $('#tableToArrayAdj').click();                 
+        return false;
+      }
+    });
+
+  </script>
+  <script>
+    $(document).on("change", '#valueHolderEAdj', function(){
+      var classNames = $("#valueHolderEAdj").attr("class").toString().split(' ');
+      var thirdClass = classNames[2];
+      var newValue = $("#valueHolderEAdj").val();
+
+      var thirdClassArray = thirdClass.split('_'); //changeRow_QtAdj_1504
+      var id = thirdClassArray[2] //1504
+
+      var price = $("#Pr_"+id).text();
+      var total = $("#Tl_"+id);
+      var fixed = $("#RS_"+id);
+      var qty = $("#RSE_"+id);
+      var difference = parseInt(newValue) - parseInt(fixed.text());
+
+      qty.text(newValue);
+      total.text(price*difference)
+
+      $("#changeValueModalEAdj").modal('hide');
+      $('#searchItem').focus(); 
+      $('#tableToArrayEAdj').click();     
+    });
+  </script>
+  <script>
+    $(document).on('keypress', '#valueHolderEAdj', function(e){
+      var key = e.which;
+      if(key == 13){ 
+      var classNames = $("#valueHolderEAdj").attr("class").toString().split(' ');
+      var thirdClass = classNames[2];
+      var newValue = $("#valueHolderEAdj").val();
+
+      var thirdClassArray = thirdClass.split('_'); //changeRow_QtAdj_1504
+      var id = thirdClassArray[2] //1504
+
+      var price = $("#Pr_"+id).text();
+      var total = $("#Tl_"+id);
+      var fixed = $("#RS_"+id);
+      var adjustable = $("#RSE_"+id);
+      var qty = $("#QtAdj_"+id);
+      var difference = parseInt(newValue) - parseInt(fixed.text());
+
+      adjustable.text(newValue);
+      total.text(price*difference)
+      qty.text(difference);
+      console.log(difference);
+
+      $("#changeValueModalEAdj").modal('hide');
+      $('#searchItem').focus(); 
+      $('#tableToArrayEAdj').click();                 
+        return false;
+      }
+    });
+
+  </script>
+    <script>
+    $(document).on("click", '[id^="QtAdj_"]', function(){
+      var value = $(this).text();
+      var id = jQuery(this).attr("id");
+        $.ajax({
+            url:'{{ (path('get_value')) }}',
+            type: "POST",
+            dataType: "json",
+            data: {
+                "thisValue": value,
+            },
+            async: true,
+            success: function (data)
+            {
+                console.log(data)
+                $("#changeValueModalAdj").modal('show');
+                $('#valueHolderAdj').val(data.output);
+                $("#valueHolderAdj").removeClass (function (index, className) {
+                    return (className.match (/(^|\s)changeRow_QtAdj_\S+/g) || []).join(' ');
+                });
+                $('#valueHolderAdj').addClass('changeRow_'+id);
+                $('#changeValueModalAdj').on('shown.bs.modal', function () {
+                  $('#valueHolderAdj').focus().select();
+                })                  
+                $('#tableToArrayAdj').click();
+            }
+        });
+        
+      //$('#valueHolder').focus().select();      
+    });
+  </script>
+
+    <script>
+    $(document).on("click", '[id^="RSE_"]', function(){
+      var value = $(this).text();
+      var id = jQuery(this).attr("id");
+        $.ajax({
+            url:'{{ (path('get_value')) }}',
+            type: "POST",
+            dataType: "json",
+            data: {
+                "thisValue": value,
+            },
+            async: true,
+            success: function (data)
+            {
+                console.log(data)
+                $("#changeValueModalEAdj").modal('show');
+                $('#valueHolderEAdj').val(data.output);
+                $("#valueHolderEAdj").removeClass (function (index, className) {
+                    return (className.match (/(^|\s)changeRow_QtAdj_\S+/g) || []).join(' ');
+                });
+                $('#valueHolderEAdj').addClass('changeRow_'+id);
+                $('#changeValueModalEAdj').on('shown.bs.modal', function () {
+                  $('#valueHolderEAdj').focus().select();
+                })                  
+                $('#tableToArrayEAdj').click();
+            }
+        });
+        
+      //$('#valueHolder').focus().select();      
+    });
+  </script>
+<script type="text/javascript">
+$("#completeAdj").click(function() {
+
+    var paidAmt =    0;
+    if($("#sales tr").length < 2 || $("#reasonForAdjustment").val() == ""){
+      $("#infoParagraphAuto").html("<span class='text-danger'>Please check that the reason for adjustment is given, and that there are item(s) in the list.");
+      $("#infoModalAuto").modal('show');
+        $('#autoModal').addClass("disabled");
+
+      } else {
+        var qtyTotal = $("#show_qty").text();
+        var total = $("#amountDue").text();
+        var tax = 0;
+        var transaction = "Adjustment";
+        var details = $("#reasonForAdjustment").val();
+        var paymentMode = "N/A";
+
+        var creditCard = 0;
+        var paymentMode = 0;
+        var mpesa = 0;
+        var check = 0;
+
+          $.ajax({
+          type: "POST",
+          url: '{{ (path('save_adj')) }}',
+          data: {
+            'transaction': transaction,
+            'details': details,
+          },
+          async: true,
+          success: function (data) 
+          {
+            console.log("fromAjaxSaveSale: "+data.output);
+            $("#receiptTotal").html('<strong>' + $("#amountDue").text() +'</strong>');              
+            $("#receiptPaid").html('<strong>' + $("#paidAmt").val() +'</strong>');              
+            $("#receiptChange").html('<strong>' + $("#show_bal").text() +'</strong>');              
+            $("#receiptTax").html('<strong>' + $("#show_tax").text() +'</strong>');              
+            $("#transactionTitle").text($("#transaction").text());           
+            $("#receiptNumber").text(data.output);           
+            $("#receiptModal").modal('show'); 
+
+            var $table = $("#sales");
+            $rowCells = $table.find("tbody tr td");
+            $rowFull = $table.find("tbody tr");
+            
+            var rows = [];
+            var raws = [];
+
+            $rowCells.each(function(k,v) {
+               rows[rows.length] = $(this).text();
+            });
+            
+            $rowFull.each(function(k,v) {
+               raws[raws.length] = $(this).attr('id');
+            });
+            
+            $.ajax({
+                  url:'{{ (path('get_additions_adj')) }}',
+                  type: "POST",
+                  dataType: "json",
+                  data: {
+                      "rows": rows,
+                      "raws": raws,
+                  },
+                  async: true,
+                  success: function (data)
+                  {
+                    var transaction = "Adjustment";
+                    var arrayLength = data.output.chunks.length;
+                    var stock = new Array();
+                    for (var i = 0; i < arrayLength; i++) {                          
+                        data.output.chunks[i].splice(0, 1, data.output.products[i]);
+                        stock.push(data.output.chunks[i]);
+                    }
+                    var stockString = JSON.stringify(stock);
+                      $.ajax({
+                      url:'{{ (path('save_stock_adj')) }}',
+                      type: "POST",
+                      dataType: "json",
+                      data: {
+                          "stock": stock,
+                          "transaction": transaction,
+                      },
+                      async: true,
+                      success: function (data)
+                      {
+                        console.log("fromAjaxSaveStock: "+data.output);
+                        $("#sendPrint").click();
+                      }
+                    });
+
+                  }
+              });
+
+            }
+        });
+
+    }
+  
+    });
+
+  </script>
+
+{% endblock %}

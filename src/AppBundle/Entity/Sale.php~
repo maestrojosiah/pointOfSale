@@ -393,4 +393,28 @@ class Sale
     {
         return $this->stocks;
     }
+
+    /**
+     * Set details
+     *
+     * @param string $details
+     *
+     * @return Sale
+     */
+    public function setDetails($details)
+    {
+        $this->details = $details;
+
+        return $this;
+    }
+
+    /**
+     * Get details
+     *
+     * @return string
+     */
+    public function getDetails()
+    {
+        return $this->details;
+    }
 }

@@ -2,8 +2,9 @@
 {% block body %}
 {{ include('templates/nav.html.twig') }}			 
 <div id="page-wrapper">
+    <div class="col-lg-6">
 	{{ form_start(form, {'method': 'post', 'action': path('user_registration'), 'attr': {'class': 'form-signin' }} ) }}
-        <h2 class="form-signin-heading">Please Sign Up</h2>
+        <h2 class="form-signin-heading">Add User</h2>
         <label for="f_name" class="sr-only">First Name</label>
         {{ form_errors(form.f_name) }}
         {{ form_widget(form.f_name, {'attr': {'class': 'form-control', 'placeholder': 'First Name', 'id': 'f_name' }} ) }}
@@ -24,5 +25,6 @@
         {{ form_widget(form.plainPassword.second, {'attr': {'class': 'form-control', 'placeholder': 'Repeat Password', 'id': 'password_repeat' }} ) }}
         <button class="btn btn-lg btn-primary btn-block" type="submit">Sign up</button>
 	{{ form_end(form) }}
+    </div>
 </div>
 {% endblock %}

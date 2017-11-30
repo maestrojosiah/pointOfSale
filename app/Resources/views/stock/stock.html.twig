@@ -104,6 +104,9 @@
   {% elseif stock.transaction == "ret" %}
     {% set transaction = "Returns" %}
     {% set changingStock = changingStock - stock.retailCost * stock.quantity %}
+  {% elseif stock.transaction == "adj" %}
+    {% set transaction = "Adjustment" %}
+    {% set changingStock = changingStock + stock.retailCost * stock.quantity %}
   {% elseif stock.transaction == "sus" %}
     {% set transaction = "Suspended" %}
   {% elseif stock.transaction == "sal" %}
@@ -190,6 +193,9 @@
   {% elseif stock.transaction == "ret" %}
     {% set transaction = "Returns" %}
     {% set changingStock = changingStock - stock.retailCost * stock.quantity %}
+  {% elseif stock.transaction == "adj" %}
+    {% set transaction = "Adjustment" %}
+    {% set changingStock = changingStock + stock.retailCost * stock.quantity %}
   {% elseif stock.transaction == "sus" %}
     {% set transaction = "Suspended" %}
   {% elseif stock.transaction == "sal" %}
@@ -277,6 +283,9 @@
   {% elseif stock.transaction == "ret" %}
     {% set transaction = "Return" %}
     {% set changingStock = changingStock - stock.retailCost * stock.quantity %}
+  {% elseif stock.transaction == "adj" %}
+    {% set transaction = "Adjustment" %}
+    {% set changingStock = changingStock + stock.retailCost * stock.quantity %}
   {% elseif stock.transaction == "sus" %}
     {% set transaction = "Suspended" %}
   {% elseif stock.transaction == "sal" %}

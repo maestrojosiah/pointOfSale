@@ -26,6 +26,7 @@
             <th>Date</th>
             <th>Sale Total</th>
             <th>Payment Mode</th>
+            <th>User</th>
             <th class="hidableColumn">Manage</th>
         </tr>
     </thead>
@@ -37,6 +38,7 @@
         <td>{{ sale.onDate|date('Y-m-d') }}</td>
         <td>{{ sale.totalSale }}</td>
         <td>{{ sale.paymentMode }}</td>
+        <td>{{ sale.user.fName }}</td>
         <td class="center hidableColumn">
             <a type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal{{ sale.id }}" data-saleId="{{ sale.id }}">
           Delete

@@ -1185,4 +1185,46 @@ class StockController extends Controller
             
     }
 
+    /**
+     * @Route("stock/adjustment", name="stock_adjustment")
+     */
+    public function adjustAction(Request $request)
+    {
+        $data = [];
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+
+        $stocks = $this->getDoctrine()
+            ->getRepository('AppBundle:Stock')
+            ->findBy(
+                array('transaction' => 'adj'),
+                array('id' => 'DESC')
+            );
+
+        $salesAdj = $this->getDoctrine()
+            ->getRepository('AppBundle:Sale')
+            ->findBy(
+                array('paymentMode' => 'Adjustment'),
+                array('id' => 'DESC'),
+                5
+            );
+
+        $categories = $this->getDoctrine()
+            ->getRepository('AppBundle:Category')
+            ->findAll();
+
+        $systSetting = $this->getDoctrine()
+            ->getRepository('AppBundle:SystSetting')
+            ->settingsForThisUser($user);
+
+        $data['stocks'] = $stocks;
+        $data['categories'] = $categories;
+        $data['systSetting'] = $systSetting;
+        $data['salesAdj'] = $salesAdj;
+
+        return $this->render('stock/adjust.html.twig', ['data' => $data,] );
+
+    }
+
+
+
 }
