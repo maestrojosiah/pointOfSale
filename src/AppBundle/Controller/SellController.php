@@ -77,16 +77,27 @@ class SellController extends Controller
      */
     public function helloAction()
     {
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
-        throw $this->createAccessDeniedException();
-        }
+        // if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+        // throw $this->createAccessDeniedException();
+        // }
         $data = [];
         $user = $this->get('security.token_storage')->getToken()->getUser();
         $data['user'] = $user;
+        $listArray = array(
+            new item("Example item #1", "4.00"),
+            new item("Another thing", "3.50"),
+            new item("Something else", "1.00"),
+            new item("A final item", "4.45"),
+        );
+
+        $this->printReceipt($listArray);
 
         return $this->render('sell/test.html.twig', [
             'data' => $data,
         ]);
 
     }
+
+        
 }
+

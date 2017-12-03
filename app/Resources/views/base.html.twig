@@ -97,6 +97,9 @@
         $( "#sendPrint" ).click(function(e) {
           $('#toPrint').printThis();
         });
+        $( "#openDrawer" ).click(function(e) {
+          $('#emptyDiv').printThis();
+        });
       });
       $("#searchItem").focus();
       </script>
@@ -769,6 +772,7 @@ $( "#paidAmt" ).keypress(function(e) {
           success: function (data) 
           {
             console.log("fromAjaxSaveSale: "+data.output);
+            var receiptNumber = data.output;
             $("#receiptTotal").html('<strong>' + $("#amountDue").text() +'</strong>');              
             $("#receiptPaid").html('<strong>' + $("#paidAmt").val() +'</strong>');              
             $("#receiptChange").html('<strong>' + $("#show_bal").text() +'</strong>');              
@@ -777,6 +781,8 @@ $( "#paidAmt" ).keypress(function(e) {
             $("#receiptNumber").text(data.output);           
             $("#receiptModal").modal('show'); 
 
+            var trans = $("#transaction").text();
+            var paid = $("#paidAmt").val();
             var $table = $("#sales");
             $rowCells = $table.find("tbody tr td");
             $rowFull = $table.find("tbody tr");
@@ -793,16 +799,20 @@ $( "#paidAmt" ).keypress(function(e) {
             });
             
             $.ajax({
-                  url:'{{ (path('get_additions')) }}',
+                  url:'{{ (path('get_additions_and_print')) }}',
                   type: "POST",
                   dataType: "json",
                   data: {
                       "rows": rows,
                       "raws": raws,
+                      "trans": trans,
+                      "paid": paid,
+                      "receiptNumber": receiptNumber,
                   },
                   async: true,
                   success: function (data)
                   {
+                    console.log(data.output.fineArray);
                     var transaction = $("#transaction").text();
                     var arrayLength = data.output.chunks.length;
                     var stock = new Array();
@@ -823,7 +833,7 @@ $( "#paidAmt" ).keypress(function(e) {
                       success: function (data)
                       {
                         console.log("fromAjaxSaveStock: "+data.output);
-                        $("#sendPrint").click();
+                        // $("#sendPrint").click();
                       }
                     });
 

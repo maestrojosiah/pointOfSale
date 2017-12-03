@@ -8,6 +8,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use AppBundle\Entity\Sale;
 use AppBundle\Entity\Stock;
+use Mike42\Escpos\Printer;
+use Mike42\Escpos\EscposImage;
+use Mike42\Escpos\PrintConnectors\FilePrintConnector;
 
 class AjaxController extends Controller
 {
@@ -733,6 +736,95 @@ class AjaxController extends Controller
         return new JsonResponse($arrData);
     }
 
+    /**
+     * @Route("/get_additions_print", name="get_additions_and_print")
+     */
+    public function getAdditionsPrintAction(Request $request)
+    {
+        $stuff = [];
+        $em = $this->getDoctrine()->getManager();
+        $rows = $request->request->get('rows');
+        $raws = $request->request->get('raws');
+        $trans = $request->request->get('trans');
+        $paid = $request->request->get('paid');
+        $receiptNumber = $request->request->get('receiptNumber');
+
+        if($rows){
+          $chunks = array_chunk($rows, 5);
+        } else {
+          $chunks = [0,0,0,0,0];
+        }
+
+
+        $colArray = [];
+        $fineArray = [];
+
+        foreach($chunks as $chunk){
+          $colArray[] = $chunk;
+          $itm = trim(explode("|", $chunk[1])[1]);
+          $fineArray[] = new item("$itm"." ($chunk[2]x$chunk[3])", "$chunk[4]");
+
+          if($raws){
+            $profit = 0;
+            $tax = 0;
+            $products = [];
+            foreach($raws as $raw){
+              $fullId = explode('_',$raw);
+              $id = $fullId[1];
+
+              $product = $this->getDoctrine()
+                ->getRepository('AppBundle:Product')
+                ->find($id);
+              if($product->getProductTax() == 1.16){
+                $tax += $this->getVat($product->getProductCost(), $product->getProductRetailPrice(), $chunk[3]);
+              } 
+              if($product->getProductTax() == 1) {
+                $tax += 0;
+              }
+              $profit += $this->getProfit($product->getProductCost(), $product->getProductRetailPrice(), $chunk[3]);
+              $products[] = $product->getId();
+            }
+          } else {
+            $tax = 0;
+            $profit = 0;
+          }
+        }
+
+        $priceSum = array_sum(array_column($colArray, 2));
+        $qtySum = array_sum(array_column($colArray, 3));
+        $totalSum = array_sum(array_column($colArray, 4));
+
+        $stuff['priceSum'] = $priceSum;
+        $stuff['qtySum'] = $qtySum;
+        $stuff['totalSum'] = $totalSum;
+        $stuff['chunks'] = $chunks;
+        $stuff['fineArray'] = $fineArray;
+
+        if($raws){
+          $stuff['tax'] = $tax;
+          $stuff['profit'] = $profit;
+          $stuff['product'] = $id;
+          $stuff['products'] = $products;
+        }
+
+        //receipt info
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+        $systSetting = $em->getRepository('AppBundle:SystSetting')
+          ->findOneBy(
+            array('user' => $user),
+            array('id' => 'DESC')
+          );
+
+        $header = strip_tags($systSetting->getReceiptHeader());
+        $footer = strip_tags($systSetting->getReceiptFooter());
+        $change = $paid - $totalSum;
+        $this->printReceipt($fineArray, $header, $trans, $totalSum, $tax, $paid, $change, $footer, $receiptNumber);
+
+        $arrData = ['output' => $stuff ];
+        return new JsonResponse($arrData);
+    }
+
+
 
     public function getProfit($bp, $sp, $qty = 1, $rate = 16){
         $vat = round($sp * ($rate / 116), 2);
@@ -746,4 +838,106 @@ class AjaxController extends Controller
         return round($vat, 2);
     }
 
+    public function printReceipt($listArray, $header, $transaction, $tot, $tax, $paid, $change, $footer, $receiptNumber)
+    {
+        /* Fill in your own connector here */
+        $connector = new FilePrintConnector("/dev/ttyACM0");
+
+        /* Information for the receipt */
+        $items = $listArray;
+        $subtotal = new item('Total', $tot);
+        $tax = new item('Tax', $tax);
+        $paid = new item('Paid', $paid);
+        $change = new item('Change', $change);
+        // $total = new item('Total', '14.25', true);
+        /* Date is kept the same for testing */
+        // $date = date('l jS \of F Y h:i:s A');
+        $date = date("l jS \of F Y H:i:s");
+
+        /* Start the printer */
+        // $logo = EscposImage::load("resources/escpos-php.png", false);
+        $printer = new Printer($connector);
+
+        /* Print top logo */
+        $printer -> setJustification(Printer::JUSTIFY_CENTER);
+        // $printer -> graphics($logo);
+
+        /* Name of shop */
+        $printer -> selectPrintMode();
+        // $printer -> selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
+        $printer -> text($header."\n");
+        // $printer -> selectPrintMode();
+        // $printer -> text("Shop No. 42.\n");
+        $printer -> feed();
+
+        /* Title of receipt */
+        $printer -> setEmphasis(true);
+        $printer -> text(strtoupper($transaction." #".$receiptNumber."\n"));
+        $printer -> setEmphasis(false);
+
+        /* Items */
+        $printer -> setJustification(Printer::JUSTIFY_LEFT);
+        $printer -> setEmphasis(true);
+        $printer -> text(new item('', '$'));
+        $printer -> setEmphasis(false);
+        foreach ($items as $item) {
+            $printer -> text($item);
+        }
+        $printer -> setEmphasis(true);
+        $printer -> text($subtotal);
+        $printer -> setEmphasis(false);
+        $printer -> feed();
+
+        /* Tax and total */
+        $printer -> text($tax);
+        $printer -> selectPrintMode();
+        $printer -> text($paid);
+        $printer -> selectPrintMode();
+        $printer -> text($change);
+        $printer -> selectPrintMode();
+
+        /* Footer */
+        $printer -> feed(2);
+        $printer -> setJustification(Printer::JUSTIFY_CENTER);
+        $printer -> text($footer."\n");
+        $printer -> feed(2);
+        $printer -> text($date . "\n");
+
+        /* Cut the receipt and open the cash drawer */
+        $printer -> cut();
+        $printer -> pulse();
+
+        $printer -> close();
+
+    }
+        
+}
+
+/* A wrapper to do organise item names & prices into columns */
+class item
+{
+    private $name;
+    private $price;
+    private $dollarSign;
+
+    public function __construct($name = '', $price = '', $dollarSign = false)
+    {
+        $this -> name = $name;
+        $this -> price = $price;
+        $this -> dollarSign = $dollarSign;
+    }
+    
+    public function __toString()
+    {
+        $rightCols = 10;
+        $leftCols = 38;
+        if ($this -> dollarSign) {
+            $leftCols = $leftCols / 2 - $rightCols / 2;
+        }
+        $left = str_pad($this -> name, $leftCols) ;
+        
+        $sign = ($this -> dollarSign ? '$ ' : '');
+        $right = str_pad($sign . $this -> price, $rightCols, ' ', STR_PAD_LEFT);
+        return "$left$right\n";
+    }
 }
