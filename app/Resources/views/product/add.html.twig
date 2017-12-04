@@ -8,7 +8,8 @@
     <div class="col-lg-12">
         <div class="panel panel-default">
             <div class="panel-heading">
-                Add Product | <a href="{{ path('upload_product') }}">Upload from Excel (.xls) file</a>
+                Find Product | <a href="{{ path('upload_product') }}">Upload from Excel (.xls) file</a>
+                <input type="text" id="searchForThisCode" class="form-control" style="width:300px;" />
             </div>
             <div class="panel-body">
                 <div class="row">
@@ -63,7 +64,40 @@
         <!-- /.panel -->
     </div>
     <!-- /.col-lg-12 -->
+    
 </div>
 </div>
+
+{% endblock %}
+{% block javascripts %}
+    <script>
+        $(document).on('keypress', '#searchForThisCode', function(e){
+            var code = $(this).val();
+            var key = e.which;
+            if(key == 13){ 
+
+            $.ajax({
+                url:'{{ (path('search_for_this_code')) }}',
+                type: "POST",
+                dataType: "json",
+                data: {
+                    "code": code,
+                },
+                async: true,
+                success: function (data)
+                {
+                    console.log('results for find'+data.output);
+                    location.href = data.output;
+                },
+                error: function () {
+                    console.log('there was an error');
+                    location.href = data.output;                    
+                }
+
+            });
+            return false;
+        }
+        });
+    </script>
 
 {% endblock %}

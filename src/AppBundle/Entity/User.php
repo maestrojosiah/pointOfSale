@@ -7,11 +7,13 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
+
 /**
  * User
  *
  * @ORM\Table(name="user")
  * @ORM\Entity
+ * @UniqueEntity("email")
  */
 class User implements AdvancedUserInterface, \Serializable
 {
@@ -30,9 +32,10 @@ class User implements AdvancedUserInterface, \Serializable
     private $lName;
 
     /**
-     * @var string
+     * @var string $email
      *
-     * @ORM\Column(name="email", type="string", length=110, nullable=false)
+     * @ORM\Column(name="email", type="string", length=110, nullable=false, unique=true)
+     * @Assert\Email()
      */
     private $email;
 

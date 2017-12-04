@@ -29,39 +29,54 @@ class ProductController extends Controller
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+			$prodCode = $form["product_code"]->getData();
 
             $em = $this->getDoctrine()->getManager();
 
 			$last_entity = $em->getRepository('AppBundle:Product')
 				->loadLastProductEntry();
 
-            $product->setUser($user);
+			$existingProd = $em->getRepository('AppBundle:Product')
+				->findOneByProductCode($prodCode);
 
-	            if(!$last_entity){
-	            	$product->setOrigId(1);
-	            } else {
-	            	$lastInputId = $last_entity->getId();
-	            	$thisId = $lastInputId + 1;
-	            	$product->setOrigId($thisId);
-	        	}
+			if($existingProd){
+	        	$this->addFlash(
+		            'success',
+		            'There is a product that exists with that code!'
+	        	);
 
-            $em->persist($product);
-            $em->flush();
+				return $this->redirectToRoute('product_edit', ['productId' => $existingProd->getId() ]);
+			} else {
 
-        	$this->addFlash(
-	            'success',
-	            'Product added successfully!'
-        	);
+	            $product->setUser($user);
 
-            // ... do any other work - like sending them an email, etc
-            // maybe set a "flash" success message for the user
+		            if(!$last_entity){
+		            	$product->setOrigId(1);
+		            } else {
+		            	$lastInputId = $last_entity->getId();
+		            	$thisId = $lastInputId + 1;
+		            	$product->setOrigId($thisId);
+		        	}
 
+	            $em->persist($product);
+	            $em->flush();
+
+	        	$this->addFlash(
+		            'success',
+		            'Product added successfully!'
+	        	);
 
             if($form->get('saveAndAdd')->isClicked()){
                 return $this->redirectToRoute('product_add');
             } else {
                 return $this->redirectToRoute('homepage');
             }
+
+        }
+            // ... do any other work - like sending them an email, etc
+            // maybe set a "flash" success message for the user
+
+
         }
 
         return $this->render(

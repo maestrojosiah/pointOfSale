@@ -274,5 +274,34 @@ class AdjController extends Controller
         return new JsonResponse($arrData);
     }
 
+    //this is supposed to be in the ProductController.php
+    /**
+     * @Route("/find/product", name="search_for_this_code")
+     */
+    public function searchForCodeAction(Request $request)
+    {
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+
+        $em = $this->getDoctrine()->getManager();
+
+        $codeValue = $request->request->get('code');
+
+        $product = $em->getRepository('AppBundle:Product')
+          ->findOneByProductCode($codeValue);
+
+        if(!$product){
+          $product = null;
+        }
+
+        if($product == null){
+          $address = $this->generateUrl('product_add');
+        } else {
+          $address = $this->generateUrl('product_edit', ['productId' => $product->getId()]);
+        }
+
+        $arrData = ['output' => $address ];
+        return new JsonResponse($arrData);
+    }
+
 
 }
