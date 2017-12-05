@@ -677,76 +677,12 @@ class AjaxController extends Controller
     public function getAdditionsAction(Request $request)
     {
         $stuff = [];
-        $rows = $request->request->get('rows');
-        $raws = $request->request->get('raws');
-
-        if($rows){
-          $chunks = array_chunk($rows, 5);
-        } else {
-          $chunks = [0,0,0,0,0];
-        }
-
-
-        $colArray = [];
-
-        foreach($chunks as $chunk){
-          $colArray[] = $chunk;
-          if($raws){
-            $profit = 0;
-            $tax = 0;
-            $products = [];
-            foreach($raws as $raw){
-              $fullId = explode('_',$raw);
-              $id = $fullId[1];
-
-              $product = $this->getDoctrine()
-                ->getRepository('AppBundle:Product')
-                ->find($id);
-              if($product->getProductTax() == 1.16){
-                $tax += $this->getVat($product->getProductCost(), $product->getProductRetailPrice(), $chunk[3]);
-              } 
-              if($product->getProductTax() == 1) {
-                $tax += 0;
-              }
-              $profit += $this->getProfit($product->getProductCost(), $product->getProductRetailPrice(), $chunk[3]);
-              $products[] = $product->getId();
-            }
-          } else {
-            $tax = 0;
-            $profit = 0;
-          }
-        }
-
-        $priceSum = array_sum(array_column($colArray, 2));
-        $qtySum = array_sum(array_column($colArray, 3));
-        $totalSum = array_sum(array_column($colArray, 4));
-
-        $stuff['priceSum'] = $priceSum;
-        $stuff['qtySum'] = $qtySum;
-        $stuff['totalSum'] = $totalSum;
-        $stuff['chunks'] = $chunks;
-        //$stuff['colArray'] = $colArray;
-        if($raws){
-          $stuff['tax'] = $tax;
-          $stuff['profit'] = $profit;
-          $stuff['product'] = $id;
-          $stuff['products'] = $products;
-        }
-        $arrData = ['output' => $stuff ];
-        return new JsonResponse($arrData);
-    }
-
-    /**
-     * @Route("/get_additions_print", name="get_additions_and_print")
-     */
-    public function getAdditionsPrintAction(Request $request)
-    {
-        $stuff = [];
         $em = $this->getDoctrine()->getManager();
         $rows = $request->request->get('rows');
         $raws = $request->request->get('raws');
         $trans = $request->request->get('trans');
         $paid = $request->request->get('paid');
+        $paidAmt = preg_replace('/[^0-9]/', '', $paid);
         $receiptNumber = $request->request->get('receiptNumber');
 
         if($rows){
@@ -817,7 +753,8 @@ class AjaxController extends Controller
 
         $header = strip_tags($systSetting->getReceiptHeader());
         $footer = strip_tags($systSetting->getReceiptFooter());
-        $change = $paid - $totalSum;
+        $change = (int)$paidAmt - (int)$totalSum;
+
         $this->printReceipt($fineArray, $header, $trans, $totalSum, $tax, $paid, $change, $footer, $receiptNumber);
 
         $arrData = ['output' => $stuff ];
@@ -838,79 +775,89 @@ class AjaxController extends Controller
         return round($vat, 2);
     }
 
+    /**
+     * @Route("/open/drawer", name="open_cash_drawer")
+     */
     public function openCashbox()
     {
-        $connector = new FilePrintConnector("/dev/ttyACM0");
-        $printer = new Printer($connector);
-
-        /* Initialize */
-        $printer -> initialize();
-
-        /* Text */
-        $printer -> text("Hello world\n");
-        $printer -> close();
-
+        if (!file_exists("/dev/ttyACM0")) {
+            $message = "receipt printer not detected";
+        } else {
+          $connector = new FilePrintConnector("/dev/ttyACM0");
+          $printer = new Printer($connector);
+          $printer -> text("Opened cashbox.\n");
+          $printer -> cut();
+          $printer -> close();
+          $message = "opened cash box";
+        }
+        return new JsonResponse($message);
     }
 
     public function printReceipt($listArray, $header, $transaction, $tot, $tax, $paid, $change, $footer, $receiptNumber)
     {
-        /* Fill in your own connector here */
-        $connector = new FilePrintConnector("/dev/ttyACM0");
+        if (!file_exists("/dev/ttyACM0")) {
+            //do nothing
+        } else {
+          /* Fill in your own connector here */
+          $connector = new FilePrintConnector("/dev/ttyACM0");
 
-        /* Information for the receipt */
-        $items = $listArray;
-        $subtotal = new item('Total', $tot);
-        $tax = new item('Tax', $tax);
-        $paid = new item('Paid', $paid);
-        $change = new item('Change', $change);
-        $date = date("l jS \of F Y H:i:s");
+          /* Information for the receipt */
+          $items = $listArray;
+          $subtotal = new item('Total', $tot);
+          $tax = new item('Tax', $tax);
+          $paid = new item('Paid', $paid);
+          $change = new item('Change', $change);
+          $date = date("l jS \of F Y H:i:s");
 
-        /* Start the printer */
-        $printer = new Printer($connector);
+          /* Start the printer */
+          $printer = new Printer($connector);
 
-        /* Name of shop */
-        $printer -> selectPrintMode();
-        $printer -> text($header."\n");
-        $printer -> feed();
+          /* Name of shop */
+          $printer -> selectPrintMode();
+          $printer -> text($header."\n");
+          $printer -> feed();
 
-        /* Title of receipt */
-        $printer -> setEmphasis(true);
-        $printer -> text(strtoupper($transaction." #".$receiptNumber."\n"));
-        $printer -> setEmphasis(false);
+          /* Title of receipt */
+          $printer -> setEmphasis(true);
+          $printer -> text(strtoupper($transaction." #".$receiptNumber."\n"));
+          $printer -> setEmphasis(false);
 
-        /* Items */
-        $printer -> setJustification(Printer::JUSTIFY_LEFT);
-        $printer -> setEmphasis(true);
-        $printer -> text(new item('', '$'));
-        $printer -> setEmphasis(false);
-        foreach ($items as $item) {
-            $printer -> text($item);
+          /* Items */
+          $printer -> setJustification(Printer::JUSTIFY_LEFT);
+          $printer -> setEmphasis(true);
+          $printer -> text(new item('', '$'));
+          $printer -> setEmphasis(false);
+          foreach ($items as $item) {
+              $printer -> text($item);
+          }
+          $printer -> setEmphasis(true);
+          $printer -> text($subtotal);
+          $printer -> setEmphasis(false);
+          $printer -> feed();
+
+          /* Tax and total */
+          $printer -> text($tax);
+          $printer -> selectPrintMode();
+          $printer -> text($paid);
+          $printer -> selectPrintMode();
+          $printer -> text($change);
+          $printer -> selectPrintMode();
+
+          /* Footer */
+          $printer -> feed(2);
+          $printer -> setJustification(Printer::JUSTIFY_CENTER);
+          $printer -> text($footer."\n");
+          $printer -> feed(2);
+          $printer -> text($date . "\n");
+
+          /* Cut the receipt and open the cash drawer */
+          $printer -> cut();
+          $printer -> pulse();
+
+          $printer -> close();
+
         }
-        $printer -> setEmphasis(true);
-        $printer -> text($subtotal);
-        $printer -> setEmphasis(false);
-        $printer -> feed();
 
-        /* Tax and total */
-        $printer -> text($tax);
-        $printer -> selectPrintMode();
-        $printer -> text($paid);
-        $printer -> selectPrintMode();
-        $printer -> text($change);
-        $printer -> selectPrintMode();
-
-        /* Footer */
-        $printer -> feed(2);
-        $printer -> setJustification(Printer::JUSTIFY_CENTER);
-        $printer -> text($footer."\n");
-        $printer -> feed(2);
-        $printer -> text($date . "\n");
-
-        /* Cut the receipt and open the cash drawer */
-        $printer -> cut();
-        $printer -> pulse();
-
-        $printer -> close();
 
     }
         

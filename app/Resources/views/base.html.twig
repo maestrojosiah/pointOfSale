@@ -94,11 +94,67 @@
 
       <script>
       $(document).ready(function() {
-        $( "#sendPrint" ).click(function(e) {
-          $('#toPrint').printThis();
+          $( "#sendPrint" ).click(function() {
+            // $('#toPrint').printThis();
+          var receiptNumber = $("#receiptNumber").text();
+
+          var trans = 'Reprinted';
+          var $table = $("#sales");
+          $rowCells = $table.find("tbody tr td");
+          $rowFull = $table.find("tbody tr");
+          
+          var rows = [];
+          var raws = [];
+
+          $rowCells.each(function(k,v) {
+             rows[rows.length] = $(this).text();
+          });
+          
+          $rowFull.each(function(k,v) {
+             raws[raws.length] = $(this).attr('id');
+          });
+          
+          console.log($rowCells);
+          console.log($rowFull);
+          $.ajax({
+                url:'{{ (path('get_additions')) }}',
+                type: "POST",
+                dataType: "json",
+                data: {
+                    "rows": rows,
+                    "raws": raws,
+                    "trans": trans,
+                    "receiptNumber": receiptNumber,
+                },
+                async: true,
+                success: function (data)
+                {
+                  console.log(data.output);
+                }, 
+                error: function()
+                {
+                  console.log('something went wrong');
+                }
+            });
         });
         $( "#openDrawer" ).click(function(e) {
-          $('#emptyDiv').printThis();
+          $.ajax({
+              url:'{{ (path('open_cash_drawer')) }}',
+              type: "POST",
+              dataType: "json",
+              data: {
+                  "categories": "categories",
+              },
+              async: true,
+              success: function (data)
+              {
+                  console.log(data);
+                  $("#warning").html(data);
+              },
+              error: function () {
+                  $("#warning").html("<b>something's wrong</b>");
+              }
+          });
         });
       });
       $("#searchItem").focus();
@@ -559,7 +615,7 @@
       console.log("clicked on sales return submit button")
       var e = jQuery.Event("keypress");
       e.which = 13; 
-      $("#paidAmtPurchaseAndReturns").trigger(e);      
+      $("#paidAmt").trigger(e);      
     });
   </script>
   <script>
@@ -575,7 +631,7 @@
       console.log("clicked on stock in submit button")
       var e = jQuery.Event("keypress");
       e.which = 13; 
-      $("#paidAmtPurchaseAndReturns").trigger(e);
+      $("#paidAmt").trigger(e);
     });
   </script>
   <script>
@@ -720,145 +776,7 @@ $( "#paidAmt" ).keypress(function(e) {
       $("#infoParagraphAuto").html("<span class='text-danger'>Something is wrong with this sale. If you have made any sale entries, Hit F7 to input amount paid. Also make sure the amount paid is enough for the goods sold");
       $("#infoModalAuto").modal('show');
         $('#autoModal').addClass("disabled");
-
-      } else {
-        $("#paidAmt").blur();
-        var qtyTotal = $("#show_qty").text();
-        var total = $("#amountDue").text();
-        var tax = $("#show_tax").text();
-        var transaction = $("#transaction").text();
-        var purchaseDetails = $("#companyName").val()+'|'+$("#companyAddress").val();
-        var returnsDetails = $("#companyNameR").val()+'|'+$("#companyAddressR").val();
-        var referenceNumber = $("#referenceNumber").val();
-        var referenceNumberR = $("#referenceNumberR").val();
-
-        if($("#creditCardInput").val() != ""){
-          var creditCard = $("#creditCardInput").val();
-          var paymentMode = "creditCard";
-        } else {
-          var creditCard = 0;
-        } 
-        if($("#mpesaInput").val() != "") {
-          var mpesa = $("#mpesaInput").val();
-          var paymentMode = "mpesa";
-        } else {
-          var mpesa = 0;
-        }
-        if($("#checkInput").val() != "") {
-          var check = $("#checkInput").val();
-          var paymentMode = "check";
-        } else {
-          var check = 0;
-        }
-
-          $.ajax({
-          type: "POST",
-          url: '{{ (path('save_sale')) }}',
-          data: {
-            'qtyTotal': qtyTotal,
-            'total': total,
-            'tax': tax,
-            'mpesa': mpesa,
-            'check': check,
-            'creditCard': creditCard,
-            'paymentMode': paymentMode,
-            'transaction': transaction,
-            'purchaseDetails': purchaseDetails,
-            'returnsDetails': returnsDetails,
-            'referenceNumber': referenceNumber,
-            'referenceNumberR': referenceNumberR,
-          },
-          async: true,
-          success: function (data) 
-          {
-            console.log("fromAjaxSaveSale: "+data.output);
-            var receiptNumber = data.output;
-            $("#receiptTotal").html('<strong>' + $("#amountDue").text() +'</strong>');              
-            $("#receiptPaid").html('<strong>' + $("#paidAmt").val() +'</strong>');              
-            $("#receiptChange").html('<strong>' + $("#show_bal").text() +'</strong>');              
-            $("#receiptTax").html('<strong>' + $("#show_tax").text() +'</strong>');              
-            $("#transactionTitle").text($("#transaction").text());           
-            $("#receiptNumber").text(data.output);           
-            $("#receiptModal").modal('show'); 
-
-            var trans = $("#transaction").text();
-            var paid = $("#paidAmt").val();
-            var $table = $("#sales");
-            $rowCells = $table.find("tbody tr td");
-            $rowFull = $table.find("tbody tr");
-            
-            var rows = [];
-            var raws = [];
-
-            $rowCells.each(function(k,v) {
-               rows[rows.length] = $(this).text();
-            });
-            
-            $rowFull.each(function(k,v) {
-               raws[raws.length] = $(this).attr('id');
-            });
-            
-            $.ajax({
-                  url:'{{ (path('get_additions_and_print')) }}',
-                  type: "POST",
-                  dataType: "json",
-                  data: {
-                      "rows": rows,
-                      "raws": raws,
-                      "trans": trans,
-                      "paid": paid,
-                      "receiptNumber": receiptNumber,
-                  },
-                  async: true,
-                  success: function (data)
-                  {
-                    console.log(data.output.fineArray);
-                    var transaction = $("#transaction").text();
-                    var arrayLength = data.output.chunks.length;
-                    var stock = new Array();
-                    for (var i = 0; i < arrayLength; i++) {                          
-                        data.output.chunks[i].splice(0, 1, data.output.products[i]);
-                        stock.push(data.output.chunks[i]);
-                    }
-                    var stockString = JSON.stringify(stock);
-                      $.ajax({
-                      url:'{{ (path('save_stock')) }}',
-                      type: "POST",
-                      dataType: "json",
-                      data: {
-                          "stock": stock,
-                          "transaction": transaction,
-                      },
-                      async: true,
-                      success: function (data)
-                      {
-                        console.log("fromAjaxSaveStock: "+data.output);
-                        // $("#sendPrint").click();
-                      }
-                    });
-
-                  }
-              });
-
-            }
-        });
-
-    }
-  }
-  });
-
-  </script>
-<script type="text/javascript">
-$( "#paidAmtPurchaseAndReturns" ).keypress(function(e) {
-    var key = e.which;
-    if(key == 13) {
-    var paidAmt =    $("#paidAmt").val();
-
-    if(($("#transaction").text() == "Sale") && (parseInt($("#paidAmt").val()) < parseInt($("#amountDue").text()) ) ){
-      $("#infoParagraphAuto").html("<span class='text-danger'>Something is wrong with this sale. If you have made any sale entries, Hit F7 to input amount paid. Also make sure the amount paid is enough for the goods sold");
-      $("#infoModalAuto").modal('show');
-        $('#autoModal').addClass("disabled");
-
+        console.log('couldn\'t process the sale because of some errors');
       } else {
         $("#paidAmt").blur();
         var qtyTotal = $("#show_qty").text();

@@ -84,7 +84,7 @@ You can contact me with my username at Gmail.
 
 ## Authors
 
-* **Maestro Josiah** - *Initial work* - [PurpleBooth](https://github.com/maestrojosiah)
+* **Maestro Josiah** - *Initial work* - [Maestrojosiah](https://github.com/maestrojosiah)
 
 ## License
 

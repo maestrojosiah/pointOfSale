@@ -6,7 +6,7 @@
 <div id="receiptModal" class="">
     <div class="container">
         <div class="row">
-            <div class="well col-xs-10 col-sm-10 col-md-6 col-xs-offset-1 col-sm-offset-1">
+            <div id="toPrint" class="well col-xs-10 col-sm-10 col-md-6 col-xs-offset-1 col-sm-offset-1">
                 <div class="row">
                     <div class="col-xs-6 col-sm-6 col-md-6">
                         <address>
@@ -18,56 +18,63 @@
                             <em>Date: {{ data.lastSale.onDate|date('d - m -Y') }}</em>
                         </p>
                         <p>
-                            <em>Receipt #: {{ data.lastSale.id }}</em>
+                            <em>Receipt #: <span id="receiptNumber">{{ data.lastSale.id }}</span></em>
                         </p>
                     </div>
                 </div>
                 <div class="row">
                     <div class="text-center">
-                        <h1>Receipt</h1>
+                        <h1 id="transactionTitle">Receipt</h1>
                     </div>
-                    <table class="table table-hover" id="receiptTable">
+                    <table class="table table-hover" id="sales">
                         <thead>
                             <tr>
+                                <th>#</th>
                                 <th>Item</th>
                                 <th>Qty</th>
                                 <th class="text-center">Price</th>
                                 <th class="text-center">Total</th>
                             </tr>
                         </thead>
-                        <tbody>
-                        	{% for item in data.lastSale.stocks %}
-                        		<tr>
-                        			<td>{{ item.product }}</td>
-                        			<td>{{ item.quantity }}</td>
-	                                <th class="text-center">{{ item.retailCost }}</th>
-	                                <th class="text-center">{{ item.retailCost * item.quantity }}</th>
-                        		</tr>
-                        	{% endfor %}
+                        <tbody id="records">
+                            {% set count = 0 %}
+                            {% for item in data.lastSale.stocks %}
+                                {% set count = count + 1 %}
+                                <tr>
+                                    <td>{{ count }}</td>
+                                    <td>{{ item.product.productCode }} | {{ item.product }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td class="text-center">{{ item.retailCost }}</td>
+                                    <td class="text-center">{{ item.retailCost * item.quantity }}</td>
+                                </tr>
+                            {% endfor %}
                         </tbody>
                         <tbody>
-                            <tr>
+                            <tr id="totalsRecord">
                                 <td>   </td>
                                 <td>   </td>
                                 <td class="text-right">
                                 <p>
                                     <strong>Total: </strong>
                                 </p>
+                                <p>
                                 </td>
                                 <td class="text-center">
                                 <p id="receiptTotal">{{ data.lastSale.totalSale }}</p>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
+                    <p>{{ data.systSetting.receiptFooter|raw }}</p>
                 </div>
             </div>
             <div class="well col-xs-10 col-sm-10 col-md-6 col-xs-offset-1 col-sm-offset-1">
                 <div class="btn-group" role="group" aria-label="...">
-                    <button type="button" class="btn btn-success btn-lg">
-                        Print  <span class="glyphicon glyphicon-chevron-right"></span>
+                    <button type="button" class="btn btn-info btn-lg" id="sendPrint">
+                        Print [F1]  <span class="glyphicon glyphicon-chevron-right"></span>
                     </button>
                     <a href="{{path('homepage')}}" class="btn btn-success btn-lg">
-                        Back to POS  <span class="glyphicon glyphicon-chevron-left"></span>
+                        Back to POS [F8]  <span class="glyphicon glyphicon-chevron-left"></span>
                     </a>
                 </div>
             </div>
