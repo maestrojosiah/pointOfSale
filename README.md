@@ -1,4 +1,4 @@
-# Project Title
+# pointOfSale
 
 pointOfSale is a symfony 3 application that is designed for small businesses who are tired of the heavy POS softwares with a lot of things that they don't need. It helps keep track of sales, products, stock movement and much more. It generates reports in pdf format for printing. mpesa, cheque and credit card reports are included.
 
@@ -74,6 +74,7 @@ It is very easy to use. See the doc on the left sidebar after installing.
 ## Deployment
 
 For deployment, see tutorials on deploying symfony apps, especially from digital ocean website
+You can contact me with my username at Gmail.
 
 ## Built With
 
