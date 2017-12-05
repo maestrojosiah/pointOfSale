@@ -838,6 +838,20 @@ class AjaxController extends Controller
         return round($vat, 2);
     }
 
+    public function openCashbox()
+    {
+        $connector = new FilePrintConnector("/dev/ttyACM0");
+        $printer = new Printer($connector);
+
+        /* Initialize */
+        $printer -> initialize();
+
+        /* Text */
+        $printer -> text("Hello world\n");
+        $printer -> close();
+
+    }
+
     public function printReceipt($listArray, $header, $transaction, $tot, $tax, $paid, $change, $footer, $receiptNumber)
     {
         /* Fill in your own connector here */
@@ -849,25 +863,14 @@ class AjaxController extends Controller
         $tax = new item('Tax', $tax);
         $paid = new item('Paid', $paid);
         $change = new item('Change', $change);
-        // $total = new item('Total', '14.25', true);
-        /* Date is kept the same for testing */
-        // $date = date('l jS \of F Y h:i:s A');
         $date = date("l jS \of F Y H:i:s");
 
         /* Start the printer */
-        // $logo = EscposImage::load("resources/escpos-php.png", false);
         $printer = new Printer($connector);
-
-        /* Print top logo */
-        $printer -> setJustification(Printer::JUSTIFY_CENTER);
-        // $printer -> graphics($logo);
 
         /* Name of shop */
         $printer -> selectPrintMode();
-        // $printer -> selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
         $printer -> text($header."\n");
-        // $printer -> selectPrintMode();
-        // $printer -> text("Shop No. 42.\n");
         $printer -> feed();
 
         /* Title of receipt */
