@@ -31,8 +31,8 @@
                             <tr>
                                 <th>#</th>
                                 <th>Item</th>
-                                <th>Qty</th>
                                 <th class="text-center">Price</th>
+                                <th>Qty</th>
                                 <th class="text-center">Total</th>
                             </tr>
                         </thead>
@@ -40,31 +40,32 @@
                             {% set count = 0 %}
                             {% for item in data.lastSale.stocks %}
                                 {% set count = count + 1 %}
-                                <tr>
-                                    <td>{{ count }}</td>
-                                    <td>{{ item.product.productCode }} | {{ item.product }}</td>
-                                    <td>{{ item.quantity }}</td>
-                                    <td class="text-center">{{ item.retailCost }}</td>
-                                    <td class="text-center">{{ item.retailCost * item.quantity }}</td>
+                                <tr id="Rw_{{item.product.id}}">
+                                    <td><span id="Cl_{{item.product.id}}">{{ count }}</span></td>
+                                    <td><span id="IN_{{item.product.id}}">{{ item.product.productCode }} | {{ item.product }}</span></td>
+                                    <td><span id="Pr_{{item.product.id}}" class="text-center">{{ item.retailCost }}</span></td>
+                                    <td><span id="Qt_{{item.product.id}}">{{ item.quantity }}</span></td>
+                                    <td><span id="Tl_{{item.product.id}}" class="text-center">{{ item.retailCost * item.quantity }}</span></td>
                                 </tr>
                             {% endfor %}
                         </tbody>
-                        <tbody>
-                            <tr id="totalsRecord">
-                                <td>   </td>
-                                <td>   </td>
-                                <td class="text-right">
-                                <p>
-                                    <strong>Total: </strong>
-                                </p>
-                                <p>
-                                </td>
-                                <td class="text-center">
-                                <p id="receiptTotal">{{ data.lastSale.totalSale }}</p>
-                                </td>
-                            </tr>
-                        </tbody>
                     </table>
+                    <table class="table table-hover" id="sales">
+                       <th>
+                        <td>   </td>
+                        <td>   </td>
+                        <td class="text-right">
+                        <p>
+                            <strong>Total: </strong>
+                        </p>
+                        <p>
+                        </td>
+                        <td class="text-center">
+                        <p id="receiptTotal">{{ data.lastSale.totalSale }}</p>
+                        </td>
+                    </th>
+                </table>
+
                     <p>{{ data.systSetting.receiptFooter|raw }}</p>
                 </div>
             </div>

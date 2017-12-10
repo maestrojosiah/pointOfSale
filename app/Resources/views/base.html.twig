@@ -114,8 +114,8 @@
              raws[raws.length] = $(this).attr('id');
           });
           
-          console.log($rowCells);
-          console.log($rowFull);
+          console.log(rows);
+          console.log(raws);
           $.ajax({
                 url:'{{ (path('get_additions')) }}',
                 type: "POST",
@@ -123,6 +123,7 @@
                 data: {
                     "rows": rows,
                     "raws": raws,
+                    "printer": 'printer',
                     "trans": trans,
                     "receiptNumber": receiptNumber,
                 },
@@ -860,6 +861,7 @@ $( "#paidAmt" ).keypress(function(e) {
                   dataType: "json",
                   data: {
                       "rows": rows,
+                      "printer": 'printer',
                       "raws": raws,
                       "trans": trans,
                       "paid": paid,

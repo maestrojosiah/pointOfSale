@@ -1,11 +1,12 @@
-{% extends 'base.html.twig' %}
+{% extends 'base2.html.twig' %}
 {% block body %}
 {% if error %}
     <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
 {% endif %}
 
-<div id="page-wrapper">
-      <form class="form-signin" action="{{ path('login') }}" method="post">
+<div style="background-image:url({{asset('images/abc.jpg')}}); background-repeat:no-repeat; background-size:cover; min-height:800px;">
+      <div class="row">
+      <form class="form-signin panel col-md-6 col-md-offset-5" action="{{ path('login') }}" method="post" style="margin-left:37%;">
 
         <h2 class="form-signin-heading">Please log in</h2>
         <select id="select_email" class="form-control">
@@ -28,6 +29,7 @@
         <a href="{{ path('user_registration') }}">First Admin User?</a>
         {% endif %}
       </form>
+    </div>
 </div>
 {% endblock %}
 {% block javascripts %}

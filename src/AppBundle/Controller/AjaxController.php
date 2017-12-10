@@ -681,6 +681,7 @@ class AjaxController extends Controller
         $rows = $request->request->get('rows');
         $raws = $request->request->get('raws');
         $trans = $request->request->get('trans');
+        $printer = $request->request->get('printer');
         $paid = $request->request->get('paid');
         $paidAmt = preg_replace('/[^0-9]/', '', $paid);
         $receiptNumber = $request->request->get('receiptNumber');
@@ -755,7 +756,9 @@ class AjaxController extends Controller
         $footer = strip_tags($systSetting->getReceiptFooter());
         $change = (int)$paidAmt - (int)$totalSum;
 
-        $this->printReceipt($fineArray, $header, $trans, $totalSum, $tax, $paid, $change, $footer, $receiptNumber);
+        if($printer){
+          $this->printReceipt($fineArray, $header, $trans, $totalSum, $tax, $paid, $change, $footer, $receiptNumber);
+        }
 
         $arrData = ['output' => $stuff ];
         return new JsonResponse($arrData);
@@ -783,12 +786,14 @@ class AjaxController extends Controller
         if (!file_exists("/dev/ttyACM0")) {
             $message = "receipt printer not detected";
         } else {
+          $message = "opened cash box";
           $connector = new FilePrintConnector("/dev/ttyACM0");
           $printer = new Printer($connector);
           $printer -> text("Opened cashbox.\n");
+          $printer -> feed();
           $printer -> cut();
+          $printer -> pulse();
           $printer -> close();
-          $message = "opened cash box";
         }
         return new JsonResponse($message);
     }
