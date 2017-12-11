@@ -1,8 +1,9 @@
-{% extends 'base.html.twig' %}
+{% extends 'base2.html.twig' %}
 {% block body %}
 {{ include('templates/nav.html.twig') }}			 
-<div id="page-wrapper">
-    <div class="col-lg-6">
+<div style="background-image:url({{asset('images/abc.jpg')}}); background-repeat:no-repeat; background-size:cover; min-height:1000px;">
+      <div class="row">
+    <div class="panel col-md-6 col-md-offset-5" style="margin-left:27%;">
 	{{ form_start(form, {'method': 'post', 'action': path('user_registration'), 'attr': {'class': 'form-signin' }} ) }}
         <h2 class="form-signin-heading">Add User</h2>
         <label for="f_name" class="sr-only">First Name</label>
