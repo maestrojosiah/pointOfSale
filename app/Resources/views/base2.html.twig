@@ -43,6 +43,29 @@
     <body>
     {% block body %}
     {% endblock %}
+            <!-- jQuery -->
+      <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
+
+      <!-- Bootstrap Core JavaScript -->
+      <script src="{{ asset('vendor/bootstrap/js/bootstrap.min.js') }}"></script>
+
+      <!-- Notification javascript - notiny -->
+      <script src="{{ asset('notiny/notiny.min.js') }}"></script>
+
+      <!-- Custom Theme JavaScript -->
+      <script src="{{ asset('dist/js/sb-admin-2.js') }}"></script>
+      
+     <!-- DataTables JavaScript -->
+      <script src="{{ asset('vendor/datatables/js/jquery.dataTables.min.js') }}"></script>
+      <script src="{{ asset('vendor/datatables-plugins/dataTables.bootstrap.min.js') }}"></script>
+      <script src="{{ asset('vendor/datatables-responsive/dataTables.responsive.js') }}"></script>
+
+    <!-- Keyboard Shortcut Javascript -->
+      <script src="{{ asset('js/shortcut.js') }}"></script>
+      <script src="{{ asset('js/printThis.js') }}"></script>
+      <script src="{{ asset('pickadate/lib/picker.js') }}"></script>
+      <script src="{{ asset('pickadate/lib/picker.date.js') }}"></script>
+
     {% block javascripts %}
     {% endblock %}
 </body>

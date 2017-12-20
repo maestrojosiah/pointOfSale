@@ -3,65 +3,85 @@
 {{ include('templates/nav.html.twig') }}       
 <div id="page-wrapper">
 <div class="panel-body">
-<!-- Large modal -->
+<div id="receiptModal" class="">
     <div class="container">
         <div class="row">
-            <div class="well col-xs-10 col-sm-10 col-md-6 col-xs-offset-1 col-sm-offset-1">
+            <div id="toPrint" class="well col-xs-10 col-sm-10 col-md-6 col-xs-offset-1 col-sm-offset-1">
                 <div class="row">
                     <div class="col-xs-6 col-sm-6 col-md-6">
                         <address>
+                            {{ data.systSetting.receiptHeader|raw }}
                         </address>
                     </div>
                     <div class="col-xs-6 col-sm-6 col-md-6 text-right">
                         <p>
-                            <em>Date: {{ data.sale.onDate|date('Y-m-d') }}</em>
+                            <em>Date: {{ data.sale.onDate|date('d - m -Y') }}</em>
                         </p>
                         <p>
-                            <em>Receipt #: {{data.sale.id}}</em>
+                            <em>Receipt #: <span id="receiptNumber">{{ data.sale.id }}</span></em>
                         </p>
                     </div>
                 </div>
                 <div class="row">
                     <div class="text-center">
-                        <h1>{{ data.sale.paymentMode }} </h1>
+                        <h1 id="transactionTitle">Receipt</h1>
                     </div>
-                    <table class="table table-hover" id="receiptTable">
+                    <table class="table table-hover" id="sales">
                         <thead>
                             <tr>
+                                <th>#</th>
                                 <th>Item</th>
-                                <th>Qty</th>
                                 <th class="text-center">Price</th>
+                                <th>Qty</th>
                                 <th class="text-center">Total</th>
                             </tr>
                         </thead>
-                        <tbody>
-                        	{% for stock in data.stocks %}
-                        		<tr>
-                        			<td>{{stock.product}}</td>
-                        			<td>{{stock.quantity}}</td>
-                        			<td class="text-center">{{stock.retailCost}}</td>
-                        			<td class="text-center">{{ stock.retailCost * stock.quantity }}</td>
-                        		</tr>
-                        	{% endfor %}
-                        </tbody>
-                        <tbody>
-                            <tr>
-                                <td>   </td>
-                                <td>   </td>
-                                <td class="text-right">
-                                <p>
-                                    <strong>Total: </strong>
-                                </p>
-                                </td>
-                                <td class="text-center">
-                                <p id="receiptTotal">{{data.sale.totalSale}}</p>
-                            </tr>
+                        <tbody id="records">
+                            {% set count = 0 %}
+                            {% for item in data.sale.stocks %}
+                                {% set count = count + 1 %}
+                                <tr id="Rw_{{item.product.id}}">
+                                    <td><span id="Cl_{{item.product.id}}">{{ count }}</span></td>
+                                    <td><span id="IN_{{item.product.id}}">{{ item.product.productCode }} | {{ item.product }}</span></td>
+                                    <td><span id="Pr_{{item.product.id}}" class="text-center">{{ item.retailCost }}</span></td>
+                                    <td><span id="Qt_{{item.product.id}}">{{ item.quantity }}</span></td>
+                                    <td><span id="Tl_{{item.product.id}}" class="text-center">{{ item.retailCost * item.quantity }}</span></td>
+                                </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
+                    <table class="table table-hover" id="sales">
+                       <th>
+                        <td>   </td>
+                        <td>   </td>
+                        <td class="text-right">
+                        <p>
+                            <strong>Total: </strong>
+                        </p>
+                        <p>
+                        </td>
+                        <td class="text-center">
+                        <p id="receiptTotal">{{ data.sale.totalSale }}</p>
+                        </td>
+                    </th>
+                </table>
+
+                    <p>{{ data.systSetting.receiptFooter|raw }}</p>
+                </div>
+            </div>
+            <div class="well col-xs-10 col-sm-10 col-md-6 col-xs-offset-1 col-sm-offset-1">
+                <div class="btn-group" role="group" aria-label="...">
+                    <button type="button" class="btn btn-info btn-lg" id="sendPrint">
+                        Print [F1]  <span class="glyphicon glyphicon-chevron-right"></span>
+                    </button>
+                    <a href="{{path('homepage')}}" class="btn btn-success btn-lg">
+                        Back to POS [F8]  <span class="glyphicon glyphicon-chevron-left"></span>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
+</div>
 </div>
 </div>
 {% endblock %}

@@ -31,6 +31,7 @@ $(document).on("click", '.toggleSale', function(){
         console.log($this.text());
         $("#action").html(
             '<button type="button" id="salesReturn" class="btn btn-primary"><strong>Submit Return</strong></button>'
+            + '<h1>You are now recording Returns. Click on "Return" to go to Purchases</h1>'
         );
         $("#rightSide").hide();
         $("#totalsRecord").hide();
@@ -43,6 +44,7 @@ $(document).on("click", '.toggleSale', function(){
         console.log($this.text());      
         $("#action").html(
             '<button type="button" id="stockIn" class="btn btn-primary"><strong>Submit Purchase</strong></button>'
+            + '<h1>You are now recording Purchases. Click on "Purchase" to go to Sales</h1>'
         );
         $("#rightSide").hide();
         $("#newProduct").show();

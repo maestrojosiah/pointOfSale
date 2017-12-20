@@ -19,6 +19,7 @@ class SaleController extends Controller
 	public function viewAction(Request $request, $saleId)
 	{
 		$data = [];
+        $user = $this->get('security.token_storage')->getToken()->getUser();
 		$sale = $this->getDoctrine()
 			->getRepository('AppBundle:Sale')
 			->find($saleId);
@@ -28,6 +29,11 @@ class SaleController extends Controller
 			->findAllForThisSale($sale);
 		$data['sale'] = $sale;
 		$data['stocks'] = $stocks;
+        $systSetting = $this->getDoctrine()
+            ->getRepository('AppBundle:SystSetting')
+            ->settingsForThisUser($user);
+
+        $data['systSetting'] = $systSetting;
 
 		return $this->render('sale/view.html.twig', ['data' => $data,] );
 

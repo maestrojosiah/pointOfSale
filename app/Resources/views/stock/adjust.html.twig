@@ -146,6 +146,44 @@
 
       });
       </script>
+    <script>
+        $(document).on('keypress', '#searchItemAdj', function(e){
+           var key = e.which;
+           if(key == 13){ 
+            var itemsFromCodeStore = $('#codeStore').text().split('|');
+            var code = itemsFromCodeStore[0];
+            var qtyRemaining = itemsFromCodeStore[1];
+            console.log('this is the quantity of stock remaining after hitting ENTER:'+qtyRemaining);
+            $.ajax({
+                url:'{{ (path('ajax_request_search_adj')) }}',
+                type: "POST",
+                dataType: "json",
+                data: {
+                    "code": code,
+                    "qtyRemaining": qtyRemaining,
+                },
+                async: true,
+                success: function (data)
+                {
+                    console.log("ajaxSearch"+data.output.row)
+                    if($('#transaction').text() == 'Sale' && data.output.message == 'warningLowStock'){
+                      alert("Not enough in stock to sell this item")
+                    } else {
+                      $('#codeStore').text("");
+                      $('#sales > tbody:last-child').append(data.output.row);
+                      $('#searchItemAdj').val('');                    
+                      $("#searchResults").click();                    
+                      $('#tableToArrayAdj').click();
+                    }
+                    
+                }
+            });
+            return false;
+          }
+        });
+
+    </script>
+
       <script>
         $(document).on('click', '[id^="adjAjax_"]', function(){
             that = $(this);
@@ -165,8 +203,8 @@
                     $('#tableToArrayAdj').click();
                 }
             });
-            $('#searchItem').val(''); 
-            $('#searchItem').focus(); 
+            $('#searchItemAdj').val(''); 
+            $('#searchItemAdj').focus(); 
             return false;
 
         });
@@ -188,7 +226,7 @@
       total.text(price*newValue)
 
       $("#changeValueModalAdj").modal('hide');
-      $('#searchItem').focus(); 
+      $('#searchItemAdj').focus(); 
       $('#tableToArrayAdj').click();     
     });
   </script>
@@ -215,7 +253,7 @@
       console.log(adjustable.text());
 
       $("#changeValueModalAdj").modal('hide');
-      $('#searchItem').focus(); 
+      $('#searchItemAdj').focus(); 
       $('#tableToArrayAdj').click();                 
         return false;
       }
@@ -241,7 +279,7 @@
       total.text(price*difference)
 
       $("#changeValueModalEAdj").modal('hide');
-      $('#searchItem').focus(); 
+      $('#searchItemAdj').focus(); 
       $('#tableToArrayEAdj').click();     
     });
   </script>
@@ -269,7 +307,7 @@
       console.log(difference);
 
       $("#changeValueModalEAdj").modal('hide');
-      $('#searchItem').focus(); 
+      $('#searchItemAdj').focus(); 
       $('#tableToArrayEAdj').click();                 
         return false;
       }

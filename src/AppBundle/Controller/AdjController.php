@@ -303,5 +303,84 @@ class AdjController extends Controller
         return new JsonResponse($arrData);
     }
 
+    /**
+     * @Route("/ajax_request_search_adj", name="ajax_request_search_adj")
+     */
+    public function tableSearchRowAction(Request $request)
+    {
+        $data = [];
+        $code = $request->request->get('code');
+        $qtyRemaining = $request->request->get('qtyRemaining');
+
+
+        $product = $this->getDoctrine()
+            ->getRepository('AppBundle:Product')
+            ->findOneBy(
+              array('productCode' => $code, 'deleted' => 0),
+              array('id' => 'ASC')
+            );
+        if(!$product){
+          $arrData = [];
+        } else {
+          $em = $this->getDoctrine()->getManager();
+
+          $stockIn = $em->getRepository('AppBundle:Stock')
+              ->findAllStockForThisProduct($product, "sto");
+          $stockSold = $em->getRepository('AppBundle:Stock')
+              ->findAllStockForThisProduct($product, "sal");
+          $stockReturned = $em->getRepository('AppBundle:Stock')
+              ->findAllStockForThisProduct($product, "ret");
+          $stockAdjusted = $em->getRepository('AppBundle:Stock')
+              ->findAllStockForThisProduct($product, "adj");
+
+          $returns        =  $stockReturned[0]['total'];
+          $sales          =  $stockSold[0]['total'];
+          $stock          =  $stockIn[0]['total'];
+          $adjustments    =  $stockAdjusted[0]['total'];
+          $id             =  $product->getId();
+
+          $goodsAvailable = $stock + $adjustments - $returns;
+          if($goodsAvailable > 0) {
+            $goodsSold      = $sales;
+            $balance        = $goodsAvailable - $goodsSold; 
+            $remainingStock = $balance / $product->getProductRetailPrice();       
+          } else {
+            $remainingStock = 0;
+          }
+
+          $data['remainingStock'] = $remainingStock;
+
+          if($remainingStock > 1){
+            $data['message'] = 'OK';
+          } else {
+            $data['message'] = "warningLowStock";
+          }
+
+          $itemName   =     $product->getProductName();
+          $itemCode   =     $product->getProductCode();
+          $price      =     $product->getProductRetailPrice();
+          $quantity   =     1;
+          $total      =     $price*$quantity;
+
+          $data['row'] = " 
+          <tr id='Rw_$id'> 
+            <td><span id='Cl_$id' class='btn btn-secondary glyphicon glyphicon-remove' aria-hidden='true'></span></td>
+            <td><span id='IN_$id' class='btn btn-secondary'><b>".$itemCode."</b> | ".$itemName."</span></td>
+            <td><span id='Pr_$id' class='btn btn-secondary'>".$price."</span></td>
+            <td><span id='RS_$id' class='btn btn-danger'>".$remainingStock."</span></td>
+            <td><span id='RSE_$id' class='btn btn-success'>".$remainingStock."</span></td>
+            <td><span id='QtAdj_$id' class='btn btn-info'>".$quantity."</span></td>
+            <td><span id='Tl_$id' class='btn btn-secondary'>".$total."</span></td>
+          </tr>";
+
+          $arrData = ['output' => $data ];
+
+        }
+
+        return new JsonResponse($arrData);
+    
+
+    }
+
 
 }
